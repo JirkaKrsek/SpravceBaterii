@@ -1,10 +1,10 @@
 # Správce baterií
 
-Tato webová aplikace slouží ke správì spotøebních baterií (nenabíjecích i nabíjecích).
+Tato webová aplikace slouží ke správì spotøebních baterií - jednorázových i nabíjecích.
+
+Poskytuje pøehled o jejich stavu.
 
 Aplikace umožòuje uživatelùm evidovat umístìní, zaøízení a baterie.
-
-Poskytuje pøehled o stavu baterií.
 
 
 ## Technologie
@@ -20,5 +20,5 @@ Aplikace bude po dokonèení nasazena na webový hosting pro veøejné použití.
 ## Autor
 **Jiøí Krsek** (https://github.com/JirkaKrsek)
 
-## Poznámky
+## Další informace
 V repozitáøi v **Issues** je dostupný model databáze.
