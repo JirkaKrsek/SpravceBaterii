@@ -33,8 +33,10 @@ namespace SpravceBaterii.Data.Models
 
         public DisposableOrRechargeableEnum DisposableBatteryOrRechargeableBattery { get; set; }
 
+        public int? DisposableBatteryId { get; set; }
         public DisposableBattery? DisposableBattery { get; set; }
 
+        public int? RechargeableBatteryId { get; set; }
         public RechargeableBattery? RechargeableBattery { get; set; }
     }
 }
