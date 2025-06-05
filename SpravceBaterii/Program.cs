@@ -1,10 +1,28 @@
+using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Components;
+using SpravceBaterii.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
+// Název systémové promìnné pro pøístup k databázi
+string systemVariableName = "SpravceBateriiDatabaze";
+
+// Naètení connection stringu ze systémové promìnné
+var connectionString = Environment.GetEnvironmentVariable(systemVariableName);
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("The environment variable " + systemVariableName + " is missing or empty.");
+}
+
+// Registrace DbContext s connection stringem
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+
 
 var app = builder.Build();
 
