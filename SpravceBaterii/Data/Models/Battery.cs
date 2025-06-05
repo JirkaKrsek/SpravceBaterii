@@ -31,7 +31,7 @@ namespace SpravceBaterii.Data.Models
         [ForeignKey("ChemicalCompositionId")]
         public ChemicalComposition? ChemicalComposition { get; set; }
 
-        public DisposableOrRechargeableEnum DisposableBatteryOrRechargeableBattery { get; set; }
+        public bool IsRechargeable { get; set; }
 
         public int? DisposableBatteryId { get; set; }
         public DisposableBattery? DisposableBattery { get; set; }
