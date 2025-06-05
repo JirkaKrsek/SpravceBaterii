@@ -1,0 +1,32 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SpravceBaterii.Data.Models
+{
+    public class Device
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Name { get; set; }
+
+        [Required]
+        [StringLength(200)]
+        public string Description { get; set; }
+
+        public int BatteryCount { get; set; }
+
+        [MaxLength(100)]
+        public string? Manufacturer { get; set; }
+
+        public int LocationId { get; set; }
+
+        [ForeignKey("LocationId")]
+        public Location Location { get; set; }
+
+        public ICollection<Battery>? Batteries { get; set; }
+    }
+}
