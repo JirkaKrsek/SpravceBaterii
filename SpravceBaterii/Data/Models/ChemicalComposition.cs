@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpravceBaterii.Data.Models
 {
+    /// <summary>
+    /// Modelová třída pro chemické složení baterie
+    /// </summary>
     public class ChemicalComposition
     {
         [Key]

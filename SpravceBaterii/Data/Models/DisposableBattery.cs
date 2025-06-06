@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpravceBaterii.Data.Models
 {
+    /// <summary>
+    /// Modelová třída pro jednorázovou baterii
+    /// </summary>
     public class DisposableBattery
     {
         [Key]
