@@ -11,7 +11,7 @@ using SpravceBaterii.Data;
 
 namespace SpravceBaterii.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250606093339_AddBatteryTypeConstraint")]
     partial class AddBatteryTypeConstraint
     {

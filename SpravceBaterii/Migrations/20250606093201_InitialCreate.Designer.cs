@@ -11,7 +11,7 @@ using SpravceBaterii.Data;
 
 namespace SpravceBaterii.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250606093201_InitialCreate")]
     partial class InitialCreate
     {

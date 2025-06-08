@@ -21,7 +21,7 @@ if (string.IsNullOrEmpty(connectionString))
 }
 
 // Registrace DbContext s connection stringem
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 
 var app = builder.Build();
