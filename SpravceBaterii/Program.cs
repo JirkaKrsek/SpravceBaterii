@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Components;
 using SpravceBaterii.Data;
+using SpravceBaterii.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,10 @@ if (string.IsNullOrEmpty(connectionString))
 // Registrace DbContext s connection stringem
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
+// Nastavení Identity uživatele
+builder.Services.AddDefaultIdentity<ApplicationUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
 
 var app = builder.Build();
 
@@ -36,6 +41,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Pøidání autentizace a autorizace
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAntiforgery();
 
