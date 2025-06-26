@@ -1,13 +1,17 @@
 ﻿@page "/prihlaseni"
-
+@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
 @using System.ComponentModel.DataAnnotations
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager Navigation
 
 <PageTitle>Přihlášení</PageTitle>
 
 <h1>Přihlášení</h1>
 
 <!--Formulář pro registraci-->
-<EditForm Model="@Input" FormName="LoginForm">
+<EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm">
 	<DataAnnotationsValidator></DataAnnotationsValidator>
 	<ValidationSummary></ValidationSummary>
 
@@ -23,6 +27,19 @@
 @code {
 	[SupplyParameterFromForm]
 	private InputModel Input { get; set; } = new InputModel();
+
+	/// <summary>
+	/// Přihlášení existujícího uživatele pomocí emailu a hesla
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task LoginUser()
+	{
+		SignInResult result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, false, true);
+		if (result.Succeeded)
+		{
+			Navigation.NavigateTo("/");
+		}
+	}
 
 	/// <summary>
 	/// Model pro vstupní data z formuláře pro přihlášení
