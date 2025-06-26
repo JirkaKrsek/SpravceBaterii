@@ -1,0 +1,23 @@
+﻿@page "/registrace"
+
+<PageTitle>Registrace</PageTitle>
+
+<h1>Registrace</h1>
+
+<!--Formulář pro registraci-->
+<EditForm FormName="RegisterForm">
+	<DataAnnotationsValidator></DataAnnotationsValidator>
+	<ValidationSummary></ValidationSummary>
+
+	<label for="input-email">Email: </label>
+	<InputText id="input-email" type="email" placeholder="Email@email.com" required></InputText>
+	
+	<label for="input-password">Heslo: </label>
+	<InputText id="input-password" type="password" placeholder="TajneHeslo" required></InputText>
+
+	<button type="submit">Registrovat se</button>
+</EditForm>
+
+@code {
+
+}
