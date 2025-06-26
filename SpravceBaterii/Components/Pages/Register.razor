@@ -1,13 +1,18 @@
 ﻿@page "/registrace"
-
+@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
 @using System.ComponentModel.DataAnnotations
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager Navigation
 
 <PageTitle>Registrace</PageTitle>
 
 <h1>Registrace</h1>
 
 <!--Formulář pro registraci-->
-<EditForm Model="@Input" FormName="RegisterForm">
+<EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
@@ -23,6 +28,26 @@
 @code {
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new InputModel();
+
+    /// <summary>
+    /// Registrace nového uživatele pomocí emailu a hesla
+    /// Pokud registrace proběhne úspěšně, vytvořený uživatel je automaticky přihlášen
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    private async Task RegisterUser()
+    {
+        ApplicationUser newUser = new ApplicationUser();
+        newUser.UserName = Input.Email;
+        newUser.Email = Input.Email;
+
+        IdentityResult result = await UserManager.CreateAsync(newUser, Input.Password);
+
+        if (result.Succeeded)
+        {
+            await SignInManager.SignInAsync(newUser, false);
+            Navigation.NavigateTo("/");
+        }
+    }
 
     /// <summary>
     /// Model pro vstupní data z formuláře pro registraci
