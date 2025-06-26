@@ -1,23 +1,38 @@
 ﻿@page "/registrace"
 
+@using System.ComponentModel.DataAnnotations
+
 <PageTitle>Registrace</PageTitle>
 
 <h1>Registrace</h1>
 
 <!--Formulář pro registraci-->
-<EditForm FormName="RegisterForm">
-	<DataAnnotationsValidator></DataAnnotationsValidator>
-	<ValidationSummary></ValidationSummary>
+<EditForm Model="@Input" FormName="RegisterForm">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
 
-	<label for="input-email">Email: </label>
-	<InputText id="input-email" type="email" placeholder="Email@email.com" required></InputText>
-	
-	<label for="input-password">Heslo: </label>
-	<InputText id="input-password" type="password" placeholder="TajneHeslo" required></InputText>
+    <label for="input-email">Email: </label>
+    <InputText id="input-email" @bind-Value="@Input.Email" type="email" placeholder="Email@email.com" required></InputText>
 
-	<button type="submit">Registrovat se</button>
+    <label for="input-password">Heslo: </label>
+    <InputText id="input-password" @bind-Value="@Input.Password" type="password" placeholder="TajneHeslo" required></InputText>
+
+    <button type="submit">Registrovat se</button>
 </EditForm>
 
 @code {
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new InputModel();
 
+    /// <summary>
+    /// Model pro vstupní data z formuláře pro registraci
+    /// </summary>
+    private class InputModel
+    {
+        [Required]
+        public string Email { get; set; } = "";
+
+        [Required]
+        public string Password { get; set; } = "";
+    }
 }
