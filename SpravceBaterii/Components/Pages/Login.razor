@@ -11,6 +11,12 @@
 
 <h1>Přihlášení</h1>
 
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm">
 	<DataAnnotationsValidator></DataAnnotationsValidator>
@@ -29,6 +35,8 @@
 	[SupplyParameterFromForm]
 	private InputModel Input { get; set; } = new InputModel();
 
+	private string errorMessage = "";
+
 	/// <summary>
 	/// Přihlášení existujícího uživatele pomocí emailu a hesla
 	/// </summary>
@@ -39,6 +47,10 @@
 		if (result.Succeeded)
 		{
 			Navigation.NavigateTo("/");
+		}
+		else
+		{
+			errorMessage = result.ToString();
 		}
 	}
 

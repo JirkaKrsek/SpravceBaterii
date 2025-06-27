@@ -12,6 +12,12 @@
 
 <h1>Registrace</h1>
 
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm">
     <DataAnnotationsValidator></DataAnnotationsValidator>
@@ -30,6 +36,8 @@
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new InputModel();
 
+    private string errorMessage = "";
+
     /// <summary>
     /// Registrace nového uživatele pomocí emailu a hesla
     /// Pokud registrace proběhne úspěšně, vytvořený uživatel je automaticky přihlášen
@@ -47,6 +55,10 @@
         {
             await SignInManager.SignInAsync(newUser, false);
             Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = string.Join(", ", result.Errors.Select(error => error.Description));
         }
     }
 
