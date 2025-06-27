@@ -1,0 +1,23 @@
+﻿@page "/ucet/odhlaseni"
+@attribute [ExcludeFromInteractiveRouting]
+@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager Navigation
+
+<PageTitle>Odhlášení</PageTitle>
+
+<h1>Odhlášení</h1>
+
+@code {
+    /// <summary>
+    /// Po načtení této stránky automaticky odhlásí aktuálně přihlášeného uživatele a přesměruje na domovskou stránku
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await SignInManager.SignOutAsync();
+        Navigation.NavigateTo("/");
+    }
+}
