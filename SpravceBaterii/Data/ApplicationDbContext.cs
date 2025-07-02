@@ -7,7 +7,7 @@ namespace SpravceBaterii.Data
     /// <summary>
     /// Třída pro správu databáze a identity uživatelů pomocí závislostí Microsoft.EntityFrameworkCore a Microsoft.AspNetCore.Identity
     /// </summary>
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityUserContext<ApplicationUser>
     {
         /// <summary>
         /// Konstruktor s konfigurací připojení
