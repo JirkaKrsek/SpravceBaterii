@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Components;
 using SpravceBaterii.Data;
@@ -25,8 +26,20 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 // Nastavení Identity uživatele
-builder.Services.AddDefaultIdentity<ApplicationUser>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentityCore<ApplicationUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders()
+    .AddSignInManager();
+
+// Pøidání autentizace s cookie
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+})
+    .AddCookie(IdentityConstants.ApplicationScheme);
+
+// Pøidání autorizace
+builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
