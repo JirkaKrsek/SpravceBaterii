@@ -41,6 +41,18 @@ builder.Services.AddAuthentication(options =>
 // Pøidání autorizace
 builder.Services.AddAuthorization();
 
+// Úprava nastavení cookie
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/ucet/prihlaseni";
+    options.LogoutPath = "/ucet/odhlaseni";
+});
+
 
 var app = builder.Build();
 
