@@ -26,7 +26,22 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 // Nastavení Identity uživatele
-builder.Services.AddIdentityCore<ApplicationUser>()
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+{
+    // Pøihlášení bez nutnosti ovìøeného emailu
+    options.SignIn.RequireConfirmedAccount = false;
+
+    // Každý email musí být v databázi jedineèný
+    options.User.RequireUniqueEmail = true;
+
+    // Nastavení požadavkù hesla
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+})
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
     .AddSignInManager();
