@@ -22,8 +22,10 @@ if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("The environment variable " + systemVariableName + " is missing or empty.");
 }
 
-// Registrace DbContext s connection stringem
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+// Registrace DbContext s connection stringem + automatická obnova pøipojení k databázi v pøípadì výpadku
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure())
+);
 
 // Nastavení Identity uživatele
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
