@@ -12,7 +12,7 @@
 <h1>Přihlášení</h1>
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (string.IsNullOrEmpty(errorMessage))
+@if (!string.IsNullOrEmpty(errorMessage))
 {
 	<p>@errorMessage</p>
 }
