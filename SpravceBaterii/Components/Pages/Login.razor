@@ -28,6 +28,9 @@
 	<label for="input-password">Heslo: </label>
 	<InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="TajneHeslo" required></InputText>
 
+	<InputCheckbox id="input-checkbox" @bind-Value="Input.RememberMe"></InputCheckbox>
+	<label for="input-checkbox" title="Po zavření prohlížeče zůstanete přihlášeni">Zůstat přihlášen(a)</label>
+
 	<button type="submit">Přihlásit se</button>
 </EditForm>
 
@@ -43,7 +46,7 @@
 	/// <returns>Asynchronní metoda</returns>
 	private async Task LoginUser()
 	{
-		SignInResult result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, false, true);
+		SignInResult result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, true);
 		if (result.Succeeded)
 		{
 			Navigation.NavigateTo("/");
@@ -64,5 +67,7 @@
 
 		[Required]
 		public string Password { get; set; } = "";
+
+		public bool RememberMe { get; set; } = false;
 	}
 }
