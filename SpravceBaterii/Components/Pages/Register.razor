@@ -29,6 +29,9 @@
     <label for="input-password">Heslo: </label>
     <InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="TajneHeslo" required></InputText>
 
+    <label for="input-confirm-password">Zadejte heslo znovu: </label>
+    <InputText id="input-confirm-password" @bind-Value="Input.ConfirmPassword" type="password" placeholder="TajneHesloZnovu" required></InputText>
+
     <button type="submit">Registrovat se</button>
 </EditForm>
 
@@ -45,6 +48,12 @@
     /// <returns>Asynchronní metoda</returns>
     private async Task RegisterUser()
     {
+        if (Input.Password != Input.ConfirmPassword)
+        {
+            errorMessage = "Zadaná hesla se neshodují.";
+            return;
+        }
+
         ApplicationUser newUser = new ApplicationUser();
         newUser.UserName = Input.Email;
         newUser.Email = Input.Email;
@@ -72,5 +81,8 @@
 
         [Required]
         public string Password { get; set; } = "";
+
+        [Required]
+        public string ConfirmPassword { get; set; } = "";
     }
 }
