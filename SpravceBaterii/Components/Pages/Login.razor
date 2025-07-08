@@ -19,8 +19,8 @@
 
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm">
-	<DataAnnotationsValidator></DataAnnotationsValidator>
-	<ValidationSummary></ValidationSummary>
+	<DataAnnotationsValidator />
+	<ValidationSummary />
 
 	<label for="input-email">Email: </label>
 	<InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Email@email.com" required></InputText>
@@ -51,9 +51,17 @@
 		{
 			Navigation.NavigateTo("/");
 		}
+		else if (result.IsLockedOut)
+		{
+			errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později.";
+		}
+		else if (result.IsNotAllowed)
+		{
+			errorMessage = "Přihlášení bylo zamítnuto.";
+		}
 		else
 		{
-			errorMessage = result.ToString();
+			errorMessage = "Zadali jste nesprávný email nebo heslo.";
 		}
 	}
 
@@ -62,10 +70,11 @@
 	/// </summary>
 	private class InputModel
 	{
-		[Required]
+		[Required(ErrorMessage = "Zadejte email.")]
+		[EmailAddress(ErrorMessage = "Zadaný email není správný.")]
 		public string Email { get; set; } = "";
 
-		[Required]
+		[Required(ErrorMessage = "Zadejte heslo.")]
 		public string Password { get; set; } = "";
 
 		public bool RememberMe { get; set; } = false;

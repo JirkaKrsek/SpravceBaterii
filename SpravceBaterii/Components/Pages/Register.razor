@@ -15,13 +15,13 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p>@((MarkupString)errorMessage)</p>
 }
 
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm">
-    <DataAnnotationsValidator></DataAnnotationsValidator>
-    <ValidationSummary></ValidationSummary>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
     <label for="input-email">Email: </label>
     <InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Email@email.com" required></InputText>
@@ -67,7 +67,7 @@
         }
         else
         {
-            errorMessage = string.Join(", ", result.Errors.Select(error => error.Description));
+            errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description));
         }
     }
 
@@ -76,13 +76,14 @@
     /// </summary>
     private class InputModel
     {
-        [Required]
+        [Required(ErrorMessage = "Zadejte email.")]
+        [EmailAddress(ErrorMessage = "Zadaný email není správný.")]
         public string Email { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "Zadejte heslo.")]
         public string Password { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "Zadejte znovu heslo.")]
         public string ConfirmPassword { get; set; } = "";
     }
 }
