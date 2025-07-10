@@ -57,12 +57,17 @@
         ApplicationUser newUser = new ApplicationUser();
         newUser.UserName = Input.Email;
         newUser.Email = Input.Email;
+        newUser.RegistrationDate = DateTime.UtcNow;
 
         IdentityResult result = await UserManager.CreateAsync(newUser, Input.Password);
 
         if (result.Succeeded)
         {
             await SignInManager.SignInAsync(newUser, false);
+
+            newUser.LastLogin = DateTime.UtcNow;
+            await UserManager.UpdateAsync(newUser);
+
             Navigation.NavigateTo("/");
         }
         else
