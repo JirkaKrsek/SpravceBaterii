@@ -67,7 +67,7 @@
         }
         else
         {
-            errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description));
+            errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
         }
     }
 

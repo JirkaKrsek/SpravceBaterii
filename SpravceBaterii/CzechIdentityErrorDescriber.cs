@@ -33,7 +33,7 @@ namespace SpravceBaterii
             return new IdentityError
             {
                 Code = nameof(DuplicateUserName),
-                Description = "Zadaný email je již zaregistrovaný."
+                Description = ""
             };
         }
 
