@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SpravceBaterii;
 using SpravceBaterii.Components;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
@@ -46,7 +47,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
-    .AddSignInManager();
+    .AddSignInManager()
+    .AddErrorDescriber<CzechIdentityErrorDescriber>(); // Pøeklad chybových hlášek do èeštiny
 
 // Pøidání autentizace s cookie
 builder.Services.AddAuthentication(options =>
