@@ -1,5 +1,6 @@
 ﻿@page "/ucet/registrace"
 @attribute [ExcludeFromInteractiveRouting]
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 @using SpravceBaterii.Data.Models
 @using System.ComponentModel.DataAnnotations
@@ -7,6 +8,7 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Registrace</PageTitle>
 
@@ -40,6 +42,20 @@
     private InputModel Input { get; set; } = new InputModel();
 
     private string errorMessage = "";
+
+    /// <summary>
+    /// Po načtení této stránky proběhne kontrola stavu přihlášení uživatele
+    /// Pokud je již přihlášen, bude přesměrován na domovskou stránku
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (state.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
 
     /// <summary>
     /// Registrace nového uživatele pomocí emailu a hesla
