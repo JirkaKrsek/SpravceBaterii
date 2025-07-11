@@ -53,7 +53,7 @@
         AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (state.User.Identity?.IsAuthenticated == true)
         {
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/", true);
         }
     }
 
@@ -84,7 +84,7 @@
             newUser.LastLogin = DateTime.UtcNow;
             await UserManager.UpdateAsync(newUser);
 
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/", true);
         }
         else
         {
