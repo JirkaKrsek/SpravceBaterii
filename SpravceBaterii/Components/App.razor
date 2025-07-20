@@ -8,12 +8,37 @@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["SpravceBaterii.styles.css"]" />
     <ImportMap />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="@GetRenderMode()" />
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer" />
+    <Routes @rendermode="@GetRenderMode()" />
     <script src="_framework/blazor.web.js"></script>
 </body>
 
 </html>
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    /// <summary>
+    /// Přepínání režimu renderování podle cesty URL
+    /// Cesta začínající na "/ucet" je vykreslena staticky (SSR), ostatní interaktivně
+    /// </summary>
+    /// <returns>
+    /// RenderMode.InteractiveServer - interaktivní režim
+    /// null - statický (SSR) režim
+    /// </returns>
+    private IComponentRenderMode? GetRenderMode()
+    {
+        PathString path = HttpContext.Request.Path;
+
+        if (path.StartsWithSegments("/ucet", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return RenderMode.InteractiveServer;
+    }
+}

@@ -1,25 +1,25 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Data.Models;
 
 namespace SpravceBaterii.Data
 {
     /// <summary>
-    /// Třída pro správu databáze pomocí závislosti Microsoft.EntityFrameworkCore
+    /// Třída pro správu databáze a identity uživatelů pomocí závislostí Microsoft.EntityFrameworkCore a Microsoft.AspNetCore.Identity
     /// </summary>
-    public class AppDbContext : DbContext
+    public class ApplicationDbContext : IdentityUserContext<ApplicationUser>
     {
         /// <summary>
         /// Konstruktor s konfigurací připojení
         /// </summary>
         /// <param name="options"></param>
-        public AppDbContext(DbContextOptions options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-
+        
         /// <summary>
         /// Připojení modelových tříd
         /// </summary>
-        public DbSet<User> Users { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<Battery> Batteries { get; set; }

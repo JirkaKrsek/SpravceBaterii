@@ -1,0 +1,110 @@
+﻿@page "/ucet/registrace"
+@attribute [ExcludeFromInteractiveRouting]
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
+@using System.ComponentModel.DataAnnotations
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Registrace</PageTitle>
+
+<h1>Registrace</h1>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@((MarkupString)errorMessage)</p>
+}
+
+<!--Formulář pro registraci-->
+<EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <label for="input-email">Email: </label>
+    <InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Email@email.com" required></InputText>
+
+    <label for="input-password">Heslo: </label>
+    <InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="TajneHeslo" required></InputText>
+
+    <label for="input-confirm-password">Zadejte heslo znovu: </label>
+    <InputText id="input-confirm-password" @bind-Value="Input.ConfirmPassword" type="password" placeholder="TajneHesloZnovu" required></InputText>
+
+    <button type="submit">Registrovat se</button>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new InputModel();
+
+    private string errorMessage = "";
+
+    /// <summary>
+    /// Po načtení této stránky proběhne kontrola stavu přihlášení uživatele
+    /// Pokud je již přihlášen, bude přesměrován na domovskou stránku
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (state.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/", true);
+        }
+    }
+
+    /// <summary>
+    /// Registrace nového uživatele pomocí emailu a hesla
+    /// Pokud registrace proběhne úspěšně, vytvořený uživatel je automaticky přihlášen
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    private async Task RegisterUser()
+    {
+        if (Input.Password != Input.ConfirmPassword)
+        {
+            errorMessage = "Zadaná hesla se neshodují.";
+            return;
+        }
+
+        ApplicationUser newUser = new ApplicationUser();
+        newUser.UserName = Input.Email;
+        newUser.Email = Input.Email;
+        newUser.RegistrationDate = DateTime.UtcNow;
+
+        IdentityResult result = await UserManager.CreateAsync(newUser, Input.Password);
+
+        if (result.Succeeded)
+        {
+            await SignInManager.SignInAsync(newUser, false);
+
+            newUser.LastLogin = DateTime.UtcNow;
+            await UserManager.UpdateAsync(newUser);
+
+            Navigation.NavigateTo("/", true);
+        }
+        else
+        {
+            errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+        }
+    }
+
+    /// <summary>
+    /// Model pro vstupní data z formuláře pro registraci
+    /// </summary>
+    private class InputModel
+    {
+        [Required(ErrorMessage = "Zadejte email.")]
+        [EmailAddress(ErrorMessage = "Zadaný email není správný.")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Zadejte heslo.")]
+        public string Password { get; set; } = "";
+
+        [Required(ErrorMessage = "Zadejte znovu heslo.")]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

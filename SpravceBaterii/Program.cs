@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SpravceBaterii;
 using SpravceBaterii.Components;
 using SpravceBaterii.Data;
+using SpravceBaterii.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +23,54 @@ if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("The environment variable " + systemVariableName + " is missing or empty.");
 }
 
-// Registrace DbContext s connection stringem
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+// Registrace DbContext s connection stringem + automatická obnova pøipojení k databázi v pøípadì výpadku
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure())
+);
+
+// Nastavení Identity uživatele
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+{
+    // Pøihlášení bez nutnosti ovìøeného emailu
+    options.SignIn.RequireConfirmedAccount = false;
+
+    // Každý email musí být v databázi jedineèný
+    options.User.RequireUniqueEmail = true;
+
+    // Nastavení požadavkù hesla
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+})
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders()
+    .AddSignInManager()
+    .AddErrorDescriber<CzechIdentityErrorDescriber>(); // Pøeklad chybových hlášek do èeštiny
+
+// Pøidání autentizace s cookie
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+})
+    .AddCookie(IdentityConstants.ApplicationScheme);
+
+// Pøidání autorizace
+builder.Services.AddAuthorization();
+
+// Úprava nastavení cookie
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/ucet/prihlaseni";
+    options.LogoutPath = "/ucet/odhlaseni";
+});
 
 
 var app = builder.Build();
@@ -36,6 +85,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Pøidání autentizace a autorizace
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAntiforgery();
 

@@ -1,4 +1,19 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+
+<nav>
+    <NavLink href="/">Domovská stránka</NavLink>
+
+    <AuthorizeView>
+        <Authorized>
+            <NavLink href="/ucet/odhlaseni">Odhlásit se</NavLink>
+        </Authorized>
+        <NotAuthorized>
+            <NavLink href="/ucet/registrace">Registrace</NavLink>
+            <NavLink href="/ucet/prihlaseni">Přihlásit se</NavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</nav>
 
 @Body
 
