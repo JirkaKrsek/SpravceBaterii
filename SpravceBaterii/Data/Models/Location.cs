@@ -22,11 +22,6 @@ namespace SpravceBaterii.Data.Models
         [StringLength(100)]
         public string? Floor { get; set; }
 
-        public string UserId { get; set; }
-
-        [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; }
-
         public ICollection<Device>? Devices { get; set; }
     }
 }

@@ -81,7 +81,7 @@
         {
             await SignInManager.SignInAsync(newUser, false);
 
-            newUser.LastLogin = DateTime.UtcNow;
+            newUser.LastLoginDate = DateTime.UtcNow;
             await UserManager.UpdateAsync(newUser);
 
             Navigation.NavigateTo("/", true);

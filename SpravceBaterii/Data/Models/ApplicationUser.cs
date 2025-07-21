@@ -10,8 +10,8 @@ namespace SpravceBaterii.Data.Models
     {
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
 
-        public DateTime LastLogin { get; set; } = DateTime.UtcNow;
+        public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Location>? Locations { get; set; }
+        public ICollection<Battery>? Batteries { get; set; }
     }
 }
