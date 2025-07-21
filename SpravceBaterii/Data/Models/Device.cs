@@ -25,10 +25,10 @@ namespace SpravceBaterii.Data.Models
         [MaxLength(100)]
         public string? Manufacturer { get; set; }
 
-        public int LocationId { get; set; }
+        public int? LocationId { get; set; }
 
         [ForeignKey("LocationId")]
-        public Location Location { get; set; }
+        public Location? Location { get; set; }
 
         public ICollection<Battery>? Batteries { get; set; }
     }

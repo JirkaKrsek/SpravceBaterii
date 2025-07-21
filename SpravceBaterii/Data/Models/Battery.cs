@@ -19,10 +19,10 @@ namespace SpravceBaterii.Data.Models
         [MaxLength(100)]
         public string? Manufacturer { get; set; }
 
-        public int DeviceId { get; set; }
+        public int? DeviceId { get; set; }
 
         [ForeignKey("DeviceId")]
-        public Device Device { get; set; }
+        public Device? Device { get; set; }
 
         public int BatteryTypeId { get; set; }
 
