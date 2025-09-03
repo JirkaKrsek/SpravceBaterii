@@ -38,54 +38,61 @@
 </EditForm>
 
 @code {
-	[SupplyParameterFromForm]
-	private InputModel Input { get; set; } = new InputModel();
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new InputModel();
 
-	private string errorMessage = "";
+    private string errorMessage = "";
 
-	/// <summary>
-	/// Po načtení této stránky proběhne kontrola stavu přihlášení uživatele
-	/// Pokud je již přihlášen, bude přesměrován na domovskou stránku
-	/// </summary>
-	/// <returns>Asynchronní metoda</returns>
-	protected override async Task OnInitializedAsync()
-	{
-		AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-		if (state.User.Identity?.IsAuthenticated == true)
-		{
-			Navigation.NavigateTo("/", true);
-		}
-	}
+    /// <summary>
+    /// Po načtení této stránky proběhne kontrola stavu přihlášení uživatele
+    /// Pokud je již přihlášen, bude přesměrován na domovskou stránku
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (state.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/", true);
+        }
+    }
 
-	/// <summary>
-	/// Přihlášení existujícího uživatele pomocí emailu a hesla
-	/// </summary>
-	/// <returns>Asynchronní metoda</returns>
-	private async Task LoginUser()
-	{
-		SignInResult result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, true);
-		if (result.Succeeded)
-		{
-			ApplicationUser? user = await UserManager.FindByEmailAsync(Input.Email);
-			if (user != null)
-			{
-				user.LastLoginDate = DateTime.UtcNow;
-				await UserManager.UpdateAsync(user);
-			}
+    /// <summary>
+    /// Přihlášení existujícího uživatele pomocí emailu a hesla
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    private async Task LoginUser()
+    {
+        try
+        {
+            SignInResult result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, true);
+            if (result.Succeeded)
+            {
+                ApplicationUser? user = await UserManager.FindByEmailAsync(Input.Email);
+                if (user != null)
+                {
+                    user.LastLoginDate = DateTime.UtcNow;
+                    await UserManager.UpdateAsync(user);
+                }
 
-			Navigation.NavigateTo("/", true);
-		}
-		else if (result.IsLockedOut)
-		{
-			errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později.";
-		}
-		else if (result.IsNotAllowed)
-		{
-			errorMessage = "Přihlášení bylo zamítnuto.";
-		}
-		else
-		{
-			errorMessage = "Zadali jste nesprávný email nebo heslo.";
+                Navigation.NavigateTo("/", true);
+            }
+            else if (result.IsLockedOut)
+            {
+                errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později.";
+            }
+            else if (result.IsNotAllowed)
+            {
+                errorMessage = "Přihlášení bylo zamítnuto.";
+            }
+            else
+            {
+                errorMessage = "Zadali jste nesprávný email nebo heslo.";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Databáze není momentálně dostupná. Zkuste to prosím později. Omlouváme se za způsobené komplikace.";
 		}
 	}
 

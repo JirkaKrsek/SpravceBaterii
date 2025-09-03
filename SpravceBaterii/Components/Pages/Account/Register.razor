@@ -64,31 +64,38 @@
     /// <returns>Asynchronní metoda</returns>
     private async Task RegisterUser()
     {
-        if (Input.Password != Input.ConfirmPassword)
+        try
         {
-            errorMessage = "Zadaná hesla se neshodují.";
-            return;
+            if (Input.Password != Input.ConfirmPassword)
+            {
+                errorMessage = "Zadaná hesla se neshodují.";
+                return;
+            }
+
+            ApplicationUser newUser = new ApplicationUser();
+            newUser.UserName = Input.Email;
+            newUser.Email = Input.Email;
+            newUser.RegistrationDate = DateTime.UtcNow;
+
+            IdentityResult result = await UserManager.CreateAsync(newUser, Input.Password);
+
+            if (result.Succeeded)
+            {
+                await SignInManager.SignInAsync(newUser, false);
+
+                newUser.LastLoginDate = DateTime.UtcNow;
+                await UserManager.UpdateAsync(newUser);
+
+                Navigation.NavigateTo("/", true);
+            }
+            else
+            {
+                errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+            }
         }
-
-        ApplicationUser newUser = new ApplicationUser();
-        newUser.UserName = Input.Email;
-        newUser.Email = Input.Email;
-        newUser.RegistrationDate = DateTime.UtcNow;
-
-        IdentityResult result = await UserManager.CreateAsync(newUser, Input.Password);
-
-        if (result.Succeeded)
+        catch (Exception)
         {
-            await SignInManager.SignInAsync(newUser, false);
-
-            newUser.LastLoginDate = DateTime.UtcNow;
-            await UserManager.UpdateAsync(newUser);
-
-            Navigation.NavigateTo("/", true);
-        }
-        else
-        {
-            errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+            errorMessage = "Databáze není momentálně dostupná. Zkuste to prosím později. Omlouváme se za způsobené komplikace.";
         }
     }
 
