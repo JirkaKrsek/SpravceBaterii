@@ -74,26 +74,30 @@
                     user.LastLoginDate = DateTime.UtcNow;
                     await UserManager.UpdateAsync(user);
                 }
-
-                Navigation.NavigateTo("/", true);
             }
             else if (result.IsLockedOut)
             {
                 errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později.";
+                return;
             }
             else if (result.IsNotAllowed)
             {
                 errorMessage = "Přihlášení bylo zamítnuto.";
+                return;
             }
             else
             {
                 errorMessage = "Zadali jste nesprávný email nebo heslo.";
+                return;
             }
         }
         catch (Exception)
         {
             errorMessage = "Databáze není momentálně dostupná. Zkuste to prosím později. Omlouváme se za způsobené komplikace.";
+            return;
 		}
+
+        Navigation.NavigateTo("/", true);
 	}
 
 	/// <summary>
