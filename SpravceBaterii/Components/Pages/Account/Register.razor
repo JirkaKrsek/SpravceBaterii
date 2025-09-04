@@ -85,18 +85,20 @@
 
                 newUser.LastLoginDate = DateTime.UtcNow;
                 await UserManager.UpdateAsync(newUser);
-
-                Navigation.NavigateTo("/", true);
             }
             else
             {
                 errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+                return;
             }
         }
         catch (Exception)
         {
             errorMessage = "Databáze není momentálně dostupná. Zkuste to prosím později. Omlouváme se za způsobené komplikace.";
+            return;
         }
+
+        Navigation.NavigateTo("/", true);
     }
 
     /// <summary>
