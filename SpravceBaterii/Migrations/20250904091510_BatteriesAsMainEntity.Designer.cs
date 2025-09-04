@@ -12,7 +12,7 @@ using SpravceBaterii.Data;
 namespace SpravceBaterii.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250721053246_BatteriesAsMainEntity")]
+    [Migration("20250904091510_BatteriesAsMainEntity")]
     partial class BatteriesAsMainEntity
     {
         /// <inheritdoc />
@@ -170,9 +170,6 @@ namespace SpravceBaterii.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("BatteryTypeId")
                         .HasColumnType("int");
 
@@ -201,15 +198,19 @@ namespace SpravceBaterii.Migrations
                     b.Property<int?>("RechargeableBatteryId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BatteryTypeId");
 
                     b.HasIndex("ChemicalCompositionId");
 
                     b.HasIndex("DeviceId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Batteries");
                 });
@@ -411,10 +412,6 @@ namespace SpravceBaterii.Migrations
 
             modelBuilder.Entity("SpravceBaterii.Data.Models.Battery", b =>
                 {
-                    b.HasOne("SpravceBaterii.Data.Models.ApplicationUser", null)
-                        .WithMany("Batteries")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("SpravceBaterii.Data.Models.BatteryType", "BatteryType")
                         .WithMany("Batteries")
                         .HasForeignKey("BatteryTypeId")
@@ -429,11 +426,19 @@ namespace SpravceBaterii.Migrations
                         .WithMany("Batteries")
                         .HasForeignKey("DeviceId");
 
+                    b.HasOne("SpravceBaterii.Data.Models.ApplicationUser", "User")
+                        .WithMany("Batteries")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("BatteryType");
 
                     b.Navigation("ChemicalComposition");
 
                     b.Navigation("Device");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SpravceBaterii.Data.Models.ChargingHistory", b =>

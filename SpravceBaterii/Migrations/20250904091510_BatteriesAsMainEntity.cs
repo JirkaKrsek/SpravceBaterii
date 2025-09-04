@@ -52,22 +52,24 @@ namespace SpravceBaterii.Migrations
                 oldType: "int");
 
             migrationBuilder.AddColumn<string>(
-                name: "ApplicationUserId",
+                name: "UserId",
                 table: "Batteries",
                 type: "nvarchar(450)",
-                nullable: true);
+                nullable: false,
+                defaultValue: "");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Batteries_ApplicationUserId",
+                name: "IX_Batteries_UserId",
                 table: "Batteries",
-                column: "ApplicationUserId");
+                column: "UserId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Batteries_AspNetUsers_ApplicationUserId",
+                name: "FK_Batteries_AspNetUsers_UserId",
                 table: "Batteries",
-                column: "ApplicationUserId",
+                column: "UserId",
                 principalTable: "AspNetUsers",
-                principalColumn: "Id");
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Batteries_Devices_DeviceId",
@@ -88,7 +90,7 @@ namespace SpravceBaterii.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Batteries_AspNetUsers_ApplicationUserId",
+                name: "FK_Batteries_AspNetUsers_UserId",
                 table: "Batteries");
 
             migrationBuilder.DropForeignKey(
@@ -100,11 +102,11 @@ namespace SpravceBaterii.Migrations
                 table: "Devices");
 
             migrationBuilder.DropIndex(
-                name: "IX_Batteries_ApplicationUserId",
+                name: "IX_Batteries_UserId",
                 table: "Batteries");
 
             migrationBuilder.DropColumn(
-                name: "ApplicationUserId",
+                name: "UserId",
                 table: "Batteries");
 
             migrationBuilder.RenameColumn(
