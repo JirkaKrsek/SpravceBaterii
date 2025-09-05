@@ -41,10 +41,8 @@ namespace SpravceBaterii.Data.Models
 
         public bool IsRechargeable { get; set; }
 
-        public int? DisposableBatteryId { get; set; }
         public DisposableBattery? DisposableBattery { get; set; }
 
-        public int? RechargeableBatteryId { get; set; }
         public RechargeableBattery? RechargeableBattery { get; set; }
     }
 }
