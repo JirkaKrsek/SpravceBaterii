@@ -176,9 +176,6 @@ namespace SpravceBaterii.Migrations
                     b.Property<int?>("DeviceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DisposableBatteryId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ExpectedLifespan")
                         .HasColumnType("int");
 
@@ -191,9 +188,6 @@ namespace SpravceBaterii.Migrations
                     b.Property<string>("Manufacturer")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("RechargeableBatteryId")
-                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
