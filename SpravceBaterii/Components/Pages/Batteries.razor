@@ -1,0 +1,66 @@
+﻿@page "/baterie"
+@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+
+@inject BatteryService BatteryService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Seznam baterií</PageTitle>
+
+<h1>Baterie</h1>
+
+<h2>Seznam všech baterií</h2>
+<table>
+	<tr>
+		<th>Datum vložení</th>
+		<th>Typ baterie</th>
+	</tr>
+	@foreach (Battery battery in BatteryList)
+	{
+		<tr>
+			<td>@battery.InsertionDate</td>
+			@if (battery.IsRechargeable)
+			{
+				<td>Nabíjecí</td>
+			}
+			else
+			{
+				<td>Jednorázová</td>
+			}
+		</tr>
+	}
+</table>
+
+@code {
+	private List<Battery> BatteryList = new();
+
+	/// <summary>
+	/// Při načtení stránky se zavolá načtení dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadBatteryList();
+	}
+
+	/// <summary>
+	/// Načtení informací o bateriích uživatele z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadBatteryList()
+	{
+		AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		string? userId = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+		if (string.IsNullOrEmpty(userId))
+		{
+			Navigation.NavigateTo("/", true);
+		}
+		else
+		{
+			BatteryList = await BatteryService.GetUserBatteries(userId);
+		}
+	}
+}
