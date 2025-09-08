@@ -29,6 +29,7 @@ namespace SpravceBaterii.Services
                 .Include(b => b.Device)
                 .Include(b => b.BatteryType)
                 .Include(b => b.DisposableBattery)
+                .AsNoTracking()
                 .ToListAsync();
         }
     }
