@@ -14,21 +14,32 @@
 <h2>Seznam všech baterií</h2>
 <table>
 	<tr>
-		<th>Datum vložení</th>
+		<th>Název zařízení</th>
+		<th>Počet baterií v zařízení</th>
+		<th>Označení baterie</th>
 		<th>Typ baterie</th>
+		<th>Datum expirace</th>
+		<th>Datum vložení</th>
+		<th>Předpokládaná doba výdrže (ve dnech)</th>
 	</tr>
 	@foreach (Battery battery in BatteryList)
 	{
 		<tr>
-			<td>@battery.InsertionDate</td>
+			<td>@(battery.Device != null ? battery.Device.Name : "")</td>
+			<td>@(battery.Device != null ? battery.Device.BatteryCount : "")</td>
+			<td>@battery.BatteryType.Name</td>
 			@if (battery.IsRechargeable)
 			{
 				<td>Nabíjecí</td>
+				<td></td>
 			}
 			else
 			{
 				<td>Jednorázová</td>
+				<td>@(battery.DisposableBattery != null ? battery.DisposableBattery.ExpirationDate : "")</td>
 			}
+			<td>@battery.InsertionDate</td>
+			<td>@battery.ExpectedLifespan</td>
 		</tr>
 	}
 </table>

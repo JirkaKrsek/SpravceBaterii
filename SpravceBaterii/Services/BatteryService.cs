@@ -24,7 +24,12 @@ namespace SpravceBaterii.Services
         /// <returns>List baterií</returns>
         public async Task<List<Battery>> GetUserBatteries(string userId)
         {
-            return await ApplicationDbContext.Batteries.Where(b => b.UserId == userId).ToListAsync();
+            return await ApplicationDbContext.Batteries
+                .Where(b => b.UserId == userId)
+                .Include(b => b.Device)
+                .Include(b => b.BatteryType)
+                .Include(b => b.DisposableBattery)
+                .ToListAsync();
         }
     }
 }
