@@ -72,6 +72,7 @@
 		else
 		{
 			BatteryList = await BatteryService.GetUserBatteries(userId);
+			BatteryList = BatteryList.OrderBy(b => b.Device?.Name == null).ThenBy(b => b.Device?.Name).ToList();
 		}
 	}
 }
