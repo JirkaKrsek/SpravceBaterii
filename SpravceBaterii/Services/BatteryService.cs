@@ -32,5 +32,16 @@ namespace SpravceBaterii.Services
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        /// <summary>
+        /// Uložení nové baterie do databáze
+        /// </summary>
+        /// <param name="battery">Zadaná baterie</param>
+        /// <returns>Asynchronní operace</returns>
+        public async Task SaveBattery(Battery battery)
+        {
+            ApplicationDbContext.Batteries.Add(battery);
+            await ApplicationDbContext.SaveChangesAsync();
+        }
     }
 }
