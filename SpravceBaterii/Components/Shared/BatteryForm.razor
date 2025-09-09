@@ -1,0 +1,71 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+
+@inject BatteryService BatteryService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<h2>Formulář pro zadání nové baterie</h2>
+
+<EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<label for="input-InsertionDate">Datum vložení: </label>
+	<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" required></InputDate>
+
+	<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
+	<InputNumber id="input-ExpectedLifespan" @bind-Value="battery.ExpectedLifespan"></InputNumber>
+
+	<label for="input-Manufacturer">Výrobce: </label>
+	<InputText id="input-Manufacturer" @bind-Value="battery.Manufacturer"></InputText>
+
+	<label for="input-IsRechargeable">Nabíjecí/jednorázová: </label>
+	<InputRadioGroup id="input-IsRechargeable" @bind-Value="battery.IsRechargeable" required>
+		<InputRadio Value="true" id="input-IsRechargeable-true">Nabíjecí</InputRadio>
+		<label for="input-IsRechargeable-true">Nabíjecí</label>
+		<InputRadio Value="false" id="input-IsRechargeable-false">Jednorázová</InputRadio>
+		<label for="input-IsRechargeable-false">Jednorázová</label>
+	</InputRadioGroup>
+
+	<button type="submit">Uložit</button>
+</EditForm>
+
+@code {
+	/// <summary>
+	/// Callback události z rodičovské komponenty
+	/// </summary>
+	[Parameter]
+	public EventCallback BatterySaved { get; set; }
+
+	private Battery battery = new()
+	{
+		InsertionDate = DateOnly.FromDateTime(DateTime.Today)
+	};
+
+	/// <summary>
+	/// Uložení zadaných informací o nové baterii do databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task SaveBattery()
+	{
+		AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		string? userId = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+		if (string.IsNullOrEmpty(userId))
+		{
+			Navigation.NavigateTo("/", true);
+		}
+		else
+		{
+			battery.UserId = userId;
+			battery.BatteryTypeId = 1;
+			await BatteryService.SaveBattery(battery);
+		}
+
+
+		//Zavolání události v rodičovské komponentě
+		await BatterySaved.InvokeAsync();
+	}
+}
