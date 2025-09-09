@@ -1,5 +1,6 @@
 ﻿@page "/baterie"
 @using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Components.Shared
 @using SpravceBaterii.Data.Models
 @using SpravceBaterii.Services
 
@@ -10,6 +11,15 @@
 <PageTitle>Seznam baterií</PageTitle>
 
 <h1>Baterie</h1>
+
+@if (showForm)
+{
+	<BatteryForm BatterySaved="@CloseFormAndReloadList"></BatteryForm>
+}
+else
+{
+	<button @onclick="ShowAddBatteryForm">Přidat novou baterii</button>
+}
 
 <h2>Seznam všech baterií</h2>
 <table>
@@ -45,6 +55,7 @@
 </table>
 
 @code {
+	private bool showForm = false;
 	private List<Battery> BatteryList = new();
 
 	/// <summary>
@@ -74,5 +85,24 @@
 			BatteryList = await BatteryService.GetUserBatteries(userId);
 			BatteryList = BatteryList.OrderBy(b => b.Device?.Name == null).ThenBy(b => b.Device?.Name).ToList();
 		}
+	}
+
+	/// <summary>
+	/// Zobrazení komponenty s formulářem
+	/// </summary>
+	private void ShowAddBatteryForm()
+	{
+		showForm = true;
+	}
+
+	/// <summary>
+	/// Skrytí komponenty s formulářem
+	/// Znovunačtení dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task CloseFormAndReloadList()
+	{
+		showForm = false;
+		await LoadBatteryList();
 	}
 }
