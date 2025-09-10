@@ -25,7 +25,7 @@
 
 	<label for="input-BatteryType">Typ: </label>
 	<InputSelect id="input-BatteryType" @bind-Value="battery.BatteryTypeId" required>
-		<option value="">- Vyberte typ -</option>
+		<option value="0">- Vyberte typ -</option>
 		@foreach (BatteryType batteryType in BatteryTypes)
 		{
 			<option value="@batteryType.Id">@batteryType.Name</option>
