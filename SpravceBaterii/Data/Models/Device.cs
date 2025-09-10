@@ -16,9 +16,8 @@ namespace SpravceBaterii.Data.Models
         [StringLength(100)]
         public string Name { get; set; }
 
-        [Required]
         [StringLength(200)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public int BatteryCount { get; set; }
 
@@ -29,6 +28,11 @@ namespace SpravceBaterii.Data.Models
 
         [ForeignKey("LocationId")]
         public Location? Location { get; set; }
+
+        public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; }
 
         public ICollection<Battery>? Batteries { get; set; }
     }
