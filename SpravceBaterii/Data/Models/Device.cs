@@ -30,6 +30,11 @@ namespace SpravceBaterii.Data.Models
         [ForeignKey("LocationId")]
         public Location? Location { get; set; }
 
+        public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; }
+
         public ICollection<Battery>? Batteries { get; set; }
     }
 }

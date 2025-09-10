@@ -13,5 +13,7 @@ namespace SpravceBaterii.Data.Models
         public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
 
         public ICollection<Battery>? Batteries { get; set; }
+        public ICollection<Device>? Devices { get; set; }
+        public ICollection<Location>? Locations { get; set; }
     }
 }
