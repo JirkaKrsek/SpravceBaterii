@@ -29,6 +29,7 @@ namespace SpravceBaterii.Data.Models
         [ForeignKey("DeviceId")]
         public Device? Device { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Vyberte platný typ baterie")]
         public int BatteryTypeId { get; set; }
 
         [ForeignKey("BatteryTypeId")]

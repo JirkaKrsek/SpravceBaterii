@@ -1,0 +1,107 @@
+﻿@page "/baterie"
+@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Components.Shared
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+
+@inject BatteryService BatteryService
+@inject ApplicationUserService UserService
+@inject NavigationManager Navigation
+
+<PageTitle>Seznam baterií</PageTitle>
+
+<h1>Baterie</h1>
+
+@if (showForm)
+{
+	<BatteryForm BatterySaved="@CloseFormAndReloadList"></BatteryForm>
+}
+else
+{
+	<button @onclick="ShowAddBatteryForm">Přidat novou baterii</button>
+}
+
+<h2>Seznam všech baterií</h2>
+<table>
+	<tr>
+		<th>Název zařízení</th>
+		<th>Počet baterií v zařízení</th>
+		<th>Označení baterie</th>
+		<th>Typ baterie</th>
+		<th>Datum expirace</th>
+		<th>Datum vložení</th>
+		<th>Předpokládaná doba výdrže (ve dnech)</th>
+	</tr>
+	@foreach (Battery battery in BatteryList)
+	{
+		<tr>
+			<td>@(battery.Device != null ? battery.Device.Name : "")</td>
+			<td>@(battery.Device != null ? battery.Device.BatteryCount : "")</td>
+			<td>@battery.BatteryType.Name</td>
+			@if (battery.IsRechargeable)
+			{
+				<td>Nabíjecí</td>
+				<td></td>
+			}
+			else
+			{
+				<td>Jednorázová</td>
+				<td>@(battery.DisposableBattery != null ? battery.DisposableBattery.ExpirationDate : "")</td>
+			}
+			<td>@battery.InsertionDate</td>
+			<td>@battery.ExpectedLifespan</td>
+		</tr>
+	}
+</table>
+
+@code {
+    private bool showForm = false;
+    private List<Battery> BatteryList = new();
+
+    /// <summary>
+    /// Při načtení stránky se zavolá načtení dat
+    /// </summary>
+    /// <returns>Asynchronní operace</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBatteryList();
+    }
+
+    /// <summary>
+    /// Načtení informací o bateriích uživatele z databáze
+    /// </summary>
+    /// <returns>Asynchronní operace</returns>
+    private async Task LoadBatteryList()
+    {
+        string? userId = await UserService.GetUserIdAsync();
+
+		if (string.IsNullOrEmpty(userId))
+		{
+			Navigation.NavigateTo("/", true);
+		}
+		else
+		{
+			BatteryList = await BatteryService.GetUserBatteries(userId);
+			BatteryList = BatteryList.OrderBy(b => b.Device?.Name == null).ThenBy(b => b.Device?.Name).ToList();
+		}
+	}
+
+	/// <summary>
+	/// Zobrazení komponenty s formulářem
+	/// </summary>
+	private void ShowAddBatteryForm()
+	{
+		showForm = true;
+	}
+
+	/// <summary>
+	/// Skrytí komponenty s formulářem
+	/// Znovunačtení dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task CloseFormAndReloadList()
+	{
+		showForm = false;
+		await LoadBatteryList();
+	}
+}

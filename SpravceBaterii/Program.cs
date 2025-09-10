@@ -4,6 +4,7 @@ using SpravceBaterii;
 using SpravceBaterii.Components;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
+using SpravceBaterii.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,11 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/ucet/odhlaseni";
 });
 
+// Pøipojení služeb
+builder.Services.AddScoped<BatteryService>();
+builder.Services.AddScoped<BatteryTypeService>();
+builder.Services.AddScoped<ChemicalCompositionService>();
+builder.Services.AddScoped<ApplicationUserService>();
 
 var app = builder.Build();
 
