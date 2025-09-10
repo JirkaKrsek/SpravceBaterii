@@ -3,6 +3,8 @@
 @using SpravceBaterii.Services
 
 @inject BatteryService BatteryService
+@inject BatteryTypeService BatteryTypeService
+@inject ChemicalCompositionService ChemicalCompositionService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Navigation
 
@@ -20,6 +22,24 @@
 
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="battery.Manufacturer"></InputText>
+
+	<label for="input-BatteryType">Typ: </label>
+	<InputSelect id="input-BatteryType" @bind-Value="battery.BatteryTypeId" required>
+		<option value="">- Vyberte typ -</option>
+		@foreach (BatteryType batteryType in BatteryTypes)
+		{
+			<option value="@batteryType.Id">@batteryType.Name</option>
+		}
+	</InputSelect>
+
+	<label for="input-ChemicalComposition">Chemické složení: </label>
+	<InputSelect id="input-ChemicalComposition" @bind-Value="battery.ChemicalCompositionId">
+		<option value="">- Vyberte typ -</option>
+		@foreach (ChemicalComposition chemicalComposition in ChemicalCompositions)
+		{
+			<option value="@chemicalComposition.Id">@chemicalComposition.Name</option>
+		}
+	</InputSelect>
 
 	<label for="input-IsRechargeable">Nabíjecí/jednorázová: </label>
 	<InputRadioGroup id="input-IsRechargeable" @bind-Value="battery.IsRechargeable" required>
@@ -39,10 +59,18 @@
 	[Parameter]
 	public EventCallback BatterySaved { get; set; }
 
+	private List<BatteryType> BatteryTypes = new();
+	private List<ChemicalComposition> ChemicalCompositions = new();
 	private Battery battery = new()
 	{
 		InsertionDate = DateOnly.FromDateTime(DateTime.Today)
 	};
+
+	protected override async Task OnInitializedAsync()
+	{
+		BatteryTypes = await BatteryTypeService.GetBatteryTypes();
+		ChemicalCompositions = await ChemicalCompositionService.GetChemicalCompositions();
+	}
 
 	/// <summary>
 	/// Uložení zadaných informací o nové baterii do databáze
@@ -60,7 +88,6 @@
 		else
 		{
 			battery.UserId = userId;
-			battery.BatteryTypeId = 1;
 			await BatteryService.SaveBattery(battery);
 		}
 

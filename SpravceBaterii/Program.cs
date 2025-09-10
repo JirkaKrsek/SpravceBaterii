@@ -75,6 +75,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Pøipojení služeb
 builder.Services.AddScoped<BatteryService>();
+builder.Services.AddScoped<BatteryTypeService>();
+builder.Services.AddScoped<ChemicalCompositionService>();
 
 var app = builder.Build();
 
