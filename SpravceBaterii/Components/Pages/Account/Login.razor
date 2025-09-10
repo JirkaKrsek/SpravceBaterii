@@ -4,11 +4,12 @@
 @using Microsoft.AspNetCore.Identity
 @using SpravceBaterii.Data.Models
 @using System.ComponentModel.DataAnnotations
+@using SpravceBaterii.Services
 
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 @inject NavigationManager Navigation
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ApplicationUserService UserService
 
 <PageTitle>Přihlášení</PageTitle>
 
@@ -50,8 +51,7 @@
     /// <returns>Asynchronní metoda</returns>
     protected override async Task OnInitializedAsync()
     {
-        AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (state.User.Identity?.IsAuthenticated == true)
+        if (await UserService.IsUserAuthenticatedAsync())
         {
             Navigation.NavigateTo("/", true);
         }

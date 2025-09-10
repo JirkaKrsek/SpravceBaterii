@@ -5,7 +5,7 @@
 @inject BatteryService BatteryService
 @inject BatteryTypeService BatteryTypeService
 @inject ChemicalCompositionService ChemicalCompositionService
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ApplicationUserService UserService
 @inject NavigationManager Navigation
 
 <h2>Formulář pro zadání nové baterie</h2>
@@ -78,8 +78,7 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task SaveBattery()
 	{
-		AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-		string? userId = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+		string? userId = await UserService.GetUserIdAsync();
 
 		if (string.IsNullOrEmpty(userId))
 		{

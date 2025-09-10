@@ -5,7 +5,7 @@
 @using SpravceBaterii.Services
 
 @inject BatteryService BatteryService
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ApplicationUserService UserService
 @inject NavigationManager Navigation
 
 <PageTitle>Seznam baterií</PageTitle>
@@ -55,26 +55,25 @@ else
 </table>
 
 @code {
-	private bool showForm = false;
-	private List<Battery> BatteryList = new();
+    private bool showForm = false;
+    private List<Battery> BatteryList = new();
 
-	/// <summary>
-	/// Při načtení stránky se zavolá načtení dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadBatteryList();
-	}
+    /// <summary>
+    /// Při načtení stránky se zavolá načtení dat
+    /// </summary>
+    /// <returns>Asynchronní operace</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBatteryList();
+    }
 
-	/// <summary>
-	/// Načtení informací o bateriích uživatele z databáze
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task LoadBatteryList()
-	{
-		AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-		string? userId = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    /// <summary>
+    /// Načtení informací o bateriích uživatele z databáze
+    /// </summary>
+    /// <returns>Asynchronní operace</returns>
+    private async Task LoadBatteryList()
+    {
+        string? userId = await UserService.GetUserIdAsync();
 
 		if (string.IsNullOrEmpty(userId))
 		{

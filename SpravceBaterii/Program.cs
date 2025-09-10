@@ -77,6 +77,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<BatteryService>();
 builder.Services.AddScoped<BatteryTypeService>();
 builder.Services.AddScoped<ChemicalCompositionService>();
+builder.Services.AddScoped<ApplicationUserService>();
 
 var app = builder.Build();
 
