@@ -78,6 +78,7 @@ builder.Services.AddScoped<BatteryService>();
 builder.Services.AddScoped<BatteryTypeService>();
 builder.Services.AddScoped<ChemicalCompositionService>();
 builder.Services.AddScoped<ApplicationUserService>();
+builder.Services.AddScoped<ExceptionHandlerService>();
 
 var app = builder.Build();
 
