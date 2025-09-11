@@ -7,10 +7,17 @@
 @inject BatteryService BatteryService
 @inject ApplicationUserService UserService
 @inject NavigationManager Navigation
+@inject ExceptionHandlerService ExceptionHandlerService
 
 <PageTitle>Seznam baterií</PageTitle>
 
 <h1>Baterie</h1>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p>@errorMessage</p>
+}
 
 @if (showForm)
 {
@@ -55,34 +62,33 @@ else
 </table>
 
 @code {
-    private bool showForm = false;
-    private List<Battery> BatteryList = new();
+	private string errorMessage = "";
+	private bool showForm = false;
+	private List<Battery> BatteryList = new();
 
-    /// <summary>
-    /// Při načtení stránky se zavolá načtení dat
-    /// </summary>
-    /// <returns>Asynchronní operace</returns>
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadBatteryList();
-    }
+	/// <summary>
+	/// Při načtení stránky se zavolá načtení dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadBatteryList();
+	}
 
-    /// <summary>
-    /// Načtení informací o bateriích uživatele z databáze
-    /// </summary>
-    /// <returns>Asynchronní operace</returns>
-    private async Task LoadBatteryList()
-    {
-        string? userId = await UserService.GetUserIdAsync();
-
-		if (string.IsNullOrEmpty(userId))
+	/// <summary>
+	/// Načtení informací o bateriích uživatele z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadBatteryList()
+	{
+		try
 		{
-			Navigation.NavigateTo("/", true);
-		}
-		else
-		{
-			BatteryList = await BatteryService.GetUserBatteries(userId);
+			BatteryList = await BatteryService.GetUserBatteries();
 			BatteryList = BatteryList.OrderBy(b => b.Device?.Name == null).ThenBy(b => b.Device?.Name).ToList();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
 	}
 

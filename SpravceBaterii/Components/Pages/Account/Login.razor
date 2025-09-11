@@ -10,6 +10,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject NavigationManager Navigation
 @inject ApplicationUserService UserService
+@inject ExceptionHandlerService ExceptionHandlerService
 
 <PageTitle>Přihlášení</PageTitle>
 
@@ -91,9 +92,9 @@
                 return;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            errorMessage = "Databáze není momentálně dostupná. Zkuste to prosím později. Omlouváme se za způsobené komplikace.";
+            errorMessage = ExceptionHandlerService.HandleException(ex);
             return;
 		}
 
