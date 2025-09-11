@@ -7,23 +7,27 @@ namespace SpravceBaterii.Services
     public class BatteryService
     {
         private ApplicationDbContext ApplicationDbContext { get; set; }
+        private readonly ApplicationUserService UserService;
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="applicationDbContext">ApplicationDbContext</param>
-        public BatteryService(ApplicationDbContext applicationDbContext)
+        /// <param name="userService">ApplicationUserService</param>
+        public BatteryService(ApplicationDbContext applicationDbContext, ApplicationUserService userService)
         {
             ApplicationDbContext = applicationDbContext;
+            UserService = userService;
         }
 
         /// <summary>
         /// Načtení baterií pro daného uživatele podle jeho ID
         /// </summary>
-        /// <param name="userId">ID uživatele</param>
         /// <returns>List baterií</returns>
-        public async Task<List<Battery>> GetUserBatteries(string userId)
+        public async Task<List<Battery>> GetUserBatteries()
         {
+            string userId = await UserService.GetUserIdAsync();
+
             return await ApplicationDbContext.Batteries
                 .Where(b => b.UserId == userId)
                 .Include(b => b.Device)
@@ -40,6 +44,9 @@ namespace SpravceBaterii.Services
         /// <returns>Asynchronní operace</returns>
         public async Task SaveBattery(Battery battery)
         {
+            string userId = await UserService.GetUserIdAsync();
+            battery.UserId = userId;
+
             ApplicationDbContext.Batteries.Add(battery);
             await ApplicationDbContext.SaveChangesAsync();
         }

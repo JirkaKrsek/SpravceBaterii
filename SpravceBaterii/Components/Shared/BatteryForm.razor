@@ -7,8 +7,15 @@
 @inject ChemicalCompositionService ChemicalCompositionService
 @inject ApplicationUserService UserService
 @inject NavigationManager Navigation
+@inject ExceptionHandlerService ExceptionHandlerService
 
 <h2>Formulář pro zadání nové baterie</h2>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
 
 <EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm">
 	<DataAnnotationsValidator />
@@ -53,6 +60,8 @@
 </EditForm>
 
 @code {
+	private string errorMessage = "";
+
 	/// <summary>
 	/// Callback události z rodičovské komponenty
 	/// </summary>
@@ -78,20 +87,16 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task SaveBattery()
 	{
-		string? userId = await UserService.GetUserIdAsync();
-
-		if (string.IsNullOrEmpty(userId))
+		try
 		{
-			Navigation.NavigateTo("/", true);
-		}
-		else
-		{
-			battery.UserId = userId;
 			await BatteryService.SaveBattery(battery);
+
+			//Zavolání události v rodičovské komponentě
+			await BatterySaved.InvokeAsync();
 		}
-
-
-		//Zavolání události v rodičovské komponentě
-		await BatterySaved.InvokeAsync();
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
 	}
 }

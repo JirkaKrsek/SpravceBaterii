@@ -18,11 +18,17 @@ namespace SpravceBaterii.Services
         /// <summary>
         /// Získání ID přihlášeného uživatele
         /// </summary>
-        /// <returns>string? ID</returns>
-        public async Task<string?> GetUserIdAsync()
+        /// <returns>string ID uživatele</returns>
+        /// <exception cref="UnauthorizedAccessException">Pokud uživatel není přihlášen nebo se nepodaří získat jeho ID</exception>
+        public async Task<string> GetUserIdAsync()
         {
             AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            return state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            string? userId = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+            return userId;
         }
 
         /// <summary>
