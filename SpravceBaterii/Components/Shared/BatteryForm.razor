@@ -66,6 +66,22 @@
 		<label for="input-IsRechargeable-false">Jednorázová</label>
 	</InputRadioGroup>
 
+	@if (battery.IsRechargeable)
+	{
+		<!--Nabíjecí baterie-->
+		<label for="input-RechargeableBattery-Capacity">Kapacita: </label>
+		<InputNumber id="input-RechargeableBattery-Capacity" @bind-Value="rechargeableBattery.Capacity"></InputNumber>
+
+		<label for="input-RechargeableBattery-CycleCount">Počet cyklů: </label>
+		<InputNumber id="input-RechargeableBattery-CycleCount" @bind-Value="rechargeableBattery.CycleCount"></InputNumber>
+	}
+	else
+	{
+		<!--Jednorázová baterie-->
+		<label for="input-DisposableBattery-ExpirationDate">Datum expirace: </label>
+		<InputDate id="input-DisposableBattery-ExpirationDate" @bind-Value="disposableBattery.ExpirationDate" required></InputDate>
+	}
+
 	<button type="submit">Uložit</button>
 </EditForm>
 
@@ -84,6 +100,11 @@
 	private Battery battery = new()
 	{
 		InsertionDate = DateOnly.FromDateTime(DateTime.Today)
+	};
+	private RechargeableBattery rechargeableBattery = new();
+	private DisposableBattery disposableBattery = new()
+	{
+		ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
 	};
 
 	protected override async Task OnInitializedAsync()
