@@ -3,6 +3,7 @@
 @using SpravceBaterii.Services
 
 @inject BatteryService BatteryService
+@inject DeviceService DeviceService
 @inject BatteryTypeService BatteryTypeService
 @inject ChemicalCompositionService ChemicalCompositionService
 @inject ApplicationUserService UserService
@@ -20,6 +21,15 @@
 <EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
+
+	<label for="input-Device">Zařízení (ve kterém je umístěna): </label>
+	<InputSelect id="input-Device" @bind-Value="battery.DeviceId">
+		<option value="">- Vyberte typ -</option>
+		@foreach (Device device in Devices)
+		{
+			<option value="@device.Id">@device.Name</option>
+		}
+	</InputSelect>
 
 	<label for="input-InsertionDate">Datum vložení: </label>
 	<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" required></InputDate>
@@ -70,6 +80,7 @@
 
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
+	private List<Device> Devices = new();
 	private Battery battery = new()
 	{
 		InsertionDate = DateOnly.FromDateTime(DateTime.Today)
@@ -77,8 +88,16 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		BatteryTypes = await BatteryTypeService.GetBatteryTypes();
-		ChemicalCompositions = await ChemicalCompositionService.GetChemicalCompositions();
+		try
+		{
+			BatteryTypes = await BatteryTypeService.GetBatteryTypes();
+			ChemicalCompositions = await ChemicalCompositionService.GetChemicalCompositions();
+			Devices = await DeviceService.GetDevices();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
 	}
 
 	/// <summary>
