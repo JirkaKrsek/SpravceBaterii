@@ -31,6 +31,8 @@
 		}
 	</InputSelect>
 
+	<span>Poloha vybraného zařízení: @(selectedDeviceLocation ?? "-")</span>
+
 	<label for="input-InsertionDate">Datum vložení: </label>
 	<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" required></InputDate>
 
@@ -87,6 +89,7 @@
 
 @code {
 	private string errorMessage = "";
+	private string? selectedDeviceLocation => Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name;
 
 	/// <summary>
 	/// Callback události z rodičovské komponenty

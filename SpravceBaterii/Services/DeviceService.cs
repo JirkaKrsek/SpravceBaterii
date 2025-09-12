@@ -30,7 +30,9 @@ namespace SpravceBaterii.Services
             string userId = await UserService.GetUserIdAsync();
 
             return await ApplicationDbContext.Devices
-                .Where(d => d.UserId == userId).ToListAsync();
+                .Where(d => d.UserId == userId)
+                .Include(d => d.Location)
+                .ToListAsync();
         }
 
         /// <summary>
