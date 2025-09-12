@@ -85,6 +85,7 @@
 	}
 
 	<button type="submit">Uložit</button>
+	<button type="button" @onclick="Close">Zavřít bez uložení</button>
 </EditForm>
 
 @code {
@@ -96,6 +97,8 @@
 	/// </summary>
 	[Parameter]
 	public EventCallback BatterySaved { get; set; }
+	[Parameter]
+	public EventCallback Cancel { get; set; }
 
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
@@ -141,5 +144,15 @@
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync();
 	}
 }

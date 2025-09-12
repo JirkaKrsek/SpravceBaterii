@@ -21,7 +21,7 @@
 
 @if (showForm)
 {
-	<BatteryForm BatterySaved="@CloseFormAndReloadList"></BatteryForm>
+	<BatteryForm BatterySaved="@CloseFormAndReloadList" Cancel="@CloseForm"></BatteryForm>
 }
 else
 {
@@ -109,5 +109,13 @@ else
 	{
 		showForm = false;
 		await LoadBatteryList();
+	}
+
+	/// <summary>
+	/// Skrytí komponenty s formulářem
+	/// </summary>
+	private void CloseForm()
+	{
+		showForm = false;
 	}
 }
