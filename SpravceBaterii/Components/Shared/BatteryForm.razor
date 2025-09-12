@@ -113,6 +113,10 @@
 		ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
 	};
 
+	/// <summary>
+	/// Při načtení komponenty se načtou potřebná data
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
 		try
