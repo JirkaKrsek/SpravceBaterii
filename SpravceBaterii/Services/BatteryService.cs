@@ -38,12 +38,12 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
-        /// Uložení nové baterie do databáze
+        /// Přidání nové baterie do databáze
         /// </summary>
         /// <param name="battery">Zadaná baterie</param>
         /// <returns>Asynchronní operace</returns>
         /// <exception cref="InvalidOperationException">Neplatný typ baterie</exception>
-        public async Task SaveBattery(Battery battery)
+        public async Task AddBattery(Battery battery)
         {
             string userId = await UserService.GetUserIdAsync();
             battery.UserId = userId;
