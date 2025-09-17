@@ -42,12 +42,27 @@ namespace SpravceBaterii.Services
         /// </summary>
         /// <param name="battery">Zadaná baterie</param>
         /// <returns>Asynchronní operace</returns>
+        /// <exception cref="InvalidOperationException">Neplatný typ baterie</exception>
         public async Task SaveBattery(Battery battery)
         {
             string userId = await UserService.GetUserIdAsync();
             battery.UserId = userId;
 
+            if (battery.IsRechargeable && battery.RechargeableBattery is not null)
+            {
+                battery.DisposableBattery = null;
+            }
+            else if (!battery.IsRechargeable && battery.DisposableBattery is not null)
+            {
+                battery.RechargeableBattery = null;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+
             ApplicationDbContext.Batteries.Add(battery);
+            //Uložení
             await ApplicationDbContext.SaveChangesAsync();
         }
     }
