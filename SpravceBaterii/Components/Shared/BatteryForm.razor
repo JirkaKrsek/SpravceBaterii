@@ -9,6 +9,8 @@
 @inject ApplicationUserService UserService
 @inject NavigationManager Navigation
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject DisposableBatteryService DisposableBatteryService
+@inject RechargeableBatteryService RechargeableBatteryService
 
 <h2>Formulář pro zadání nové baterie</h2>
 
@@ -98,6 +100,8 @@
 	/// Callback události z rodičovské komponenty
 	/// </summary>
 	[Parameter]
+	public int? BatteryToUpdateId { get; set; }
+	[Parameter]
 	public EventCallback BatterySaved { get; set; }
 	[Parameter]
 	public EventCallback Cancel { get; set; }
@@ -105,24 +109,53 @@
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
 	private List<Device> Devices = new();
-	private Battery battery = new()
-	{
-		InsertionDate = DateOnly.FromDateTime(DateTime.Today)
-	};
+	private Battery battery = new();
 	private RechargeableBattery rechargeableBattery = new();
-	private DisposableBattery disposableBattery = new()
-	{
-		ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
-	};
+	private DisposableBattery disposableBattery = new();
+
 
 	/// <summary>
-	/// Při načtení komponenty se načtou potřebná data
+	/// Načtení potřebných dat při zobrazení komponenty
 	/// </summary>
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
+			if (BatteryToUpdateId is not null)
+			{
+				battery = await BatteryService.GetUserBatteryById(BatteryToUpdateId.Value);
+
+				if (!battery.IsRechargeable)
+				{
+					disposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id) ?? new()
+					{
+						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+					};
+					rechargeableBattery = new();
+				}
+				if (battery.IsRechargeable)
+				{
+					rechargeableBattery = await RechargeableBatteryService.GetRechargeableBatteryById(battery.Id) ?? new();
+					disposableBattery = new()
+					{
+						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+					};
+				}
+			}
+			else
+			{
+				battery = new()
+				{
+					InsertionDate = DateOnly.FromDateTime(DateTime.Today)
+				};
+				disposableBattery = new()
+				{
+					ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+				};
+				rechargeableBattery = new();
+			}
+
 			BatteryTypes = await BatteryTypeService.GetBatteryTypes();
 			ChemicalCompositions = await ChemicalCompositionService.GetChemicalCompositions();
 			Devices = await DeviceService.GetDevices();
@@ -141,7 +174,7 @@
 	{
 		try
 		{
-			await BatteryService.SaveBattery(battery);
+			await BatteryService.AddBattery(battery);
 
 			//Zavolání události v rodičovské komponentě
 			await BatterySaved.InvokeAsync();
