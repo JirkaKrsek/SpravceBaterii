@@ -6,7 +6,7 @@ namespace SpravceBaterii.Services
 {
     public class ChemicalCompositionService
     {
-        private readonly ApplicationDbContext ApplicationDbContext;
+        private readonly ApplicationDbContext applicationDbContext;
 
         /// <summary>
         /// Konstruktor
@@ -14,7 +14,7 @@ namespace SpravceBaterii.Services
         /// <param name="applicationDbContext">ApplicationDbContext</param>
         public ChemicalCompositionService(ApplicationDbContext applicationDbContext)
         {
-            ApplicationDbContext = applicationDbContext;
+            this.applicationDbContext = applicationDbContext;
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace SpravceBaterii.Services
         /// <returns>List chemických složení</returns>
         public async Task<List<ChemicalComposition>> GetChemicalCompositions()
         {
-            return await ApplicationDbContext.ChemicalCompositions.AsNoTracking().ToListAsync();
+            return await applicationDbContext.ChemicalCompositions.AsNoTracking().ToListAsync();
         }
     }
 }

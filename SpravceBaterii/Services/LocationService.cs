@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
-using System.Threading.Tasks;
 
 namespace SpravceBaterii.Services
 {
     public class LocationService
     {
-        private readonly ApplicationDbContext ApplicationDbContext;
-        private readonly ApplicationUserService UserService;
+        private readonly ApplicationDbContext applicationDbContext;
+        private readonly ApplicationUserService userService;
 
         /// <summary>
         /// Konstruktor
@@ -17,8 +16,8 @@ namespace SpravceBaterii.Services
         /// <param name="userService">ApplicationUserService</param>
         public LocationService(ApplicationDbContext applicationDbContext, ApplicationUserService userService)
         {
-            ApplicationDbContext = applicationDbContext;
-            UserService = userService;
+            this.applicationDbContext = applicationDbContext;
+            this.userService = userService;
         }
 
         /// <summary>
@@ -27,9 +26,9 @@ namespace SpravceBaterii.Services
         /// <returns>List umístění</returns>
         public async Task<List<Location>> GetLocations()
         {
-            string userId = await UserService.GetUserIdAsync();
+            string userId = await userService.GetUserIdAsync();
 
-            return await ApplicationDbContext.Locations
+            return await applicationDbContext.Locations
                 .Where(l => l.UserId == userId).ToListAsync();
         }
 
@@ -40,11 +39,11 @@ namespace SpravceBaterii.Services
         /// <returns>Asynchronní operace</returns>
         public async Task AddLocation(Location location)
         {
-            string userId = await UserService.GetUserIdAsync();
+            string userId = await userService.GetUserIdAsync();
             location.UserId = userId;
 
-            ApplicationDbContext.Locations.Add(location);
-            await ApplicationDbContext.SaveChangesAsync();
+            applicationDbContext.Locations.Add(location);
+            await applicationDbContext.SaveChangesAsync();
 
         }
     }

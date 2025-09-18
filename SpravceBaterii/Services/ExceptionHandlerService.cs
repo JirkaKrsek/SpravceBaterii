@@ -6,7 +6,7 @@ namespace SpravceBaterii.Services
 {
     public class ExceptionHandlerService
     {
-        private readonly NavigationManager Navigation;
+        private readonly NavigationManager navigation;
 
         /// <summary>
         /// Konstruktor
@@ -14,7 +14,7 @@ namespace SpravceBaterii.Services
         /// <param name="navigation">NavigationManager</param>
         public ExceptionHandlerService(NavigationManager navigation)
         {
-            Navigation = navigation;
+            this.navigation = navigation;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace SpravceBaterii.Services
         {
             if (exception is UnauthorizedAccessException)
             {
-                Navigation.NavigateTo("/ucet/prihlaseni", true);
+                navigation.NavigateTo("/ucet/prihlaseni", true);
             }
             else if (exception is DbUpdateException or SqlException or TimeoutException)
             {
@@ -35,7 +35,7 @@ namespace SpravceBaterii.Services
             }
             else
             {
-                Navigation.NavigateTo("/Error", true);
+                navigation.NavigateTo("/Error", true);
             }
 
             return "";

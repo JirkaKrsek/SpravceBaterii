@@ -6,10 +6,10 @@ namespace SpravceBaterii.Services
 {
     public class BatteryService
     {
-        private readonly ApplicationDbContext ApplicationDbContext;
-        private readonly ApplicationUserService UserService;
-        private readonly DisposableBatteryService DisposableBatteryService;
-        private readonly RechargeableBatteryService RechargeableBatteryService;
+        private readonly ApplicationDbContext applicationDbContext;
+        private readonly ApplicationUserService userService;
+        private readonly DisposableBatteryService disposableBatteryService;
+        private readonly RechargeableBatteryService rechargeableBatteryService;
 
         /// <summary>
         /// Konstruktor
@@ -20,10 +20,10 @@ namespace SpravceBaterii.Services
         /// <param name="rechargeableBatteryService">RechargeableBatteryService</param>
         public BatteryService(ApplicationDbContext applicationDbContext, ApplicationUserService userService, DisposableBatteryService disposableBatteryService, RechargeableBatteryService rechargeableBatteryService)
         {
-            ApplicationDbContext = applicationDbContext;
-            UserService = userService;
-            DisposableBatteryService = disposableBatteryService;
-            RechargeableBatteryService = rechargeableBatteryService;
+            this.applicationDbContext = applicationDbContext;
+            this.userService = userService;
+            this.disposableBatteryService = disposableBatteryService;
+            this.rechargeableBatteryService = rechargeableBatteryService;
         }
 
         /// <summary>
@@ -32,9 +32,9 @@ namespace SpravceBaterii.Services
         /// <returns>List baterií</returns>
         public async Task<List<Battery>> GetUserBatteries()
         {
-            string userId = await UserService.GetUserIdAsync();
+            string userId = await userService.GetUserIdAsync();
 
-            return await ApplicationDbContext.Batteries
+            return await applicationDbContext.Batteries
                 .Where(b => b.UserId == userId)
                 .Include(b => b.Device)
                 .Include(b => b.BatteryType)
@@ -51,9 +51,9 @@ namespace SpravceBaterii.Services
         /// <exception cref="InvalidOperationException">Baterie nenalezena</exception>
         public async Task<Battery> GetUserBatteryById(int batteryId)
         {
-            string userId = await UserService.GetUserIdAsync();
+            string userId = await userService.GetUserIdAsync();
 
-            return await ApplicationDbContext.Batteries
+            return await applicationDbContext.Batteries
                 .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == batteryId)
                 ?? throw new InvalidOperationException();
@@ -67,7 +67,7 @@ namespace SpravceBaterii.Services
         /// <exception cref="InvalidOperationException">Neplatná data</exception>
         public async Task UpdateBattery(Battery battery)
         {
-            string userId = await UserService.GetUserIdAsync();
+            string userId = await userService.GetUserIdAsync();
 
             if (battery.UserId == userId)
             {
@@ -77,13 +77,13 @@ namespace SpravceBaterii.Services
                 battery.DisposableBattery = null;
                 battery.RechargeableBattery = null;
 
-                ApplicationDbContext.Update(battery);
+                applicationDbContext.Update(battery);
                 //Uložení
-                await ApplicationDbContext.SaveChangesAsync();
+                await applicationDbContext.SaveChangesAsync();
 
 
-                RechargeableBattery? existingRechargeableBattery = await RechargeableBatteryService.GetRechargeableBatteryById(battery.Id);
-                DisposableBattery? existingDisposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id);
+                RechargeableBattery? existingRechargeableBattery = await rechargeableBatteryService.GetRechargeableBatteryById(battery.Id);
+                DisposableBattery? existingDisposableBattery = await disposableBatteryService.GetDisposableBatteryById(battery.Id);
                 
                 if (battery.IsRechargeable && rechargeableBattery is not null)
                 {
@@ -92,21 +92,21 @@ namespace SpravceBaterii.Services
                     if (existingRechargeableBattery is not null)
                     {
                         rechargeableBattery.Id = existingRechargeableBattery.Id;
-                        await RechargeableBatteryService.Update(rechargeableBattery);
+                        await rechargeableBatteryService.Update(rechargeableBattery);
                     }
                     else
                     {
-                        await RechargeableBatteryService.Add(rechargeableBattery);
+                        await rechargeableBatteryService.Add(rechargeableBattery);
                         if (existingDisposableBattery is not null)
                         {
-                            await DisposableBatteryService.Delete(existingDisposableBattery);
+                            await disposableBatteryService.Delete(existingDisposableBattery);
                         }
                     }
                     //Uložení
-                    await ApplicationDbContext.SaveChangesAsync();
+                    await applicationDbContext.SaveChangesAsync();
 
                     //Odpojení od slednování EF Core
-                    ApplicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
+                    applicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
                 }
                 else if (!battery.IsRechargeable && disposableBattery is not null)
                 {
@@ -115,32 +115,32 @@ namespace SpravceBaterii.Services
                     if (existingDisposableBattery is not null)
                     {
                         disposableBattery.Id = existingDisposableBattery.Id;
-                        await DisposableBatteryService.Update(disposableBattery);
+                        await disposableBatteryService.Update(disposableBattery);
                     }
                     else
                     {
-                        await DisposableBatteryService.Add(disposableBattery);
+                        await disposableBatteryService.Add(disposableBattery);
                         if (existingRechargeableBattery is not null)
                         {
-                            await RechargeableBatteryService.Delete(existingRechargeableBattery);
+                            await rechargeableBatteryService.Delete(existingRechargeableBattery);
                         }
                     }
                     //Uložení
-                    await ApplicationDbContext.SaveChangesAsync();
+                    await applicationDbContext.SaveChangesAsync();
 
                     //Odpojení od slednování EF Core
-                    ApplicationDbContext.Entry(disposableBattery).State = EntityState.Detached;
+                    applicationDbContext.Entry(disposableBattery).State = EntityState.Detached;
                 }
                 else
                 {
                     //Odpojení od slednování EF Core
-                    ApplicationDbContext.Entry(battery).State = EntityState.Detached;
+                    applicationDbContext.Entry(battery).State = EntityState.Detached;
 
                     throw new InvalidOperationException();
                 }
 
                 //Odpojení od slednování EF Core
-                ApplicationDbContext.Entry(battery).State = EntityState.Detached;
+                applicationDbContext.Entry(battery).State = EntityState.Detached;
             }
         }
 
@@ -152,7 +152,7 @@ namespace SpravceBaterii.Services
         /// <exception cref="InvalidOperationException">Neplatný typ baterie</exception>
         public async Task AddBattery(Battery battery)
         {
-            string userId = await UserService.GetUserIdAsync();
+            string userId = await userService.GetUserIdAsync();
             battery.UserId = userId;
 
             if (battery.IsRechargeable && battery.RechargeableBattery is not null)
@@ -168,12 +168,12 @@ namespace SpravceBaterii.Services
                 throw new InvalidOperationException();
             }
 
-            ApplicationDbContext.Batteries.Add(battery);
+            applicationDbContext.Batteries.Add(battery);
             //Uložení
-            await ApplicationDbContext.SaveChangesAsync();
+            await applicationDbContext.SaveChangesAsync();
 
             //Odpojení od slednování EF Core
-            ApplicationDbContext.Entry(battery).State = EntityState.Detached;
+            applicationDbContext.Entry(battery).State = EntityState.Detached;
         }
     }
 }

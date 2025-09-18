@@ -6,7 +6,7 @@ namespace SpravceBaterii.Services
 {
     public class RechargeableBatteryService
     {
-        private readonly ApplicationDbContext ApplicationDbContext;
+        private readonly ApplicationDbContext applicationDbContext;
 
         /// <summary>
         /// Konstruktor
@@ -14,7 +14,7 @@ namespace SpravceBaterii.Services
         /// <param name="applicationDbContext">ApplicationDbContext</param>
         public RechargeableBatteryService(ApplicationDbContext applicationDbContext)
         {
-            ApplicationDbContext = applicationDbContext;
+            this.applicationDbContext = applicationDbContext;
         }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace SpravceBaterii.Services
         /// <returns>Nabíjecí baterie / null</returns>
         public async Task<RechargeableBattery?> GetRechargeableBatteryById(int batteryId)
         {
-            return await ApplicationDbContext.RechargeableBatteries.AsNoTracking().FirstOrDefaultAsync(b => b.BatteryId == batteryId);
+            return await applicationDbContext.RechargeableBatteries.AsNoTracking().FirstOrDefaultAsync(b => b.BatteryId == batteryId);
         }
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace SpravceBaterii.Services
         /// <returns>Asynchronní operace</returns>
         public async Task Add(RechargeableBattery rechargeableBattery)
         {
-            ApplicationDbContext.RechargeableBatteries.Add(rechargeableBattery);
+            applicationDbContext.RechargeableBatteries.Add(rechargeableBattery);
             //Uložení
-            await ApplicationDbContext.SaveChangesAsync();
+            await applicationDbContext.SaveChangesAsync();
 
             //Odpojení od slednování EF Core
-            ApplicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
+            applicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
         }
 
         /// <summary>
@@ -49,12 +49,12 @@ namespace SpravceBaterii.Services
         /// <returns>Asynchronní operace</returns>
         public async Task Update(RechargeableBattery rechargeableBattery)
         {
-            ApplicationDbContext.RechargeableBatteries.Update(rechargeableBattery);
+            applicationDbContext.RechargeableBatteries.Update(rechargeableBattery);
             //Uložení
-            await ApplicationDbContext.SaveChangesAsync();
+            await applicationDbContext.SaveChangesAsync();
 
             //Odpojení od slednování EF Core
-            ApplicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
+            applicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
         }
 
         /// <summary>
@@ -64,8 +64,8 @@ namespace SpravceBaterii.Services
         /// <returns>Asynchronní operace</returns>
         public async Task Delete(RechargeableBattery battery)
         {
-            ApplicationDbContext.RechargeableBatteries.Remove(battery);
-            await ApplicationDbContext.SaveChangesAsync();
+            applicationDbContext.RechargeableBatteries.Remove(battery);
+            await applicationDbContext.SaveChangesAsync();
         }
     }
 }
