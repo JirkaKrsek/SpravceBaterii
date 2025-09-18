@@ -8,16 +8,22 @@ namespace SpravceBaterii.Services
     {
         private readonly ApplicationDbContext ApplicationDbContext;
         private readonly ApplicationUserService UserService;
+        private readonly DisposableBatteryService DisposableBatteryService;
+        private readonly RechargeableBatteryService RechargeableBatteryService;
 
         /// <summary>
         /// Konstruktor
         /// </summary>
         /// <param name="applicationDbContext">ApplicationDbContext</param>
         /// <param name="userService">ApplicationUserService</param>
-        public BatteryService(ApplicationDbContext applicationDbContext, ApplicationUserService userService)
+        /// <param name="disposableBatteryService">DisposableBatteryService</param>
+        /// <param name="rechargeableBatteryService">RechargeableBatteryService</param>
+        public BatteryService(ApplicationDbContext applicationDbContext, ApplicationUserService userService, DisposableBatteryService disposableBatteryService, RechargeableBatteryService rechargeableBatteryService)
         {
             ApplicationDbContext = applicationDbContext;
             UserService = userService;
+            DisposableBatteryService = disposableBatteryService;
+            RechargeableBatteryService = rechargeableBatteryService;
         }
 
         /// <summary>
@@ -51,6 +57,91 @@ namespace SpravceBaterii.Services
                 .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == batteryId)
                 ?? throw new InvalidOperationException();
+        }
+
+        /// <summary>
+        /// Aktualizace baterie v databázi
+        /// </summary>
+        /// <param name="battery">Upravená baterie</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="InvalidOperationException">Neplatná data</exception>
+        public async Task UpdateBattery(Battery battery)
+        {
+            string userId = await UserService.GetUserIdAsync();
+
+            if (battery.UserId == userId)
+            {
+                DisposableBattery? disposableBattery = battery.DisposableBattery;
+                RechargeableBattery? rechargeableBattery = battery.RechargeableBattery;
+
+                battery.DisposableBattery = null;
+                battery.RechargeableBattery = null;
+
+                ApplicationDbContext.Update(battery);
+                //Uložení
+                await ApplicationDbContext.SaveChangesAsync();
+
+
+                RechargeableBattery? existingRechargeableBattery = await RechargeableBatteryService.GetRechargeableBatteryById(battery.Id);
+                DisposableBattery? existingDisposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id);
+                
+                if (battery.IsRechargeable && rechargeableBattery is not null)
+                {
+                    rechargeableBattery.BatteryId = battery.Id;
+
+                    if (existingRechargeableBattery is not null)
+                    {
+                        rechargeableBattery.Id = existingRechargeableBattery.Id;
+                        await RechargeableBatteryService.Update(rechargeableBattery);
+                    }
+                    else
+                    {
+                        await RechargeableBatteryService.Add(rechargeableBattery);
+                        if (existingDisposableBattery is not null)
+                        {
+                            await DisposableBatteryService.Delete(existingDisposableBattery);
+                        }
+                    }
+                    //Uložení
+                    await ApplicationDbContext.SaveChangesAsync();
+
+                    //Odpojení od slednování EF Core
+                    ApplicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
+                }
+                else if (!battery.IsRechargeable && disposableBattery is not null)
+                {
+                    disposableBattery.BatteryId = battery.Id;
+
+                    if (existingDisposableBattery is not null)
+                    {
+                        disposableBattery.Id = existingDisposableBattery.Id;
+                        await DisposableBatteryService.Update(disposableBattery);
+                    }
+                    else
+                    {
+                        await DisposableBatteryService.Add(disposableBattery);
+                        if (existingRechargeableBattery is not null)
+                        {
+                            await RechargeableBatteryService.Delete(existingRechargeableBattery);
+                        }
+                    }
+                    //Uložení
+                    await ApplicationDbContext.SaveChangesAsync();
+
+                    //Odpojení od slednování EF Core
+                    ApplicationDbContext.Entry(disposableBattery).State = EntityState.Detached;
+                }
+                else
+                {
+                    //Odpojení od slednování EF Core
+                    ApplicationDbContext.Entry(battery).State = EntityState.Detached;
+
+                    throw new InvalidOperationException();
+                }
+
+                //Odpojení od slednování EF Core
+                ApplicationDbContext.Entry(battery).State = EntityState.Detached;
+            }
         }
 
         /// <summary>
