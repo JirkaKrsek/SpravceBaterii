@@ -90,11 +90,22 @@
 
 	<button type="submit">Uložit</button>
 	<button type="button" @onclick="Close">Zavřít bez uložení</button>
+	<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
+
+	@if (showConfirm)
+	{
+		<div>
+			<p>Opravdu chcete odstranit tuto baterii?</p>
+			<button type="button" @onclick="() => DeleteBattery(battery.Id)">Ano</button>
+			<button type="button" @onclick="() => showConfirm = false">Ne</button>
+		</div>
+	}
 </EditForm>
 
 @code {
 	private string errorMessage = "";
 	private string? selectedDeviceLocation => Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name;
+	private bool showConfirm = false;
 
 	/// <summary>
 	/// Callback události z rodičovské komponenty
@@ -185,6 +196,26 @@
 			{
 				await BatteryService.UpdateBattery(battery);
 			}
+
+			//Zavolání události v rodičovské komponentě
+			await BatterySaved.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Odstranění vybrané baterie z databáze
+	/// </summary>
+	/// <param name="batteryId">ID vybrané baterie</param>
+	/// <returns>Asynchronní operace</returns>
+	private async Task DeleteBattery(int batteryId)
+	{
+		try
+		{
+			await BatteryService.DeleteBatteryById(batteryId);
 
 			//Zavolání události v rodičovské komponentě
 			await BatterySaved.InvokeAsync();
