@@ -38,6 +38,22 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Získání baterie podle ID
+        /// </summary>
+        /// <param name="batteryId">ID hledané baterie</param>
+        /// <returns>Nalezená baterie</returns>
+        /// <exception cref="InvalidOperationException">Baterie nenalezena</exception>
+        public async Task<Battery> GetUserBatteryById(int batteryId)
+        {
+            string userId = await UserService.GetUserIdAsync();
+
+            return await ApplicationDbContext.Batteries
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == batteryId)
+                ?? throw new InvalidOperationException();
+        }
+
+        /// <summary>
         /// Přidání nové baterie do databáze
         /// </summary>
         /// <param name="battery">Zadaná baterie</param>
