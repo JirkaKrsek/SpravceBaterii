@@ -56,7 +56,7 @@ namespace SpravceBaterii.Services
             return await applicationDbContext.Batteries
                 .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == batteryId)
-                ?? throw new InvalidOperationException();
+                ?? throw new KeyNotFoundException();
         }
 
         /// <summary>
