@@ -65,6 +65,7 @@ namespace SpravceBaterii.Services
         /// <param name="battery">Upravená baterie</param>
         /// <returns>Asynchronní operace</returns>
         /// <exception cref="InvalidOperationException">Neplatná data</exception>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
         public async Task UpdateBattery(Battery battery)
         {
             string userId = await userService.GetUserIdAsync();
@@ -84,7 +85,7 @@ namespace SpravceBaterii.Services
 
                 RechargeableBattery? existingRechargeableBattery = await rechargeableBatteryService.GetRechargeableBatteryById(battery.Id);
                 DisposableBattery? existingDisposableBattery = await disposableBatteryService.GetDisposableBatteryById(battery.Id);
-                
+
                 if (battery.IsRechargeable && rechargeableBattery is not null)
                 {
                     rechargeableBattery.BatteryId = battery.Id;
@@ -141,6 +142,10 @@ namespace SpravceBaterii.Services
 
                 //Odpojení od slednování EF Core
                 applicationDbContext.Entry(battery).State = EntityState.Detached;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
             }
         }
 
