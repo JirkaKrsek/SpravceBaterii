@@ -48,7 +48,7 @@ namespace SpravceBaterii.Services
         /// </summary>
         /// <param name="batteryId">ID hledané baterie</param>
         /// <returns>Nalezená baterie</returns>
-        /// <exception cref="InvalidOperationException">Baterie nenalezena</exception>
+        /// <exception cref="KeyNotFoundException">Baterie nenalezena</exception>
         public async Task<Battery> GetUserBatteryById(int batteryId)
         {
             string userId = await userService.GetUserIdAsync();
@@ -174,6 +174,29 @@ namespace SpravceBaterii.Services
 
             //Odpojení od slednování EF Core
             applicationDbContext.Entry(battery).State = EntityState.Detached;
+        }
+
+        /// <summary>
+        /// Odstranění baterie z databáze
+        /// </summary>
+        /// <param name="batteryId">ID baterie</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
+        public async Task DeleteBatteryById(int batteryId)
+        {
+            string userId = await userService.GetUserIdAsync();
+            Battery battery = await GetUserBatteryById(batteryId);
+
+            if (battery.UserId == userId)
+            {
+                applicationDbContext.Remove(battery);
+                //Uložení
+                await applicationDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
         }
     }
 }
