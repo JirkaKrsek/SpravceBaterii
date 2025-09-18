@@ -167,14 +167,24 @@
 	}
 
 	/// <summary>
-	/// Uložení zadaných informací o nové baterii do databáze
+	/// Uložení zadaných informací o (nové / vybrané) baterii do databáze
 	/// </summary>
 	/// <returns>Asynchronní operace</returns>
 	private async Task SaveBattery()
 	{
 		try
 		{
-			await BatteryService.AddBattery(battery);
+			battery.RechargeableBattery = rechargeableBattery;
+			battery.DisposableBattery = disposableBattery;
+
+			if (BatteryToUpdateId is null)
+			{
+				await BatteryService.AddBattery(battery);
+			}
+			else
+			{
+				await BatteryService.UpdateBattery(battery);
+			}
 
 			//Zavolání události v rodičovské komponentě
 			await BatterySaved.InvokeAsync();
