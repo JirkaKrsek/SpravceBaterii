@@ -23,7 +23,7 @@ namespace SpravceBaterii.Services
         /// <returns>List chemických složení</returns>
         public async Task<List<ChemicalComposition>> GetChemicalCompositions()
         {
-            return await ApplicationDbContext.ChemicalCompositions.ToListAsync();
+            return await ApplicationDbContext.ChemicalCompositions.AsNoTracking().ToListAsync();
         }
     }
 }

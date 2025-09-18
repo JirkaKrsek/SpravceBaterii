@@ -23,7 +23,7 @@ namespace SpravceBaterii.Services
         /// <returns>List typů baterií</returns>
         public async Task<List<BatteryType>> GetBatteryTypes()
         {
-            return await ApplicationDbContext.BatteryTypes.ToListAsync();
+            return await ApplicationDbContext.BatteryTypes.AsNoTracking().ToListAsync();
         }
     }
 }
