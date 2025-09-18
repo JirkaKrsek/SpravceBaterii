@@ -6,7 +6,7 @@ namespace SpravceBaterii.Services
 {
     public class BatteryService
     {
-        private ApplicationDbContext ApplicationDbContext { get; set; }
+        private readonly ApplicationDbContext ApplicationDbContext;
         private readonly ApplicationUserService UserService;
 
         /// <summary>

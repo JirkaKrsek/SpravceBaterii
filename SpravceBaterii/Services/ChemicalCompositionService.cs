@@ -6,7 +6,7 @@ namespace SpravceBaterii.Services
 {
     public class ChemicalCompositionService
     {
-        private ApplicationDbContext ApplicationDbContext { get; set; }
+        private readonly ApplicationDbContext ApplicationDbContext;
 
         /// <summary>
         /// Konstruktor
