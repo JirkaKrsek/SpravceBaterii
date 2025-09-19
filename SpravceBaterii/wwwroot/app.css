@@ -38,7 +38,7 @@ h1:focus {
 }
 
 
-/* Status baterie */
+/* Vyhodnocený stav baterie */
 .battery-expired {
     color: white;
     background-color: red;
