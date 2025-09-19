@@ -36,3 +36,22 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+
+/* Status baterie */
+.battery-expired {
+    color: white;
+    background-color: red;
+}
+.battery-warning {
+    color: black;
+    background-color: yellow;
+}
+.battery-ok {
+    color: white;
+    background-color: green;
+}
+.battery-noStatus {
+    color: black;
+    background-color: white;
+}

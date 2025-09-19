@@ -45,7 +45,7 @@
 	@if (battery.ExpectedLifespan is not null)
 	{
 		SetRemainingDaysToExpectedLife();
-		<span>Podle očekávané životnosti zbývá do vybití <strong>@remainingExpectedLifeSpanDays</strong> dní</span>
+		<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@batteryStatusExpectedLifeSpan.Days</strong> dní</span>
 	}
 
 	<label for="input-Manufacturer">Výrobce: </label>
@@ -93,7 +93,7 @@
 		<InputDate id="input-DisposableBattery-ExpirationDate" @bind-Value="disposableBattery.ExpirationDate" required></InputDate>
 
 		SetRemainingDaysToExpirate();
-		<span>Do konce expirace zbývá <strong>@remainingDays</strong> dní</span>
+		<span>Do konce expirace zbývá <strong class="@batteryStatusExpirationDate.CssClass">@batteryStatusExpirationDate.Days</strong> dní</span>
 	}
 
 	<hr>
@@ -117,30 +117,6 @@
 	private string? selectedDeviceLocation => Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name;
 	private bool showConfirm = false;
 
-	private int remainingDays = 0, remainingExpectedLifeSpanDays = 0;
-	private BatteryStatusEvaluator batteryStatusEvaluator = new();
-
-	/// <summary>
-	/// Nastavení zbývajících dní do konce expirace baterie
-	/// </summary>
-	private void SetRemainingDaysToExpirate()
-	{
-		if (!battery.IsRechargeable)
-		{
-			remainingDays = batteryStatusEvaluator.RemainingDaysToExpirate(disposableBattery.ExpirationDate);
-		}
-	}
-	/// <summary>
-	/// Nastavení zbývajících dní do předpokládaného data životnosti
-	/// </summary>
-	private void SetRemainingDaysToExpectedLife()
-	{
-		if (battery.ExpectedLifespan is not null)
-		{
-			remainingExpectedLifeSpanDays = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate, battery.ExpectedLifespan.Value);
-		}
-	}
-
 	/// <summary>
 	/// Callback události z rodičovské komponenty
 	/// </summary>
@@ -158,6 +134,9 @@
 	private RechargeableBattery rechargeableBattery = new();
 	private DisposableBattery disposableBattery = new();
 
+	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+	private BatteryStatus batteryStatusExpirationDate = new();
+	private BatteryStatus batteryStatusExpectedLifeSpan = new();
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -257,6 +236,28 @@
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Nastavení zbývajících dní do konce expirace baterie
+	/// </summary>
+	private void SetRemainingDaysToExpirate()
+	{
+		if (!battery.IsRechargeable)
+		{
+			batteryStatusExpirationDate = batteryStatusEvaluator.RemainingDaysToExpirate(disposableBattery.ExpirationDate);
+		}
+	}
+
+	/// <summary>
+	/// Nastavení zbývajících dní do předpokládaného data životnosti
+	/// </summary>
+	private void SetRemainingDaysToExpectedLife()
+	{
+		if (battery.ExpectedLifespan is not null)
+		{
+			batteryStatusExpectedLifeSpan = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate, battery.ExpectedLifespan.Value);
 		}
 	}
 
