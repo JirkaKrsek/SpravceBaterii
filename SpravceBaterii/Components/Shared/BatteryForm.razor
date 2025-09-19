@@ -26,7 +26,7 @@
 	<ValidationSummary />
 
 	<label for="input-Device">Zařízení (ve kterém je umístěna): </label>
-	<InputSelect id="input-Device" @bind-Value="battery.DeviceId">
+	<InputSelect id="input-Device" @bind-Value="battery.DeviceId" @bind-Value:after="SetDeviceLocation">
 		<option value="">- Vyberte typ -</option>
 		@foreach (Device device in Devices)
 		{
@@ -34,7 +34,7 @@
 		}
 	</InputSelect>
 
-	<span>Poloha vybraného zařízení: @(selectedDeviceLocation ?? "-")</span>
+	<span>Poloha vybraného zařízení: @selectedDeviceLocation</span>
 
 	<label for="input-InsertionDate">Datum vložení: </label>
 	<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" @bind-Value:after="SetRemainingDaysToExpectedLife" required></InputDate>
@@ -44,7 +44,6 @@
 
 	@if (battery.ExpectedLifespan is not null)
 	{
-		SetRemainingDaysToExpectedLife();
 		<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@batteryStatusExpectedLifeSpan.Days</strong> dní</span>
 	}
 
@@ -92,7 +91,6 @@
 		<label for="input-DisposableBattery-ExpirationDate">Datum expirace: </label>
 		<InputDate id="input-DisposableBattery-ExpirationDate" @bind-Value="disposableBattery.ExpirationDate" @bind-Value:after="SetRemainingDaysToExpirate" required></InputDate>
 
-		SetRemainingDaysToExpirate();
 		<span>Do konce expirace zbývá <strong class="@batteryStatusExpirationDate.CssClass">@batteryStatusExpirationDate.Days</strong> dní</span>
 	}
 
@@ -114,7 +112,6 @@
 
 @code {
 	private string errorMessage = "";
-	private string? selectedDeviceLocation => Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name;
 	private bool showConfirm = false;
 
 	/// <summary>
@@ -134,6 +131,7 @@
 	private RechargeableBattery rechargeableBattery = new();
 	private DisposableBattery disposableBattery = new();
 
+	private string selectedDeviceLocation = "";
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 	private BatteryStatus batteryStatusExpirationDate = new();
 	private BatteryStatus batteryStatusExpectedLifeSpan = new();
@@ -186,6 +184,7 @@
 
 			SetRemainingDaysToExpirate();
 			SetRemainingDaysToExpectedLife();
+			SetDeviceLocation();
 		}
 		catch (Exception ex)
 		{
@@ -262,6 +261,14 @@
 		{
 			batteryStatusExpectedLifeSpan = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate, battery.ExpectedLifespan.Value);
 		}
+	}
+
+	/// <summary>
+	/// Nastavení názvu umístění aktuálně vybraného zařízení
+	/// </summary>
+	private void SetDeviceLocation()
+	{
+		selectedDeviceLocation = Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name ?? "-";
 	}
 
 	/// <summary>
