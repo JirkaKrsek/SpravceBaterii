@@ -84,6 +84,9 @@
 		<!--Jednorázová baterie-->
 		<label for="input-DisposableBattery-ExpirationDate">Datum expirace: </label>
 		<InputDate id="input-DisposableBattery-ExpirationDate" @bind-Value="disposableBattery.ExpirationDate" required></InputDate>
+
+		SetRemainingDays();
+		<span>Do konce expirace zbývá <strong>@remainingDays</strong> dní</span>
 	}
 
 	<hr>
@@ -106,6 +109,15 @@
 	private string errorMessage = "";
 	private string? selectedDeviceLocation => Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name;
 	private bool showConfirm = false;
+
+	private int remainingDays = 0;
+	private void SetRemainingDays()
+	{
+		if (!battery.IsRechargeable)
+		{
+			remainingDays = (disposableBattery.ExpirationDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+		}
+	}
 
 	/// <summary>
 	/// Callback události z rodičovské komponenty
@@ -140,30 +152,30 @@
 				if (!battery.IsRechargeable)
 				{
 					disposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id) ?? new()
-					{
-						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
-					};
+						{
+							ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+						};
 					rechargeableBattery = new();
 				}
 				if (battery.IsRechargeable)
 				{
 					rechargeableBattery = await RechargeableBatteryService.GetRechargeableBatteryById(battery.Id) ?? new();
 					disposableBattery = new()
-					{
-						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
-					};
+						{
+							ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+						};
 				}
 			}
 			else
 			{
 				battery = new()
-				{
-					InsertionDate = DateOnly.FromDateTime(DateTime.Today)
-				};
+					{
+						InsertionDate = DateOnly.FromDateTime(DateTime.Today)
+					};
 				disposableBattery = new()
-				{
-					ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
-				};
+					{
+						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+					};
 				rechargeableBattery = new();
 			}
 
