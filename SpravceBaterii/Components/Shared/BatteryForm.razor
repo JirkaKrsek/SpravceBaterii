@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using SpravceBaterii.Data.Models
 @using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
 
 @inject BatteryService BatteryService
 @inject DeviceService DeviceService
@@ -43,7 +44,7 @@
 
 	@if (battery.ExpectedLifespan is not null)
 	{
-		SetRemainingExpectedLifeSpan();
+		SetRemainingDaysToExpectedLife();
 		<span>Podle očekávané životnosti zbývá do vybití <strong>@remainingExpectedLifeSpanDays</strong> dní</span>
 	}
 
@@ -91,7 +92,7 @@
 		<label for="input-DisposableBattery-ExpirationDate">Datum expirace: </label>
 		<InputDate id="input-DisposableBattery-ExpirationDate" @bind-Value="disposableBattery.ExpirationDate" required></InputDate>
 
-		SetRemainingDays();
+		SetRemainingDaysToExpirate();
 		<span>Do konce expirace zbývá <strong>@remainingDays</strong> dní</span>
 	}
 
@@ -116,20 +117,27 @@
 	private string? selectedDeviceLocation => Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name;
 	private bool showConfirm = false;
 
-
 	private int remainingDays = 0, remainingExpectedLifeSpanDays = 0;
-	private void SetRemainingDays()
+	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
+	/// <summary>
+	/// Nastavení zbývajících dní do konce expirace baterie
+	/// </summary>
+	private void SetRemainingDaysToExpirate()
 	{
 		if (!battery.IsRechargeable)
 		{
-			remainingDays = (disposableBattery.ExpirationDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+			remainingDays = batteryStatusEvaluator.RemainingDaysToExpirate(disposableBattery.ExpirationDate);
 		}
 	}
-	private void SetRemainingExpectedLifeSpan()
+	/// <summary>
+	/// Nastavení zbývajících dní do předpokládaného data životnosti
+	/// </summary>
+	private void SetRemainingDaysToExpectedLife()
 	{
 		if (battery.ExpectedLifespan is not null)
 		{
-			remainingExpectedLifeSpanDays = ((battery.InsertionDate.AddDays(battery.ExpectedLifespan.Value)).ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+			remainingExpectedLifeSpanDays = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate, battery.ExpectedLifespan.Value);
 		}
 	}
 
