@@ -41,6 +41,12 @@
 	<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
 	<InputNumber id="input-ExpectedLifespan" @bind-Value="battery.ExpectedLifespan"></InputNumber>
 
+	@if (battery.ExpectedLifespan is not null)
+	{
+		SetRemainingExpectedLifeSpan();
+		<span>Podle očekávané životnosti zbývá do vybití <strong>@remainingExpectedLifeSpanDays</strong> dní</span>
+	}
+
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="battery.Manufacturer"></InputText>
 
@@ -110,12 +116,20 @@
 	private string? selectedDeviceLocation => Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name;
 	private bool showConfirm = false;
 
-	private int remainingDays = 0;
+
+	private int remainingDays = 0, remainingExpectedLifeSpanDays = 0;
 	private void SetRemainingDays()
 	{
 		if (!battery.IsRechargeable)
 		{
 			remainingDays = (disposableBattery.ExpirationDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+		}
+	}
+	private void SetRemainingExpectedLifeSpan()
+	{
+		if (battery.ExpectedLifespan is not null)
+		{
+			remainingExpectedLifeSpanDays = ((battery.InsertionDate.AddDays(battery.ExpectedLifespan.Value)).ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
 		}
 	}
 
