@@ -30,54 +30,63 @@ else
 }
 
 <h2>Seznam všech baterií</h2>
-<table>
-	<tr>
-		<th>Název zařízení</th>
-		<th>Počet baterií v zařízení</th>
-		<th>Označení baterie</th>
-		<th>Typ baterie</th>
-		<th>Datum expirace</th>
-		<th>Do konce expirace zbývá dní</th>
-		<th>Datum vložení</th>
-		<th>Předpokládaná doba výdrže (ve dnech)</th>
-		<th>Zbývající předpokládaná životnost</th>
-		<th>Akce</th>
-	</tr>
-	@foreach (Battery battery in BatteryList)
-	{
-		<tr>
-			<td>@(battery.Device != null ? battery.Device.Name : "")</td>
-			<td>@(battery.Device != null ? battery.Device.BatteryCount : "")</td>
-			<td>@battery.BatteryType.Name</td>
-			@if (battery.IsRechargeable)
-			{
-				<td>Nabíjecí</td>
-				<td></td>
-				<td></td>
-			}
-			else
-			{
-				<td>Jednorázová</td>
-				<td>@(battery.DisposableBattery != null ? battery.DisposableBattery.ExpirationDate : "")</td>
-				BatteryStatus? batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-				<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days.ToString() ?? "")</td>
-			}
-			<td>@battery.InsertionDate</td>
-			<td>@(battery.ExpectedLifespan != null ? battery.ExpectedLifespan : "")</td>
-			@if (battery.ExpectedLifespan is not null)
-			{
-				BatteryStatus? batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-				<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days.ToString() ?? "")</td>
-			}
-			else
-			{
-				<td></td>
-			}
 
-			<td><button @onclick="() => ShowBatteryFormToUpdate(battery.Id)">Upravit</button></td>
+
+@if (BatteryList.Count < 1)
+{
+	<h3>Žádné uložené baterie</h3>
+}
+else
+{
+	<table>
+		<tr>
+			<th>Název zařízení</th>
+			<th>Počet baterií v zařízení</th>
+			<th>Označení baterie</th>
+			<th>Typ baterie</th>
+			<th>Datum expirace</th>
+			<th>Do konce expirace zbývá dní</th>
+			<th>Datum vložení</th>
+			<th>Předpokládaná doba výdrže (ve dnech)</th>
+			<th>Zbývající předpokládaná životnost</th>
+			<th>Akce</th>
 		</tr>
-	}
-</table>
+		@foreach (Battery battery in BatteryList)
+		{
+			<tr>
+				<td>@(battery.Device != null ? battery.Device.Name : "")</td>
+				<td>@(battery.Device != null ? battery.Device.BatteryCount : "")</td>
+				<td>@battery.BatteryType.Name</td>
+				@if (battery.IsRechargeable)
+				{
+					<td>Nabíjecí</td>
+					<td></td>
+					<td></td>
+				}
+				else
+				{
+					<td>Jednorázová</td>
+					<td>@(battery.DisposableBattery != null ? battery.DisposableBattery.ExpirationDate : "")</td>
+					BatteryStatus? batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+					<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days.ToString() ?? "")</td>
+				}
+				<td>@battery.InsertionDate</td>
+				<td>@(battery.ExpectedLifespan != null ? battery.ExpectedLifespan : "")</td>
+				@if (battery.ExpectedLifespan is not null)
+				{
+					BatteryStatus? batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
+					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days.ToString() ?? "")</td>
+				}
+				else
+				{
+					<td></td>
+				}
+
+				<td><button @onclick="() => ShowBatteryFormToUpdate(battery.Id)">Upravit</button></td>
+			</tr>
+		}
+	</table>
+}
 
 @code {
 	private string errorMessage = "";
