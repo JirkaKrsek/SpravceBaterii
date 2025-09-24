@@ -31,7 +31,6 @@ else
 
 <h2>Seznam všech baterií</h2>
 
-
 @if (BatteryList.Count < 1)
 {
 	<h3>Žádné uložené baterie</h3>
@@ -54,8 +53,8 @@ else
 		@foreach (Battery battery in BatteryList)
 		{
 			<tr>
-				<td>@(battery.Device != null ? battery.Device.Name : "")</td>
-				<td>@(battery.Device != null ? battery.Device.BatteryCount : "")</td>
+				<td>@(battery.Device?.Name ?? "")</td>
+				<td>@(battery.Device?.BatteryCount.ToString() ?? "")</td>
 				<td>@battery.BatteryType.Name</td>
 				@if (battery.IsRechargeable)
 				{
@@ -66,19 +65,20 @@ else
 				else
 				{
 					<td>Jednorázová</td>
-					<td>@(battery.DisposableBattery != null ? battery.DisposableBattery.ExpirationDate : "")</td>
+					<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
 					BatteryStatus? batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
 					<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days.ToString() ?? "")</td>
 				}
-				<td>@battery.InsertionDate</td>
-				<td>@(battery.ExpectedLifespan != null ? battery.ExpectedLifespan : "")</td>
+				<td>@battery.InsertionDate.ToShortDateString()</td>
 				@if (battery.ExpectedLifespan is not null)
 				{
+					<td>@battery.ExpectedLifespan</td>
 					BatteryStatus? batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
 					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days.ToString() ?? "")</td>
 				}
 				else
 				{
+					<td></td>
 					<td></td>
 				}
 
