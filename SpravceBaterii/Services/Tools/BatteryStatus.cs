@@ -3,7 +3,7 @@
     public class BatteryStatus
     {
         public int Days { get; }
-        public string CssClass { get; } = "battery-noStatus";
+        public string CssClass { get; } = "status-unknown";
 
         /// <summary>
         /// Konstruktor

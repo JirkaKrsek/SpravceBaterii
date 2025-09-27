@@ -38,13 +38,13 @@
         {
             if (days <= 0)
             {
-                return "battery-expired";
+                return "status-expired";
             }
             else if (days <= 30)
             {
-                return "battery-warning";
+                return "status-warning";
             }
-            return "battery-ok";
+            return "status-ok";
         }
     }
 }

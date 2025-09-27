@@ -39,19 +39,19 @@ h1:focus {
 
 
 /* Vyhodnocený stav baterie */
-.battery-expired {
-    color: white;
-    background-color: red;
-}
-.battery-warning {
+.status-unknown {
     color: black;
-    background-color: yellow;
+    background-color: white;
 }
-.battery-ok {
+.status-ok {
     color: white;
     background-color: green;
 }
-.battery-noStatus {
+.status-warning {
     color: black;
-    background-color: white;
+    background-color: yellow;
+}
+.status-expired {
+    color: white;
+    background-color: red;
 }
