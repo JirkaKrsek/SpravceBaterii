@@ -2,7 +2,7 @@
 {
     public class BatteryStatus
     {
-        public int Days { get; }
+        public int? Days { get; }
         public string CssClass { get; } = "status-unknown";
 
         /// <summary>

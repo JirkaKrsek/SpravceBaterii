@@ -44,7 +44,7 @@
 
 	@if (battery.ExpectedLifespan is not null)
 	{
-		<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@batteryStatusExpectedLifeSpan.Days</strong> dní</span>
+		<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@(batteryStatusExpectedLifeSpan.Days?.ToString() ?? "")</strong> dní</span>
 	}
 
 	<label for="input-Manufacturer">Výrobce: </label>
@@ -91,7 +91,7 @@
 		<label for="input-DisposableBattery-ExpirationDate">Datum expirace: </label>
 		<InputDate id="input-DisposableBattery-ExpirationDate" @bind-Value="disposableBattery.ExpirationDate" @bind-Value:after="SetRemainingDaysToExpirate" required></InputDate>
 
-		<span>Do konce expirace zbývá <strong class="@batteryStatusExpirationDate.CssClass">@batteryStatusExpirationDate.Days</strong> dní</span>
+		<span>Do konce expirace zbývá <strong class="@batteryStatusExpirationDate.CssClass">@(batteryStatusExpirationDate.Days?.ToString() ?? "")</strong> dní</span>
 	}
 
 	<hr>

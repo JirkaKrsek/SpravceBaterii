@@ -66,20 +66,14 @@ else
 				{
 					<td>Jednorázová</td>
 					<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-					BatteryStatus? batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-					<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days.ToString() ?? "")</td>
+					BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+					<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
 				}
 				<td>@battery.InsertionDate.ToShortDateString()</td>
-				@if (battery.ExpectedLifespan is not null)
-				{
-					<td>@battery.ExpectedLifespan</td>
-					BatteryStatus? batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days.ToString() ?? "")</td>
-				}
-				else
-				{
-					<td></td>
-					<td></td>
+				<td>@(battery.ExpectedLifespan.ToString() ?? "")</td>
+				@{
+					BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
+					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
 				}
 
 				<td><button @onclick="() => ShowBatteryFormToUpdate(battery.Id)">Upravit</button></td>
@@ -122,31 +116,31 @@ else
 	}
 
 	/// <summary>
-	/// Získání zbývajících dní do konce expirace baterie
+	/// Získání stavu baterie podle zbývajících dní do konce expirace
 	/// </summary>
 	/// <param name="battery">Baterie</param>
-	/// <returns>Status baterie / null</returns>
-	private BatteryStatus? SetRemainingDaysToExpirate(Battery battery)
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpirate(Battery battery)
 	{
 		if (!battery.IsRechargeable && battery.DisposableBattery is not null)
 		{
 			return batteryStatusEvaluator.RemainingDaysToExpirate(battery.DisposableBattery.ExpirationDate);
 		}
-		return null;
+		return new BatteryStatus();
 	}
 
 	/// <summary>
-	/// Získání zbývajících dní do předpokládaného data životnosti
+	/// Získání stavu baterie podle zbývajících dní do předpokládaného data životnosti
 	/// </summary>
 	/// <param name="battery">Baterie</param>
-	/// <returns>Status baterie / null</returns>
-	private BatteryStatus? SetRemainingDaysToExpectedLife(Battery battery)
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpectedLife(Battery battery)
 	{
 		if (battery.ExpectedLifespan is not null)
 		{
 			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate, battery.ExpectedLifespan.Value);
 		}
-		return null;
+		return new BatteryStatus();
 	}
 
 	/// <summary>
