@@ -12,12 +12,20 @@ namespace SpravceBaterii.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        public int Count { get; set; }
+
         public DateOnly InsertionDate { get; set; }
 
         public int? ExpectedLifespan { get; set; }
 
         [MaxLength(100)]
         public string? Manufacturer { get; set; }
+
+        [StringLength(200)]
+        public string? UsageHistory { get; set; }
+
+        [StringLength(200)]
+        public string? Description { get; set; }
 
         public string UserId { get; set; }
 
