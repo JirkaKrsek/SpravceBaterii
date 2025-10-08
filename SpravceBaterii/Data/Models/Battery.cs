@@ -14,7 +14,7 @@ namespace SpravceBaterii.Data.Models
 
         public int Count { get; set; }
 
-        public DateOnly InsertionDate { get; set; }
+        public DateOnly? InsertionDate { get; set; }
 
         public int? ExpectedLifespan { get; set; }
 
