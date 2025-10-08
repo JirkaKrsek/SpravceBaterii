@@ -4,7 +4,7 @@ namespace SpravceBaterii.Services
 {
     public class ApplicationUserService
     {
-        private readonly AuthenticationStateProvider AuthenticationStateProvider;
+        private readonly AuthenticationStateProvider authenticationStateProvider;
 
         /// <summary>
         /// Konstruktor
@@ -12,7 +12,7 @@ namespace SpravceBaterii.Services
         /// <param name="authenticationStateProvider">AuthenticationStateProvider</param>
         public ApplicationUserService(AuthenticationStateProvider authenticationStateProvider)
         {
-            AuthenticationStateProvider = authenticationStateProvider;
+            this.authenticationStateProvider = authenticationStateProvider;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace SpravceBaterii.Services
         /// <exception cref="UnauthorizedAccessException">Pokud uživatel není přihlášen nebo se nepodaří získat jeho ID</exception>
         public async Task<string> GetUserIdAsync()
         {
-            AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            AuthenticationState state = await authenticationStateProvider.GetAuthenticationStateAsync();
             string? userId = state.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
             {
@@ -37,7 +37,7 @@ namespace SpravceBaterii.Services
         /// <returns>bool je/není přihlášen</returns>
         public async Task<bool> IsUserAuthenticatedAsync()
         {
-            AuthenticationState state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            AuthenticationState state = await authenticationStateProvider.GetAuthenticationStateAsync();
             if (state.User.Identity?.IsAuthenticated == true)
             {
                 return true;

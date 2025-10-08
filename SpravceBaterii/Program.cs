@@ -75,10 +75,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Pøipojení služeb
 builder.Services.AddScoped<BatteryService>();
+builder.Services.AddScoped<DeviceService>();
+builder.Services.AddScoped<LocationService>();
 builder.Services.AddScoped<BatteryTypeService>();
 builder.Services.AddScoped<ChemicalCompositionService>();
 builder.Services.AddScoped<ApplicationUserService>();
 builder.Services.AddScoped<ExceptionHandlerService>();
+builder.Services.AddScoped<DisposableBatteryService>();
+builder.Services.AddScoped<RechargeableBatteryService>();
 
 var app = builder.Build();
 

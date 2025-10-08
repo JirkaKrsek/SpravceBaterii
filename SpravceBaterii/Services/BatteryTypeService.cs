@@ -6,7 +6,7 @@ namespace SpravceBaterii.Services
 {
     public class BatteryTypeService
     {
-        private ApplicationDbContext ApplicationDbContext { get; set; }
+        private readonly ApplicationDbContext applicationDbContext;
 
         /// <summary>
         /// Konstruktor
@@ -14,7 +14,7 @@ namespace SpravceBaterii.Services
         /// <param name="applicationDbContext">ApplicationDbContext</param>
         public BatteryTypeService(ApplicationDbContext applicationDbContext)
         {
-            ApplicationDbContext = applicationDbContext;
+            this.applicationDbContext = applicationDbContext;
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace SpravceBaterii.Services
         /// <returns>List typů baterií</returns>
         public async Task<List<BatteryType>> GetBatteryTypes()
         {
-            return await ApplicationDbContext.BatteryTypes.ToListAsync();
+            return await applicationDbContext.BatteryTypes.AsNoTracking().ToListAsync();
         }
     }
 }
