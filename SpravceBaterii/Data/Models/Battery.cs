@@ -12,6 +12,7 @@ namespace SpravceBaterii.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Počet baterií je min. 1")]
         public int Count { get; set; }
 
         public DateOnly? InsertionDate { get; set; }
