@@ -151,30 +151,30 @@
 				if (!battery.IsRechargeable)
 				{
 					disposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id) ?? new()
-						{
-							ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
-						};
+					{
+						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+					};
 					rechargeableBattery = new();
 				}
 				if (battery.IsRechargeable)
 				{
 					rechargeableBattery = await RechargeableBatteryService.GetRechargeableBatteryById(battery.Id) ?? new();
 					disposableBattery = new()
-						{
-							ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
-						};
+					{
+						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+					};
 				}
 			}
 			else
 			{
 				battery = new()
-					{
-						InsertionDate = DateOnly.FromDateTime(DateTime.Today)
-					};
+				{
+					InsertionDate = DateOnly.FromDateTime(DateTime.Today)
+				};
 				disposableBattery = new()
-					{
-						ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
-					};
+				{
+					ExpirationDate = DateOnly.FromDateTime(DateTime.Today)
+				};
 				rechargeableBattery = new();
 			}
 
@@ -257,9 +257,9 @@
 	/// </summary>
 	private void SetRemainingDaysToExpectedLife()
 	{
-		if (battery.ExpectedLifespan is not null)
+		if (battery.ExpectedLifespan is not null && battery.InsertionDate is not null)
 		{
-			batteryStatusExpectedLifeSpan = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate, battery.ExpectedLifespan.Value);
+			batteryStatusExpectedLifeSpan = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
 	}
 

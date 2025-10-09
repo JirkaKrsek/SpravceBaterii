@@ -69,8 +69,8 @@ else
 					BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
 					<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
 				}
-				<td>@battery.InsertionDate.ToShortDateString()</td>
-				<td>@(battery.ExpectedLifespan.ToString() ?? "")</td>
+				<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+				<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
 				@{
 					BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
 					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
@@ -136,9 +136,9 @@ else
 	/// <returns>Status baterie</returns>
 	private BatteryStatus SetRemainingDaysToExpectedLife(Battery battery)
 	{
-		if (battery.ExpectedLifespan is not null)
+		if (battery.ExpectedLifespan is not null && battery.InsertionDate is not null)
 		{
-			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate, battery.ExpectedLifespan.Value);
+			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
 		return new BatteryStatus();
 	}
