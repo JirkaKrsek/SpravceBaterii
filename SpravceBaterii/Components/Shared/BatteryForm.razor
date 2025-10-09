@@ -37,7 +37,7 @@
 	<span>Poloha vybraného zařízení: @selectedDeviceLocation</span>
 
 	<label for="input-InsertionDate">Datum vložení: </label>
-	<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" @bind-Value:after="SetRemainingDaysToExpectedLife" required></InputDate>
+	<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" @bind-Value:after="SetRemainingDaysToExpectedLife"></InputDate>
 
 	<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
 	<InputNumber id="input-ExpectedLifespan" @bind-Value="battery.ExpectedLifespan" @bind-Value:after="SetRemainingDaysToExpectedLife"></InputNumber>
@@ -47,8 +47,17 @@
 		<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@(batteryStatusExpectedLifeSpan.Days?.ToString() ?? "")</strong> dní</span>
 	}
 
+	<label for="input-Count">Počet: </label>
+	<InputNumber id="input-Count" @bind-Value="battery.Count" min="1" required></InputNumber>
+
+	<label for="input-Description">Popis: </label>
+	<InputTextArea id="input-Description" @bind-Value="battery.Description"></InputTextArea>
+
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="battery.Manufacturer"></InputText>
+
+	<label for="input-UsageHistory">Byla použita v zařízení: </label>
+	<InputTextArea id="input-UsageHistory" @bind-Value="battery.UsageHistory"></InputTextArea>
 
 	<label for="input-BatteryType">Typ: </label>
 	<InputSelect id="input-BatteryType" @bind-Value="battery.BatteryTypeId" required>

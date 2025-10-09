@@ -40,9 +40,10 @@ else
 	<table>
 		<tr>
 			<th>Název zařízení</th>
-			<th>Počet baterií v zařízení</th>
-			<th>Označení baterie</th>
-			<th>Typ baterie</th>
+			<th>Počet</th>
+			<th>Označení</th>
+			<th>Typ</th>
+			<th>Popis</th>
 			<th>Datum expirace</th>
 			<th>Do konce expirace zbývá dní</th>
 			<th>Datum vložení</th>
@@ -54,8 +55,9 @@ else
 		{
 			<tr>
 				<td>@(battery.Device?.Name ?? "")</td>
-				<td>@(battery.Device?.BatteryCount.ToString() ?? "")</td>
+				<td>@battery.Count</td>
 				<td>@battery.BatteryType.Name</td>
+				<td><textarea>@battery.Description</textarea></td>
 				@if (battery.IsRechargeable)
 				{
 					<td>Nabíjecí</td>
