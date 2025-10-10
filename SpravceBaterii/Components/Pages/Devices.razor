@@ -1,0 +1,175 @@
+﻿@page "/zarizeni"
+@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Components.Shared
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+
+@inject DeviceService DeviceService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<PageTitle>Seznam zařízení</PageTitle>
+
+<h1>Zařízení</h1>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+@if (showForm)
+{
+	<DeviceForm DeviceToUpdateId="@selectedDeviceId" DeviceSaved="@CloseFormAndReloadList" Cancel="@CloseForm"></DeviceForm>
+}
+else
+{
+	<button @onclick="ShowAddForm">Přidat nové zařízení</button>
+}
+
+<hr>
+
+<h2>Seznam všech zařízení</h2>
+
+@if (DeviceList.Count < 1)
+{
+	<h3>Žádná uložená zařízení</h3>
+}
+else
+{
+	<table>
+		<tr>
+			<th>Název zařízení</th>
+			<th>Popis zařízení</th>
+			<th>Max. počet baterií v zařízení</th>
+			<th>Počet vložených baterií</th>
+			<th>Nejbližší datum expirace vložených baterií</th>
+			<th>Do konce expirace zbývá dní</th>
+			<th>Výrobce</th>
+			<th>Umístění</th>
+			<th>Akce</th>
+		</tr>
+		@foreach (Device device in DeviceList)
+		{
+			<tr>
+				<td>@device.Name</td>
+				<td><textarea readonly>@device.Description</textarea></td>
+				<td>@device.BatteryCount</td>
+				<td>@(device.Batteries?.Sum(b => b.Count) ?? 0)</td>
+
+				@{
+					DateOnly? date = GetExpirationDate(device);
+					<td>@(date.HasValue ? date.Value.ToShortDateString() : "")</td>
+
+					BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
+					<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
+				}
+
+				<td>@device.Manufacturer</td>
+				<td>@device.Location?.Name</td>
+
+				<td><button @onclick="() => ShowFormToUpdate(device.Id)">Upravit</button></td>
+			</tr>
+		}
+	</table>
+}
+
+@code {
+	private string errorMessage = "";
+
+	private bool showForm = false;
+	private int? selectedDeviceId;
+
+	private List<Device> DeviceList = new();
+
+	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
+	/// <summary>
+	/// Při načtení stránky se zavolá načtení dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadDeviceList();
+	}
+
+	/// <summary>
+	/// Načtení informací o zařízeních uživatele z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadDeviceList()
+	{
+		try
+		{
+			DeviceList = await DeviceService.GetDevices();
+			DeviceList = DeviceList.OrderBy(d => d.Name).ToList();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	private DateOnly? GetExpirationDate(Device device)
+	{
+		return device.Batteries?
+					.Where(b => b.DisposableBattery?.ExpirationDate != null)
+					.Min(b => b.DisposableBattery?.ExpirationDate);
+	}
+
+	/// <summary>
+	/// Získání stavu baterie podle zbývajících dní do konce expirace
+	/// </summary>
+	/// <param name="device">Zařízení</param>
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpirate(Device device)
+	{
+		DateOnly? date = GetExpirationDate(device);
+		if (date is not null)
+		{
+			BatteryStatus status = batteryStatusEvaluator.RemainingDaysToExpirate(date.Value);
+			return status;
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Zobrazení komponenty s formulářem
+	/// </summary>
+	private void ShowAddForm()
+	{
+		selectedDeviceId = null;
+		showForm = true;
+	}
+
+	/// <summary>
+	/// Zobrazení komponenty s formulářem pro úpravu vybraného zařízení
+	/// </summary>
+	/// <param name="deviceId">ID vybraného zařízení</param>
+	private void ShowFormToUpdate(int deviceId)
+	{
+		selectedDeviceId = deviceId;
+		showForm = true;
+	}
+
+	/// <summary>
+	/// Skrytí komponenty s formulářem
+	/// Znovunačtení dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task CloseFormAndReloadList()
+	{
+		showForm = false;
+		selectedDeviceId = null;
+		await LoadDeviceList();
+	}
+
+	/// <summary>
+	/// Skrytí komponenty s formulářem
+	/// </summary>
+	private void CloseForm()
+	{
+		showForm = false;
+		selectedDeviceId = null;
+	}
+}
