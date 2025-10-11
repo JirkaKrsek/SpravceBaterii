@@ -18,13 +18,17 @@
 	<p>@errorMessage</p>
 }
 
-@if (showForm)
+@if (showBatteryForm)
 {
-	<DeviceForm DeviceToUpdateId="@selectedDeviceId" DeviceSaved="@CloseFormAndReloadList" Cancel="@CloseForm"></DeviceForm>
+	<BatteryForm BatteryToUpdateId="@selectedBatteryId" BatterySaved="@CloseBatteryFormShowDeviceForm" Cancel="@CloseBatteryFormShowDeviceForm"></BatteryForm>
+}
+else if (showDeviceForm)
+{
+	<DeviceForm DeviceToUpdateId="@selectedDeviceId" EditBattery="@ShowBatteryForm" DeviceSaved="@CloseDeviceFormAndReloadList" Cancel="@CloseDeviceFormAndReloadList"></DeviceForm>
 }
 else
 {
-	<button @onclick="ShowAddForm">Přidat nové zařízení</button>
+	<button @onclick="ShowDeviceForm">Přidat nové zařízení</button>
 }
 
 <hr>
@@ -59,7 +63,7 @@ else
 
 				@{
 					DateOnly? date = GetExpirationDate(device);
-					<td>@(date.HasValue ? date.Value.ToShortDateString() : "")</td>
+					<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
 
 					BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
 					<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
@@ -68,7 +72,7 @@ else
 				<td>@device.Manufacturer</td>
 				<td>@device.Location?.Name</td>
 
-				<td><button @onclick="() => ShowFormToUpdate(device.Id)">Upravit</button></td>
+				<td><button @onclick="() => ShowDeviceForm(device.Id)">Upravit</button></td>
 			</tr>
 		}
 	</table>
@@ -77,8 +81,10 @@ else
 @code {
 	private string errorMessage = "";
 
-	private bool showForm = false;
+	private bool showDeviceForm = false;
+	private bool showBatteryForm = false;
 	private int? selectedDeviceId;
+	private int? selectedBatteryId;
 
 	private List<Device> DeviceList = new();
 
@@ -134,42 +140,66 @@ else
 	}
 
 	/// <summary>
-	/// Zobrazení komponenty s formulářem
+	/// Zobrazení komponenty s formulářem pro zadání nového zařízení
 	/// </summary>
-	private void ShowAddForm()
+	private void ShowDeviceForm()
 	{
 		selectedDeviceId = null;
-		showForm = true;
+		showDeviceForm = true;
+		showBatteryForm = false;
 	}
 
 	/// <summary>
 	/// Zobrazení komponenty s formulářem pro úpravu vybraného zařízení
 	/// </summary>
 	/// <param name="deviceId">ID vybraného zařízení</param>
-	private void ShowFormToUpdate(int deviceId)
+	private void ShowDeviceForm(int deviceId)
 	{
 		selectedDeviceId = deviceId;
-		showForm = true;
+		showDeviceForm = true;
+		showBatteryForm = false;
 	}
 
 	/// <summary>
-	/// Skrytí komponenty s formulářem
+	/// Zobrazení komponenty s formulářem pro úpravu vybrané baterie
+	/// </summary>
+	/// <param name="batteryId">ID vybrané baterie</param>
+	private void ShowBatteryForm(int batteryId)
+	{
+		selectedBatteryId = batteryId;
+		showDeviceForm = false;
+		showBatteryForm = true;
+	}
+
+	/// <summary>
+	/// Skrytí komponenty s formulářem pro úpravu vybrané baterie
+	/// Zobrazení komponenty s formulářem pro úpravu vybraného zařízení
+	/// </summary>
+	private void CloseBatteryFormShowDeviceForm()
+	{
+		showBatteryForm = false;
+		showDeviceForm = true;
+		selectedBatteryId = null;
+	}
+
+	/// <summary>
+	/// Skrytí komponenty s formulářem pro úpravu vybraného zařízení
 	/// Znovunačtení dat
 	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task CloseFormAndReloadList()
+	/// <returns></returns>
+	private async Task CloseDeviceFormAndReloadList()
 	{
-		showForm = false;
+		showDeviceForm = false;
 		selectedDeviceId = null;
 		await LoadDeviceList();
 	}
 
 	/// <summary>
-	/// Skrytí komponenty s formulářem
+	/// Skrytí komponenty s formulářem pro úpravu vybraného zařízení
 	/// </summary>
-	private void CloseForm()
+	private void CloseDeviceForm()
 	{
-		showForm = false;
+		showDeviceForm = false;
 		selectedDeviceId = null;
 	}
 }
