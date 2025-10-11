@@ -83,6 +83,7 @@ builder.Services.AddScoped<ApplicationUserService>();
 builder.Services.AddScoped<ExceptionHandlerService>();
 builder.Services.AddScoped<DisposableBatteryService>();
 builder.Services.AddScoped<RechargeableBatteryService>();
+builder.Services.AddScoped<FormNavigationService>();
 
 var app = builder.Build();
 
