@@ -7,6 +7,7 @@
 
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject FormNavigationService FormNavigationService
 
 <PageTitle>Seznam zařízení</PageTitle>
 
@@ -18,19 +19,23 @@
 	<p>@errorMessage</p>
 }
 
-@if (showBatteryForm)
+@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 {
-	<BatteryForm BatteryToUpdateId="@selectedBatteryId" BatterySaved="@CloseBatteryFormShowDeviceForm" Cancel="@CloseBatteryFormShowDeviceForm"></BatteryForm>
+	<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+				 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+				 Cancel="@(() => FormNavigationService.Close())"></BatteryForm>
 }
-else if (showDeviceForm)
+else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
 {
-	<DeviceForm DeviceToUpdateId="@selectedDeviceId" EditBattery="@ShowBatteryForm" DeviceSaved="@CloseDeviceFormAndReloadList" Cancel="@CloseDeviceFormAndReloadList"></DeviceForm>
+	<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+				EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+				DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
+				Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></DeviceForm>
 }
 else
 {
-	<button @onclick="ShowDeviceForm">Přidat nové zařízení</button>
+	<button @onclick="() => FormNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
 }
-
 <hr>
 
 <h2>Seznam všech zařízení</h2>
@@ -72,7 +77,7 @@ else
 				<td>@device.Manufacturer</td>
 				<td>@device.Location?.Name</td>
 
-				<td><button @onclick="() => ShowDeviceForm(device.Id)">Upravit</button></td>
+				<td><button @onclick="() => FormNavigationService.Open(typeof(DeviceForm), device.Id)">Upravit</button></td>
 			</tr>
 		}
 	</table>
@@ -96,6 +101,8 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
+		FormNavigationService.Reset();
+
 		await LoadDeviceList();
 	}
 
@@ -140,66 +147,17 @@ else
 	}
 
 	/// <summary>
-	/// Zobrazení komponenty s formulářem pro zadání nového zařízení
+	/// Pokud je v FormNavigationService reloadList = true
+	/// Znovu se načtou data
+	/// FormNavigationService se nastaví na výchozí hodnoty
 	/// </summary>
-	private void ShowDeviceForm()
+	/// <returns>Asynchronní operace</returns>
+	private async Task TryReloadList()
 	{
-		selectedDeviceId = null;
-		showDeviceForm = true;
-		showBatteryForm = false;
-	}
-
-	/// <summary>
-	/// Zobrazení komponenty s formulářem pro úpravu vybraného zařízení
-	/// </summary>
-	/// <param name="deviceId">ID vybraného zařízení</param>
-	private void ShowDeviceForm(int deviceId)
-	{
-		selectedDeviceId = deviceId;
-		showDeviceForm = true;
-		showBatteryForm = false;
-	}
-
-	/// <summary>
-	/// Zobrazení komponenty s formulářem pro úpravu vybrané baterie
-	/// </summary>
-	/// <param name="batteryId">ID vybrané baterie</param>
-	private void ShowBatteryForm(int batteryId)
-	{
-		selectedBatteryId = batteryId;
-		showDeviceForm = false;
-		showBatteryForm = true;
-	}
-
-	/// <summary>
-	/// Skrytí komponenty s formulářem pro úpravu vybrané baterie
-	/// Zobrazení komponenty s formulářem pro úpravu vybraného zařízení
-	/// </summary>
-	private void CloseBatteryFormShowDeviceForm()
-	{
-		showBatteryForm = false;
-		showDeviceForm = true;
-		selectedBatteryId = null;
-	}
-
-	/// <summary>
-	/// Skrytí komponenty s formulářem pro úpravu vybraného zařízení
-	/// Znovunačtení dat
-	/// </summary>
-	/// <returns></returns>
-	private async Task CloseDeviceFormAndReloadList()
-	{
-		showDeviceForm = false;
-		selectedDeviceId = null;
-		await LoadDeviceList();
-	}
-
-	/// <summary>
-	/// Skrytí komponenty s formulářem pro úpravu vybraného zařízení
-	/// </summary>
-	private void CloseDeviceForm()
-	{
-		showDeviceForm = false;
-		selectedDeviceId = null;
+		if (FormNavigationService.ShouldReload())
+		{
+			await LoadDeviceList();
+			FormNavigationService.Reset();
+		}
 	}
 }
