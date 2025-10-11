@@ -65,6 +65,9 @@ namespace SpravceBaterii.Services
 
             applicationDbContext.Devices.Add(device);
             await applicationDbContext.SaveChangesAsync();
+
+            //Odpojení od slednování EF Core
+            applicationDbContext.Entry(device).State = EntityState.Detached;
         }
 
         /// <summary>
