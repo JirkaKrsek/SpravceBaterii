@@ -60,6 +60,23 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Načtení baterií podle ID zařízení, ve kterém jsou vloženy
+        /// </summary>
+        /// <param name="deviceId">ID zařízení</param>
+        /// <returns>List baterií</returns>
+        public async Task<List<Battery>> GetUserBatteriesByDeviceId(int deviceId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Batteries
+                .Where(b => b.UserId == userId && b.DeviceId == deviceId)
+                .Include(b => b.BatteryType)
+                .Include(b => b.DisposableBattery)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <summary>
         /// Aktualizace baterie v databázi
         /// </summary>
         /// <param name="battery">Upravená baterie</param>

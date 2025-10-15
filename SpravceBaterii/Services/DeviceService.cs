@@ -31,8 +31,26 @@ namespace SpravceBaterii.Services
             return await applicationDbContext.Devices
                 .Where(d => d.UserId == userId)
                 .Include(d => d.Location)
+                .Include(d => d.Batteries!)
+                    .ThenInclude(b => b.DisposableBattery)
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        /// <summary>
+        /// Získání zařízení podle ID
+        /// </summary>
+        /// <param name="batteryId">ID hledaného zařízení</param>
+        /// <returns>Nalezené zařízení</returns>
+        /// <exception cref="KeyNotFoundException">Zařízení nenalezeno</exception>
+        public async Task<Device> GetUserDeviceById(int deviceId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Devices
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.UserId == userId && d.Id == deviceId)
+                ?? throw new KeyNotFoundException();
         }
 
         /// <summary>
@@ -47,6 +65,58 @@ namespace SpravceBaterii.Services
 
             applicationDbContext.Devices.Add(device);
             await applicationDbContext.SaveChangesAsync();
+
+            //Odpojení od slednování EF Core
+            applicationDbContext.Entry(device).State = EntityState.Detached;
+        }
+
+        /// <summary>
+        /// Aktualizace zařízení v databázi
+        /// </summary>
+        /// <param name="battery">Upravené zařízení</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="InvalidOperationException">Neplatná data</exception>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
+        public async Task UpdateDevice(Device device)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            if (device.UserId == userId)
+            {
+                applicationDbContext.Update(device);
+                //Uložení
+                await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení od slednování EF Core
+                applicationDbContext.Entry(device).State = EntityState.Detached;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
+        }
+
+        /// <summary>
+        /// Odstranění zařízení z databáze
+        /// </summary>
+        /// <param name="batteryId">ID zařízení</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
+        public async Task DeleteDeviceById(int deviceId)
+        {
+            string userId = await userService.GetUserIdAsync();
+            Device device = await GetUserDeviceById(deviceId);
+
+            if (device.UserId == userId)
+            {
+                applicationDbContext.Remove(device);
+                //Uložení
+                await applicationDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
         }
     }
 }

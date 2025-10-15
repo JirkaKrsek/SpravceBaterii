@@ -73,16 +73,17 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/ucet/odhlaseni";
 });
 
-// Pøipojení služeb
+// Registrace služeb
+builder.Services.AddScoped<ApplicationUserService>();
 builder.Services.AddScoped<BatteryService>();
 builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<LocationService>();
 builder.Services.AddScoped<BatteryTypeService>();
 builder.Services.AddScoped<ChemicalCompositionService>();
-builder.Services.AddScoped<ApplicationUserService>();
-builder.Services.AddScoped<ExceptionHandlerService>();
 builder.Services.AddScoped<DisposableBatteryService>();
 builder.Services.AddScoped<RechargeableBatteryService>();
+builder.Services.AddScoped<ExceptionHandlerService>();
+builder.Services.AddScoped<FormNavigationService>();
 
 var app = builder.Build();
 
