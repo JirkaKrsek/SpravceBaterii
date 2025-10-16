@@ -19,23 +19,27 @@
 	<p>@errorMessage</p>
 }
 
-@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+@if (isDataLoaded)
 {
-	<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-				 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-				 Cancel="@(() => FormNavigationService.Close())"></BatteryForm>
+	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	{
+		<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+					 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+					 Cancel="@(() => FormNavigationService.Close())"></BatteryForm>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
+	{
+		<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+					EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
+					Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></DeviceForm>
+	}
+	else
+	{
+		<button @onclick="() => FormNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
+	}
 }
-else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
-{
-	<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-				EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-				DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
-				Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></DeviceForm>
-}
-else
-{
-	<button @onclick="() => FormNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
-}
+
 <hr>
 
 <h2>Seznam všech zařízení</h2>
@@ -85,14 +89,8 @@ else
 
 @code {
 	private string errorMessage = "";
-
-	private bool showDeviceForm = false;
-	private bool showBatteryForm = false;
-	private int? selectedDeviceId;
-	private int? selectedBatteryId;
-
+	private bool isDataLoaded = false;
 	private List<Device> DeviceList = new();
-
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 
 	/// <summary>
@@ -116,6 +114,8 @@ else
 		{
 			DeviceList = await DeviceService.GetDevices();
 			DeviceList = DeviceList.OrderBy(d => d.Name).ToList();
+
+			isDataLoaded = true;
 		}
 		catch (Exception ex)
 		{
