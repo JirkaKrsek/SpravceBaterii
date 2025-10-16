@@ -7,6 +7,7 @@
 
 @inject BatteryService BatteryService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject FormNavigationService FormNavigationService
 
 <PageTitle>Seznam baterií</PageTitle>
 
@@ -18,14 +19,21 @@
 	<p>@errorMessage</p>
 }
 
-@if (showForm)
+@if (isDataLoaded)
 {
-	<BatteryForm BatteryToUpdateId="@selectedBatteryId" BatterySaved="@CloseFormAndReloadList" Cancel="@CloseForm"></BatteryForm>
+	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	{
+		<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+					 BatterySaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
+					 Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></BatteryForm>
+	}
+	else
+	{
+		<button @onclick="() => FormNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
+	}
 }
-else
-{
-	<button @onclick="ShowAddBatteryForm">Přidat novou baterii</button>
-}
+
+<hr>
 
 <h2>Seznam všech baterií</h2>
 
@@ -76,7 +84,7 @@ else
 					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
 				}
 
-				<td><button @onclick="() => ShowBatteryFormToUpdate(battery.Id)">Upravit</button></td>
+				<td><button @onclick="() => FormNavigationService.Open(typeof(BatteryForm), battery.Id)">Upravit</button></td>
 			</tr>
 		}
 	</table>
@@ -84,7 +92,7 @@ else
 
 @code {
 	private string errorMessage = "";
-	private bool showForm = false;
+	private bool isDataLoaded = false;
 	private List<Battery> BatteryList = new();
 	private int? selectedBatteryId;
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
@@ -95,6 +103,8 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
+		FormNavigationService.Reset();
+
 		await LoadBatteryList();
 	}
 
@@ -108,6 +118,8 @@ else
 		{
 			BatteryList = await BatteryService.GetUserBatteries();
 			BatteryList = BatteryList.OrderBy(b => b.Device?.Name == null).ThenBy(b => b.Device?.Name).ToList();
+
+			isDataLoaded = true;
 		}
 		catch (Exception ex)
 		{
@@ -144,42 +156,17 @@ else
 	}
 
 	/// <summary>
-	/// Zobrazení komponenty s formulářem
-	/// </summary>
-	private void ShowAddBatteryForm()
-	{
-		selectedBatteryId = null;
-		showForm = true;
-	}
-
-	/// <summary>
-	/// Zobrazení komponenty s formulářem pro úpravu vybrané baterie
-	/// </summary>
-	/// <param name="batteryId">ID vybrané baterie</param>
-	private void ShowBatteryFormToUpdate(int batteryId)
-	{
-		selectedBatteryId = batteryId;
-		showForm = true;
-	}
-
-	/// <summary>
-	/// Skrytí komponenty s formulářem
-	/// Znovunačtení dat
+	/// Pokud je v FormNavigationService reloadList = true
+	/// Znovu se načtou data
+	/// FormNavigationService se nastaví na výchozí hodnoty
 	/// </summary>
 	/// <returns>Asynchronní operace</returns>
-	private async Task CloseFormAndReloadList()
+	private async Task TryReloadList()
 	{
-		showForm = false;
-		selectedBatteryId = null;
-		await LoadBatteryList();
-	}
-
-	/// <summary>
-	/// Skrytí komponenty s formulářem
-	/// </summary>
-	private void CloseForm()
-	{
-		showForm = false;
-		selectedBatteryId = null;
+		if (FormNavigationService.ShouldReload())
+		{
+			await LoadBatteryList();
+			FormNavigationService.Reset();
+		}
 	}
 }
