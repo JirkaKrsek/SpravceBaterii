@@ -46,6 +46,8 @@ namespace SpravceBaterii.Services
             applicationDbContext.Locations.Add(location);
             await applicationDbContext.SaveChangesAsync();
 
+            //Odpojení od slednování EF Core
+            applicationDbContext.Entry(location).State = EntityState.Detached;
         }
     }
 }
