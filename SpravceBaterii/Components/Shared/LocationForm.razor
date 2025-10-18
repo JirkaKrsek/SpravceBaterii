@@ -1,0 +1,140 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+
+@inject LocationService LocationService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<h2>Formulář pro zadání nové baterie</h2>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+<EditForm Model="@location" OnValidSubmit="SaveLocation" FormName="LocationForm">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<label for="input-Name">Název: </label>
+	<InputText id="input-Name" @bind-Value="location.Name"></InputText>
+
+	<label for="input-Floor">Podlaží: </label>
+	<InputText id="input-Floor" @bind-Value="location.Floor"></InputText>
+
+	<label for="input-Description">Popis: </label>
+	<InputTextArea id="input-Description" @bind-Value="location.Description"></InputTextArea>
+
+	<hr>
+
+	<button type="submit">Uložit</button>
+	<button type="button" @onclick="Close">Zavřít bez uložení</button>
+	<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
+
+	@if (showConfirm)
+	{
+		<div>
+			<p>Opravdu chcete odstranit toto umístění?</p>
+			<button type="button" @onclick="() => DeleteLocation(location.Id)">Ano</button>
+			<button type="button" @onclick="() => showConfirm = false">Ne</button>
+		</div>
+	}
+</EditForm>
+
+@code {
+	private string errorMessage = "";
+	private bool showConfirm = false;
+
+	/// <summary>
+	/// Callback události z rodičovské komponenty
+	/// </summary>
+	[Parameter]
+	public int? LocationToUpdateId { get; set; }
+	[Parameter]
+	public EventCallback LocationSaved { get; set; }
+	[Parameter]
+	public EventCallback Cancel { get; set; }
+
+	private Location location = new();
+
+	/// <summary>
+	/// Načtení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			if (LocationToUpdateId is not null)
+			{
+				location = await LocationService.GetUserLocationById(LocationToUpdateId.Value);
+			}
+			else
+			{
+				location = new();
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Uložení zadaných informací o (novém / vybraném) umístění do databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task SaveLocation()
+	{
+		try
+		{
+			if (LocationToUpdateId is null)
+			{
+				await LocationService.AddLocation(location);
+			}
+			else
+			{
+				await LocationService.UpdateLocation(location);
+			}
+
+			//Zavolání události v rodičovské komponentě
+			await LocationSaved.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Odstranění vybraného umístění z databáze
+	/// </summary>
+	/// <param name="locationId">ID vybraného umístění</param>
+	/// <returns>Asynchronní operace</returns>
+	private async Task DeleteLocation(int locationId)
+	{
+		try
+		{
+			await LocationService.DeleteLocationById(locationId);
+
+			//Zavolání události v rodičovské komponentě
+			await LocationSaved.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync();
+	}
+}
