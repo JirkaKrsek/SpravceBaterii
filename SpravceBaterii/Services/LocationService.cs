@@ -29,7 +29,24 @@ namespace SpravceBaterii.Services
             string userId = await userService.GetUserIdAsync();
 
             return await applicationDbContext.Locations
+                .AsNoTracking()
                 .Where(l => l.UserId == userId).ToListAsync();
+        }
+
+        /// <summary>
+        /// Získání umístění podle ID
+        /// </summary>
+        /// <param name="locationId">ID hledaného umístění</param>
+        /// <returns>Nalezené umístění</returns>
+        /// <exception cref="KeyNotFoundException">Umístění nenalezeno</exception>
+        public async Task<Location> GetUserLocationById(int locationId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Locations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(l => l.UserId == userId && l.Id == locationId)
+                ?? throw new KeyNotFoundException();
         }
 
         /// <summary>
@@ -45,6 +62,57 @@ namespace SpravceBaterii.Services
             applicationDbContext.Locations.Add(location);
             await applicationDbContext.SaveChangesAsync();
 
+            //Odpojení od slednování EF Core
+            applicationDbContext.Entry(location).State = EntityState.Detached;
+        }
+
+        /// <summary>
+        /// Aktualizace umístění v databázi
+        /// </summary>
+        /// <param name="location">Upravené umístění</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="InvalidOperationException">Neplatná data</exception>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
+        public async Task UpdateLocation(Location location)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            if (location.UserId == userId)
+            {
+                applicationDbContext.Update(location);
+                //Uložení
+                await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení od slednování EF Core
+                applicationDbContext.Entry(location).State = EntityState.Detached;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
+        }
+
+        /// <summary>
+        /// Odstranění umístění z databáze
+        /// </summary>
+        /// <param name="locationId">ID umístění</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
+        public async Task DeleteLocationById(int locationId)
+        {
+            string userId = await userService.GetUserIdAsync();
+            Location location = await GetUserLocationById(locationId);
+
+            if (location.UserId == userId)
+            {
+                applicationDbContext.Remove(location);
+                //Uložení
+                await applicationDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
         }
     }
 }
