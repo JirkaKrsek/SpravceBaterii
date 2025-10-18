@@ -1,0 +1,115 @@
+﻿@page "/umisteni"
+@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Components.Shared
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+
+@inject LocationService LocationService
+@inject ExceptionHandlerService ExceptionHandlerService
+@inject FormNavigationService FormNavigationService
+
+<PageTitle>Seznam umístění</PageTitle>
+
+<h1>Umístění</h1>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+@if (isDataLoaded)
+{
+	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(LocationForm))
+	{
+		<LocationForm LocationToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+					  LocationSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
+					  Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></LocationForm>
+	}
+	else
+	{
+		<button @onclick="() => FormNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
+	}
+}
+
+<hr>
+
+<h2>Seznam všech umístění</h2>
+
+@if (LocationList.Count < 1)
+{
+	<h3>Žádná uložená umístění</h3>
+}
+else
+{
+	<table>
+		<tr>
+			<th>Název umístění</th>
+			<th>Podlaží</th>
+			<th>Popis</th>
+			<th>Akce</th>
+		</tr>
+		@foreach (Location location in LocationList)
+		{
+			<tr>
+				<td>@location.Name</td>
+				<td>@(location.Floor ?? "")</td>
+				<td><textarea readonly>@location.Description</textarea></td>
+
+				<td><button @onclick="() => FormNavigationService.Open(typeof(LocationForm), location.Id)">Upravit</button></td>
+			</tr>
+		}
+	</table>
+}
+
+@code {
+	private string errorMessage = "";
+	private bool isDataLoaded = false;
+	private List<Location> LocationList = new();
+
+	/// <summary>
+	/// Při načtení stránky se zavolá načtení dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		FormNavigationService.Reset();
+
+		await LoadLocationList();
+	}
+
+	/// <summary>
+	/// Načtení informací o umístěních uživatele z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadLocationList()
+	{
+		try
+		{
+			LocationList = await LocationService.GetLocations();
+			LocationList = LocationList.OrderBy(l => l.Name).ToList();
+
+			isDataLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Pokud je v FormNavigationService reloadList = true
+	/// Znovu se načtou data
+	/// FormNavigationService se nastaví na výchozí hodnoty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task TryReloadList()
+	{
+		if (FormNavigationService.ShouldReload())
+		{
+			await LoadLocationList();
+			FormNavigationService.Reset();
+		}
+	}
+}
