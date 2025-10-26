@@ -17,5 +17,6 @@ namespace SpravceBaterii.Data.Models
         public string Name { get; set; }
 
         public ICollection<Battery>? Batteries { get; set; }
+        public ICollection<Device>? Devices { get; set; }
     }
 }

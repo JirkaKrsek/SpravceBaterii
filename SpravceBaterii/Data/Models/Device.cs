@@ -21,6 +21,9 @@ namespace SpravceBaterii.Data.Models
 
         public int BatteryCount { get; set; }
 
+        [ForeignKey("BatteryTypeId")]
+        public BatteryType BatteryType { get; set; }
+
         [MaxLength(100)]
         public string? Manufacturer { get; set; }
 
