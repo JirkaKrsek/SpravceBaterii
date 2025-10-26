@@ -12,7 +12,7 @@ using SpravceBaterii.Data;
 namespace SpravceBaterii.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251026091147_AddBatteryTypeToDevice")]
+    [Migration("20251026174739_AddBatteryTypeToDevice")]
     partial class AddBatteryTypeToDevice
     {
         /// <inheritdoc />
