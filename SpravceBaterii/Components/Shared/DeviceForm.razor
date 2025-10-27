@@ -43,59 +43,62 @@
 		}
 	</InputSelect>
 
-	<hr>
-
-	@if (Batteries.Count < 1)
+	@if (DeviceToUpdateId is not null)
 	{
-		<h3>Žádné vložené baterie</h3>
-	}
-	else
-	{
-		<p>Vložené baterie:</p>
+		<hr>
 
-		<table>
-			<tr>
-				<th>Počet</th>
-				<th>Označení</th>
-				<th>Popis</th>
-				<th>Typ</th>
-				<th>Datum expirace</th>
-				<th>Do konce expirace zbývá dní</th>
-				<th>Datum vložení</th>
-				<th>Předpokládaná doba výdrže (ve dnech)</th>
-				<th>Zbývající předpokládaná životnost</th>
-				<th>Akce</th>
-			</tr>
-			@foreach (Battery battery in Batteries)
-			{
+		@if (Batteries.Count < 1)
+		{
+			<h3>Žádné vložené baterie</h3>
+		}
+		else
+		{
+			<p>Vložené baterie:</p>
+
+			<table>
 				<tr>
-					<td>@battery.Count</td>
-					<td>@battery.BatteryType.Name</td>
-					<td><textarea readonly>@battery.Description</textarea></td>
-					@if (battery.IsRechargeable)
-					{
-						<td>Nabíjecí</td>
-						<td></td>
-						<td></td>
-					}
-					else
-					{
-						<td>Jednorázová</td>
-						<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-						BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-						<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-					}
-					<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-					<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-					@{
-						BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-						<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
-					}
-
-					<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit</button></td>
+					<th>Počet</th>
+					<th>Označení</th>
+					<th>Popis</th>
+					<th>Typ</th>
+					<th>Datum expirace</th>
+					<th>Do konce expirace zbývá dní</th>
+					<th>Datum vložení</th>
+					<th>Předpokládaná doba výdrže (ve dnech)</th>
+					<th>Zbývající předpokládaná životnost</th>
+					<th>Akce</th>
 				</tr>
-			}
-		</table>
+				@foreach (Battery battery in Batteries)
+				{
+					<tr>
+						<td>@battery.Count</td>
+						<td>@battery.BatteryType.Name</td>
+						<td><textarea readonly>@battery.Description</textarea></td>
+						@if (battery.IsRechargeable)
+						{
+							<td>Nabíjecí</td>
+							<td></td>
+							<td></td>
+						}
+						else
+						{
+							<td>Jednorázová</td>
+							<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+							BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+							<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+						}
+						<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+						<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
+						@{
+							BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
+							<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
+						}
+
+						<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit</button></td>
+					</tr>
+				}
+			</table>
+		}
 	}
 
 	<hr>
