@@ -5,6 +5,7 @@
 
 @inject BatteryService BatteryService
 @inject DeviceService DeviceService
+@inject LocationService LocationService
 @inject ExceptionHandlerService ExceptionHandlerService
 
 <h2>Formulář pro vytvoření/úpravu zařízení</h2>
@@ -32,6 +33,15 @@
 
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="device.Manufacturer"></InputText>
+
+	<label for="input-Location">Umístění (kde se zařízení nachází): </label>
+	<InputSelect id="input-Location" @bind-Value="device.LocationId">
+		<option value="">- Vyberte typ -</option>
+		@foreach (Location location in Locations)
+		{
+			<option value="@location.Id">@location.Name</option>
+		}
+	</InputSelect>
 
 	<hr>
 
@@ -122,6 +132,7 @@
 
 	private Device device = new();
 	private List<Battery> Batteries = new();
+	private List<Location> Locations = new();
 
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 
@@ -145,6 +156,7 @@
 					BatteryCount = 1
 				};
 			}
+			Locations = await LocationService.GetLocations();
 		}
 		catch (Exception ex)
 		{
