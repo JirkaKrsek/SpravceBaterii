@@ -22,7 +22,7 @@
 	<ValidationSummary />
 
 	<label for="input-Name">Název: </label>
-	<InputText id="input-Name" @bind-Value="device.Name"></InputText>
+	<InputText id="input-Name" @bind-Value="device.Name" required></InputText>
 
 	<span>Poloha zařízení: @(device.Location?.Name ?? "")</span>
 
