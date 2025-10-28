@@ -44,7 +44,7 @@
 
 	<label for="input-Location">Umístění (kde se zařízení nachází): </label>
 	<InputSelect id="input-Location" @bind-Value="device.LocationId">
-		<option value="">- Vyberte typ -</option>
+		<option value="">- Vyberte umístění -</option>
 		@foreach (Location location in Locations)
 		{
 			<option value="@location.Id">@location.Name</option>
