@@ -6,6 +6,7 @@
 @inject BatteryService BatteryService
 @inject DeviceService DeviceService
 @inject LocationService LocationService
+@inject BatteryTypeService BatteryTypeService
 @inject ExceptionHandlerService ExceptionHandlerService
 
 <h2>Formulář pro vytvoření/úpravu zařízení</h2>
@@ -27,6 +28,15 @@
 
 	<label for="input-Count">Maximální počet baterií: </label>
 	<InputNumber id="input-Count" @bind-Value="device.BatteryCount" min="1" required></InputNumber>
+
+	<label for="input-BatteryType">Typ baterií v zařízení: </label>
+	<InputSelect id="input-BatteryType" @bind-Value="device.BatteryTypeId" required>
+		<option value="">- Vyberte typ -</option>
+		@foreach (BatteryType batteryType in BatteryTypes)
+		{
+			<option value="@batteryType.Id">@batteryType.Name</option>
+		}
+	</InputSelect>
 
 	<label for="input-Description">Popis: </label>
 	<InputTextArea id="input-Description" @bind-Value="device.Description"></InputTextArea>
@@ -136,6 +146,7 @@
 	private Device device = new();
 	private List<Battery> Batteries = new();
 	private List<Location> Locations = new();
+	private List<BatteryType> BatteryTypes = new();
 
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 
@@ -160,6 +171,7 @@
 				};
 			}
 			Locations = await LocationService.GetLocations();
+			BatteryTypes = await BatteryTypeService.GetBatteryTypes();
 		}
 		catch (Exception ex)
 		{
