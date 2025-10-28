@@ -24,8 +24,6 @@
 	<label for="input-Name">Název: </label>
 	<InputText id="input-Name" @bind-Value="device.Name" required></InputText>
 
-	<span>Poloha zařízení: @(device.Location?.Name ?? "")</span>
-
 	<label for="input-Count">Maximální počet baterií: </label>
 	<InputNumber id="input-Count" @bind-Value="device.BatteryCount" min="1" required></InputNumber>
 
