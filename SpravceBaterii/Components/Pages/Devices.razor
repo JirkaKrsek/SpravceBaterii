@@ -21,7 +21,15 @@
 
 @if (isDataLoaded)
 {
-	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceDetail))
+	{
+		<DeviceDetail DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+					  EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+					  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
+					  Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+					  Cancel="@(async () => {FormNavigationService.Close();})"></DeviceDetail>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 	{
 		<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
 					 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
