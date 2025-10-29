@@ -1,0 +1,138 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+
+@inject DeviceService DeviceService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+@if (isDataLoaded)
+{
+	<h2>Detail zařízení: @device.Name</h2>
+
+	<table>
+		<tr>
+			<td>Název zařízení: </td>
+			<td>@device.Name</td>
+		</tr>
+		<tr>
+			<td>Popis zařízení: </td>
+			<td><textarea readonly>@device.Description</textarea></td>
+		</tr>
+		<tr>
+			<td>Max. počet baterií v zařízení: </td>
+			<td>@device.BatteryCount</td>
+		</tr>
+		<tr>
+			<td>Typ baterií: </td>
+			<td>@device.BatteryType.Name</td>
+		</tr>
+		<tr>
+			<td>Počet aktuálně vložených baterií: </td>
+			<td>@(device.Batteries?.Sum(b => b.Count) ?? 0)</td>
+		</tr>
+		<tr>
+			<td>Výrobce: </td>
+			<td>@device.Manufacturer</td>
+		</tr>
+		<tr>
+			<td>Umístění: </td>
+			<td>@device.Location?.Name</td>
+		</tr>
+	</table>
+}
+else
+{
+	<h2>Detail Zařízení</h2>
+}
+
+<hr>
+
+<h3>Akce:</h3>
+<button @onclick="() => EditDevice.InvokeAsync(device.Id)">Upravit zařízení</button>
+<button type="button" @onclick="() => showConfirm = true">Odstranit toto zařízení</button>
+
+<hr>
+
+<button type="button" @onclick="Close">Zavřít</button>
+
+@if (showConfirm)
+{
+	<div>
+		<p>Opravdu chcete odstranit toto zařízení?</p>
+		<button type="button" @onclick="DeleteDevice">Ano</button>
+		<button type="button" @onclick="() => showConfirm = false">Ne</button>
+	</div>
+}
+
+@code {
+	private string errorMessage = "";
+	private bool showConfirm = false;
+	private bool isDataLoaded = false;
+
+	/// <summary>
+	/// Callback události z rodičovské komponenty
+	/// </summary>
+	[Parameter]
+	public int DeviceId { get; set; }
+	[Parameter]
+	public EventCallback Deleted { get; set; }
+	[Parameter]
+	public EventCallback Cancel { get; set; }
+	[Parameter]
+	public EventCallback<int> EditDevice { get; set; }
+
+	private Device device = new();
+
+	/// <summary>
+	/// Načtení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			device = await DeviceService.GetUserDeviceByIdWithDetails(DeviceId);
+
+			isDataLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Odstranění vybraného zařízení z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task DeleteDevice()
+	{
+		try
+		{
+			await DeviceService.DeleteDeviceById(DeviceId);
+
+			//Zavolání události v rodičovské komponentě
+			await Deleted.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync();
+	}
+}
