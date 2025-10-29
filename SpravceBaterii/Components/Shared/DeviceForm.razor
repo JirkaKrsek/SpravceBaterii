@@ -3,7 +3,6 @@
 @using SpravceBaterii.Services
 @using SpravceBaterii.Services.Tools
 
-@inject BatteryService BatteryService
 @inject DeviceService DeviceService
 @inject LocationService LocationService
 @inject BatteryTypeService BatteryTypeService
@@ -51,65 +50,7 @@
 		}
 	</InputSelect>
 
-	@if (DeviceToUpdateId is not null)
-	{
 		<hr>
-
-		@if (Batteries.Count < 1)
-		{
-			<h3>Žádné vložené baterie</h3>
-		}
-		else
-		{
-			<p>Vložené baterie:</p>
-
-			<table>
-				<tr>
-					<th>Počet</th>
-					<th>Označení</th>
-					<th>Popis</th>
-					<th>Typ</th>
-					<th>Datum expirace</th>
-					<th>Do konce expirace zbývá dní</th>
-					<th>Datum vložení</th>
-					<th>Předpokládaná doba výdrže (ve dnech)</th>
-					<th>Zbývající předpokládaná životnost</th>
-					<th>Akce</th>
-				</tr>
-				@foreach (Battery battery in Batteries)
-				{
-					<tr>
-						<td>@battery.Count</td>
-						<td>@battery.BatteryType.Name</td>
-						<td><textarea readonly>@battery.Description</textarea></td>
-						@if (battery.IsRechargeable)
-						{
-							<td>Nabíjecí</td>
-							<td></td>
-							<td></td>
-						}
-						else
-						{
-							<td>Jednorázová</td>
-							<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-							BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-							<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-						}
-						<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-						<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-						@{
-							BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-							<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
-						}
-
-						<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit</button></td>
-					</tr>
-				}
-			</table>
-		}
-	}
-
-	<hr>
 
 	<button type="submit">Uložit</button>
 	<button type="button" @onclick="Close">Zavřít bez uložení</button>
@@ -138,11 +79,8 @@
 	public EventCallback DeviceSaved { get; set; }
 	[Parameter]
 	public EventCallback Cancel { get; set; }
-	[Parameter]
-	public EventCallback<int> EditBattery { get; set; }
 
 	private Device device = new();
-	private List<Battery> Batteries = new();
 	private List<Location> Locations = new();
 	private List<BatteryType> BatteryTypes = new();
 
@@ -159,7 +97,6 @@
 			if (DeviceToUpdateId is not null)
 			{
 				device = await DeviceService.GetUserDeviceById(DeviceToUpdateId.Value);
-				Batteries = await BatteryService.GetUserBatteriesByDeviceId(device.Id);
 			}
 			else
 			{
