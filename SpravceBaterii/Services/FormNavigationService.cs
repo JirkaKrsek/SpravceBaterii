@@ -45,12 +45,16 @@
         }
 
         /// <summary>
-        /// Získání hodnoty reloadList
+        /// Rozhodnutí, zda se mají data na stránce znovu načíst
         /// </summary>
-        /// <returns>bool zda se mají data znovu načíst</returns>
+        /// <returns>bool, zda se mají data znovu načíst</returns>
         public bool ShouldReload()
         {
-            return reload;
+            if (history.Count < 1)
+            {
+                return reload;
+            }
+            return false;
         }
 
         /// <summary>
