@@ -27,7 +27,7 @@
 					  EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
 					  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
 					  Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-					  Cancel="@(async () => {FormNavigationService.Close();})"></DeviceDetail>
+					  Cancel="@(async () => FormNavigationService.Close())"></DeviceDetail>
 	}
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 	{
@@ -38,9 +38,8 @@
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
 	{
 		<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-					EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
-					Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></DeviceForm>
+					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+					Cancel="@(async () => FormNavigationService.Close())"></DeviceForm>
 	}
 	else
 	{
@@ -113,6 +112,22 @@ else
 	}
 
 	/// <summary>
+	/// Po vykreslení stránky se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	/// <param name="firstRender">bool, zda se stránka vykresluje poprvé</param>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (FormNavigationService.ShouldReload())
+		{
+			await LoadDeviceList();
+			FormNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
+		}
+	}
+	/// <summary>
 	/// Načtení informací o zařízeních uživatele z databáze
 	/// </summary>
 	/// <returns>Asynchronní operace</returns>
@@ -152,20 +167,5 @@ else
 			return status;
 		}
 		return new BatteryStatus();
-	}
-
-	/// <summary>
-	/// Pokud je v FormNavigationService reloadList = true
-	/// Znovu se načtou data
-	/// FormNavigationService se nastaví na výchozí hodnoty
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task TryReloadList()
-	{
-		if (FormNavigationService.ShouldReload())
-		{
-			await LoadDeviceList();
-			FormNavigationService.Reset();
-		}
 	}
 }
