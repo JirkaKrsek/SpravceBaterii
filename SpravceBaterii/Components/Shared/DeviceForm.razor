@@ -50,7 +50,7 @@
 		}
 	</InputSelect>
 
-		<hr>
+	<hr>
 
 	<button type="submit">Uložit</button>
 	<button type="button" @onclick="Close">Zavřít bez uložení</button>
@@ -79,6 +79,8 @@
 	public EventCallback DeviceSaved { get; set; }
 	[Parameter]
 	public EventCallback Cancel { get; set; }
+	[Parameter]
+	public EventCallback<int> DeviceSavedShowDeviceDetail { get; set; }
 
 	private Device device = new();
 	private List<Location> Locations = new();
@@ -125,15 +127,17 @@
 			if (DeviceToUpdateId is null)
 			{
 				await DeviceService.AddDevice(device);
+
+				//Zavolání události v rodičovské komponentě
+				await DeviceSavedShowDeviceDetail.InvokeAsync(device.Id);
 			}
 			else
 			{
 				await DeviceService.UpdateDevice(device);
+
+				//Zavolání události v rodičovské komponentě
+				await DeviceSaved.InvokeAsync();
 			}
-
-
-			//Zavolání události v rodičovské komponentě
-			await DeviceSaved.InvokeAsync();
 		}
 		catch (Exception ex)
 		{

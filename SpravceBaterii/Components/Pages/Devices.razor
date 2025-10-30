@@ -38,7 +38,8 @@
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
 	{
 		<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+					DeviceSavedShowDeviceDetail="@(async (deviceId) => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(DeviceDetail), deviceId);})"
+					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
 					Cancel="@(async () => FormNavigationService.Close())"></DeviceForm>
 	}
 	else
