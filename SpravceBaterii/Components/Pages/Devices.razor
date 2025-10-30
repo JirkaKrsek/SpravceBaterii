@@ -88,7 +88,9 @@ else
 				<td>@device.Manufacturer</td>
 				<td>@device.Location?.Name</td>
 
-				<td><button @onclick="() => FormNavigationService.Open(typeof(DeviceForm), device.Id)">Upravit</button></td>
+				<td>
+					<button @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">Detail zařízení</button>
+				</td>
 			</tr>
 		}
 	</table>
