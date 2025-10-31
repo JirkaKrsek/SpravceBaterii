@@ -77,6 +77,48 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Načtení baterií, které nejsou vloženy v žádném zařízení, podle ID jejich typu
+        /// </summary>
+        /// <param name="typeId">ID typu baterie</param>
+        /// <returns>List baterií</returns>
+        public async Task<List<Battery>> GetUnUsedBatteriesByTypeId(int typeId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Batteries
+                .Where(b => b.UserId == userId && b.DeviceId == null && b.BatteryTypeId == typeId)
+                .Include(b => b.BatteryType)
+                .Include(b => b.DisposableBattery)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Aktualizace samotné baterie v databázi
+        /// </summary>
+        /// <param name="battery">Upravená baterie</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
+        public async Task UpdateOnlyBattery(Battery battery)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            if (battery.UserId == userId)
+            {
+                applicationDbContext.Update(battery);
+                //Uložení
+                await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení od slednování EF Core
+                applicationDbContext.Entry(battery).State = EntityState.Detached;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
+        }
+
+        /// <summary>
         /// Aktualizace baterie v databázi
         /// </summary>
         /// <param name="battery">Upravená baterie</param>
@@ -219,6 +261,54 @@ namespace SpravceBaterii.Services
             {
                 throw new UnauthorizedAccessException();
             }
+        }
+
+        /// <summary>
+        /// Vytvoření kopie objektu baterie
+        /// </summary>
+        /// <param name="sourceBattery">Zdrojová baterie</param>
+        /// <returns>Kopie baterie</returns>
+        public Battery CreateBatteryCopy(Battery sourceBattery)
+        {
+            RechargeableBattery rechargeableBattery = new();
+            DisposableBattery disposableBattery = new();
+
+            if (sourceBattery.IsRechargeable & sourceBattery.RechargeableBattery is not null)
+            {
+                rechargeableBattery = new()
+                {
+                    BatteryId = sourceBattery.RechargeableBattery!.BatteryId,
+                    Capacity = sourceBattery.RechargeableBattery.Capacity,
+                    CycleCount = sourceBattery.RechargeableBattery.CycleCount
+                };
+            }
+            else if (!sourceBattery.IsRechargeable & sourceBattery.DisposableBattery is not null)
+            {
+                disposableBattery = new()
+                {
+                    BatteryId = sourceBattery.DisposableBattery!.BatteryId,
+                    ExpirationDate = sourceBattery.DisposableBattery.ExpirationDate
+                };
+            }
+
+            Battery batteryCopy = new()
+            {
+                BatteryTypeId = sourceBattery.BatteryTypeId,
+                ChemicalCompositionId = sourceBattery.ChemicalCompositionId,
+                IsRechargeable = sourceBattery.IsRechargeable,
+                DisposableBattery = disposableBattery,
+                RechargeableBattery = rechargeableBattery,
+                Description = sourceBattery.Description,
+                Manufacturer = sourceBattery.Manufacturer,
+                ExpectedLifespan = sourceBattery.ExpectedLifespan,
+                InsertionDate = sourceBattery.InsertionDate,
+                UsageHistory = sourceBattery.UsageHistory,
+                UserId = sourceBattery.UserId,
+                DeviceId = sourceBattery.DeviceId,
+                Count = sourceBattery.Count
+            };
+
+            return batteryCopy;
         }
     }
 }
