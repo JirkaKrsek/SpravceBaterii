@@ -26,6 +26,7 @@
 		<DeviceDetail DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
 					  EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
 					  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
+					  InsertBattery="@(deviceId => FormNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
 					  Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
 					  Cancel="@(async () => FormNavigationService.Close())"></DeviceDetail>
 	}
@@ -41,6 +42,13 @@
 					DeviceSavedShowDeviceDetail="@(async (deviceId) => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(DeviceDetail), deviceId);})"
 					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
 					Cancel="@(async () => FormNavigationService.Close())"></DeviceForm>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(InsertBatteryToDevice))
+	{
+		<InsertBatteryToDevice DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+							   Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
+							   Cancel="@(async () => FormNavigationService.Close())"></InsertBatteryToDevice>
 	}
 	else
 	{

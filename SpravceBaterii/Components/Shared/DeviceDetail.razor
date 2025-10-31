@@ -112,7 +112,10 @@ else
 
 <h3>Akce:</h3>
 <button @onclick="() => EditDevice.InvokeAsync(device.Id)">Upravit zařízení</button>
-<button>Vložit baterii</button>
+@if (device.Batteries?.Count < device.BatteryCount)
+{
+	<button @onclick="() => InsertBattery.InvokeAsync(device.Id)">Vložit baterii</button>
+}
 <button type="button" @onclick="() => showConfirm = true">Odstranit toto zařízení</button>
 
 <hr>
@@ -146,6 +149,8 @@ else
 	public EventCallback<int> EditBattery { get; set; }
 	[Parameter]
 	public EventCallback<int> EditDevice { get; set; }
+	[Parameter]
+	public EventCallback<int> InsertBattery { get; set; }
 
 	private Device device = new();
 	private List<Battery> Batteries = new();
