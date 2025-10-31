@@ -34,8 +34,11 @@
 
 	<span>Poloha vybraného zařízení: @selectedDeviceLocation</span>
 
-	<label for="input-InsertionDate">Datum vložení: </label>
-	<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" @bind-Value:after="SetRemainingDaysToExpectedLife"></InputDate>
+	@if (battery.DeviceId is not null)
+	{
+		<label for="input-InsertionDate">Datum vložení: </label>
+		<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" @bind-Value:after="SetRemainingDaysToExpectedLife"></InputDate>
+	}
 
 	<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
 	<InputNumber id="input-ExpectedLifespan" @bind-Value="battery.ExpectedLifespan" @bind-Value:after="SetRemainingDaysToExpectedLife"></InputNumber>
@@ -176,7 +179,6 @@
 			{
 				battery = new()
 				{
-					InsertionDate = DateOnly.FromDateTime(DateTime.Today),
 					Count = 1
 				};
 				disposableBattery = new()
