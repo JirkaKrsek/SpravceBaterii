@@ -193,7 +193,7 @@
 
 		if (device is not null && selectedBattery is not null)
 		{
-			int usedSlots = device.Batteries?.Count ?? 0;
+			int usedSlots = device.Batteries?.Sum(b => b.Count) ?? 0;
 			int freeSlots = device.BatteryCount - usedSlots;
 			int freeBatteryCount = selectedBattery.Count;
 
