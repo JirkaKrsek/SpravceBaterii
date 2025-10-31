@@ -28,7 +28,7 @@
 					  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
 					  InsertBattery="@(deviceId => FormNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
 					  Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-					  Cancel="@(async () => FormNavigationService.Close())"></DeviceDetail>
+					  Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></DeviceDetail>
 	}
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 	{

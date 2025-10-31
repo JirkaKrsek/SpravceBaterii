@@ -2,6 +2,7 @@
 @using SpravceBaterii.Data.Models
 @using SpravceBaterii.Services
 @using SpravceBaterii.Services.Tools
+@using System.Text
 
 @inject BatteryService BatteryService
 @inject DeviceService DeviceService
@@ -102,7 +103,10 @@ else
 					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
 				}
 
-				<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
+				<td>
+					<button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button>
+					<button @onclick="() => { batteryToEjectId = battery.Id; showConfirmEjectBattery = true; }">Vysunout tuto baterii</button>
+				</td>
 			</tr>
 		}
 	</table>
@@ -130,11 +134,31 @@ else
 		<button type="button" @onclick="() => showConfirm = false">Ne</button>
 	</div>
 }
+@if (batteryToEjectId is not null && showConfirmEjectBattery)
+{
+	<div>
+		<p>Opravdu chcete vysunout tuto baterii ze zařízení?</p>
+		<button type="button" @onclick="() => { showConfirmEjectBattery = false; showConfirmDeleteEjectedBattery = true; }">Ano</button>
+		<button type="button" @onclick="() => { showConfirmEjectBattery = false; batteryToEjectId = null; }">Ne</button>
+	</div>
+}
+@if (batteryToEjectId is not null && showConfirmDeleteEjectedBattery)
+{
+	<div>
+		<p>Chcete tuto vysunutou baterii i odstranit?</p>
+		<button @onclick="async () => await EjectBatteryFromDevice(true)">Ano</button>
+		<button @onclick="async () => await EjectBatteryFromDevice(false)">Ne</button>
+	</div>
+}
 
 @code {
 	private string errorMessage = "";
 	private bool showConfirm = false;
+	private int? batteryToEjectId = null;
+	private bool showConfirmEjectBattery = false;
+	private bool showConfirmDeleteEjectedBattery = false;
 	private bool isDataLoaded = false;
+	private bool dataUpdated = false;
 
 	/// <summary>
 	/// Callback události z rodičovské komponenty
@@ -144,7 +168,7 @@ else
 	[Parameter]
 	public EventCallback Deleted { get; set; }
 	[Parameter]
-	public EventCallback Cancel { get; set; }
+	public EventCallback<bool> Cancel { get; set; }
 	[Parameter]
 	public EventCallback<int> EditBattery { get; set; }
 	[Parameter]
@@ -162,6 +186,15 @@ else
 	/// </summary>
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
+	{
+		await LoadDeviceList();
+	}
+
+	/// <summary>
+	/// Načtení potřebných informací z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadDeviceList()
 	{
 		try
 		{
@@ -193,6 +226,54 @@ else
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
+	}
+
+	/// <summary>
+	/// Vysunutí vybrané baterie ze zařízení s možností jí i ihned smazat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task EjectBatteryFromDevice(bool deleteEjectedBattery)
+	{
+		showConfirmDeleteEjectedBattery = false;
+
+		try
+		{
+			if (batteryToEjectId is null)
+			{
+				return;
+			}
+
+			if (deleteEjectedBattery)
+			{
+				await BatteryService.DeleteBatteryById(batteryToEjectId!.Value);
+			}
+			else
+			{
+				Battery battery = await BatteryService.GetUserBatteryById(batteryToEjectId!.Value);
+
+				StringBuilder stringBuilder = new();
+				stringBuilder.Append(battery.InsertionDate?.ToString() ?? "Datum vložení nebyl zadán");
+				stringBuilder.Append(" - ");
+				stringBuilder.Append(DateOnly.FromDateTime(DateTime.Today).ToShortDateString());
+				stringBuilder.Append(" byla použita v ");
+				stringBuilder.AppendLine(device.Name);
+
+				battery.UsageHistory += stringBuilder.ToString();
+				battery.DeviceId = null;
+				battery.InsertionDate = null;
+
+				await BatteryService.UpdateOnlyBattery(battery);
+			}
+
+			dataUpdated = true;
+			await LoadDeviceList();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+
+		batteryToEjectId = null;
 	}
 
 	/// <summary>
@@ -230,6 +311,6 @@ else
 	private async Task Close()
 	{
 		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+		await Cancel.InvokeAsync(dataUpdated);
 	}
 }
