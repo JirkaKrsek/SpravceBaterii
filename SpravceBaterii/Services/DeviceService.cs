@@ -54,6 +54,23 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Získání zařízení podle ID
+        /// </summary>
+        /// <param name="deviceId">ID hledaného zařízení</param>
+        /// <returns>Nalezené zařízení</returns>
+        /// <exception cref="KeyNotFoundException">Zařízení nenalezeno</exception>
+        public async Task<Device> GetUserDeviceByIdWithBatteries(int deviceId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Devices
+                .Include(d => d.Batteries)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.UserId == userId && d.Id == deviceId)
+                ?? throw new KeyNotFoundException();
+        }
+
+        /// <summary>
         /// Získání zařízení s jeho detaily podle ID
         /// </summary>
         /// <param name="deviceId">ID hledaného zařízení</param>
@@ -64,6 +81,7 @@ namespace SpravceBaterii.Services
             string userId = await userService.GetUserIdAsync();
 
             return await applicationDbContext.Devices
+                .Include(d => d.Batteries)
                 .Include(d => d.BatteryType)
                 .Include(d => d.Location)
                 .AsNoTracking()
