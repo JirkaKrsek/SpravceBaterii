@@ -112,7 +112,7 @@ else
 
 <h3>Akce:</h3>
 <button @onclick="() => EditDevice.InvokeAsync(device.Id)">Upravit zařízení</button>
-@if (device.Batteries?.Count < device.BatteryCount)
+@if ((device.Batteries?.Sum(b => b.Count) ?? 0) < device.BatteryCount)
 {
 	<button @onclick="() => InsertBattery.InvokeAsync(device.Id)">Vložit baterii</button>
 }
