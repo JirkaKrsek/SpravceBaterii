@@ -60,6 +60,24 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Získání baterie podle ID s načtením informací o jednorázové a nabíjecí variantě
+        /// </summary>
+        /// <param name="batteryId">ID hledané baterie</param>
+        /// <returns>Nalezená baterie</returns>
+        /// <exception cref="KeyNotFoundException">Baterie nenalezena</exception>
+        public async Task<Battery> GetUserBatteryByIdWithDetails(int batteryId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Batteries
+                .Include(b => b.DisposableBattery)
+                .Include(b => b.RechargeableBattery)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == batteryId)
+                ?? throw new KeyNotFoundException();
+        }
+
+        /// <summary>
         /// Načtení baterií podle ID zařízení, ve kterém jsou vloženy
         /// </summary>
         /// <param name="deviceId">ID zařízení</param>
