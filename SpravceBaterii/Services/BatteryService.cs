@@ -284,29 +284,31 @@ namespace SpravceBaterii.Services
         /// <summary>
         /// Vytvoření kopie objektu baterie
         /// </summary>
-        /// <param name="sourceBattery">Zdrojová baterie</param>
+        /// <param name="batteryId">ID zdrojové baterie</param>
         /// <returns>Kopie baterie</returns>
-        public Battery CreateBatteryCopy(Battery sourceBattery)
+        public async Task<Battery> CreateBatteryCopy(int batteryId)
         {
-            RechargeableBattery rechargeableBattery = new();
-            DisposableBattery disposableBattery = new();
+            Battery sourceBattery = await GetUserBatteryByIdWithDetails(batteryId);
 
-            if (sourceBattery.IsRechargeable & sourceBattery.RechargeableBattery is not null)
+            RechargeableBattery? rechargeableBattery = null;
+            DisposableBattery? disposableBattery = null;
+
+            if (sourceBattery.IsRechargeable && sourceBattery.RechargeableBattery is not null)
             {
                 rechargeableBattery = new()
                 {
-                    BatteryId = sourceBattery.RechargeableBattery!.BatteryId,
-                    Capacity = sourceBattery.RechargeableBattery.Capacity,
-                    CycleCount = sourceBattery.RechargeableBattery.CycleCount
+                    Capacity = sourceBattery.RechargeableBattery!.Capacity,
+                    CycleCount = sourceBattery.RechargeableBattery!.CycleCount
                 };
+                disposableBattery = null;
             }
-            else if (!sourceBattery.IsRechargeable & sourceBattery.DisposableBattery is not null)
+            else if (!sourceBattery.IsRechargeable && sourceBattery.DisposableBattery is not null)
             {
                 disposableBattery = new()
                 {
-                    BatteryId = sourceBattery.DisposableBattery!.BatteryId,
-                    ExpirationDate = sourceBattery.DisposableBattery.ExpirationDate
+                    ExpirationDate = sourceBattery.DisposableBattery!.ExpirationDate
                 };
+                rechargeableBattery = null;
             }
 
             Battery batteryCopy = new()
