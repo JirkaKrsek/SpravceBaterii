@@ -40,7 +40,7 @@
 			</tr>
 			@foreach (Battery battery in Batteries)
 			{
-				<tr @onclick="@(() => { Input.selectedBatteryId = battery.Id; SelectBatteryAndSetInsertLimit(); })">
+				<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })">
 					<td>@battery.Count</td>
 					<td>@battery.BatteryType.Name</td>
 					<td><textarea readonly>@battery.Description</textarea></td>
@@ -140,7 +140,17 @@
 	{
 		try
 		{
-			if (device is not null && selectedBattery is not null && device.BatteryTypeId == selectedBattery.BatteryTypeId)
+			if (Input.selectedBatteryId is not null)
+			{
+				selectedBattery = await BatteryService.GetUserBatteryById(Input.selectedBatteryId!.Value);
+			}
+			else
+			{
+				errorMessage = "Musí být vybrána baterie";
+				return;
+			}
+
+			if (device is not null && device.BatteryTypeId == selectedBattery.BatteryTypeId)
 			{
 				if (Input.batteryCountToInsert < selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
 				{
@@ -149,7 +159,7 @@
 					await BatteryService.UpdateOnlyBattery(selectedBattery);
 
 					//Nová baterie pro vložení do zařízení s nastaveným počtem přiřazených baterií
-					Battery newBattery = BatteryService.CreateBatteryCopy(selectedBattery);
+					Battery newBattery = await BatteryService.CreateBatteryCopy(selectedBattery.Id);
 					newBattery.DeviceId = DeviceId;
 					newBattery.Count = Input.batteryCountToInsert;
 					newBattery.InsertionDate = Input.InsertionDate;
@@ -187,9 +197,17 @@
 	/// Uložení vybrané baterie do proměnné
 	/// Nastavení maximálního možného počtu pro vložení baterií
 	/// </summary>
-	private void SelectBatteryAndSetInsertLimit()
+	private async Task SelectBatteryAndSetInsertLimit()
 	{
-		selectedBattery = Batteries.FirstOrDefault(b => b.Id == Input.selectedBatteryId);
+		if (Input.selectedBatteryId is not null)
+		{
+			selectedBattery = await BatteryService.GetUserBatteryById(Input.selectedBatteryId!.Value);
+		}
+		else
+		{
+			errorMessage = "Musí být vybrána baterie";
+			return;
+		}
 
 		if (device is not null && selectedBattery is not null)
 		{
