@@ -104,7 +104,7 @@ else
 
 				<td>
 					<button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button>
-					<button @onclick="() => { batteryToEjectId = battery.Id; showConfirmEjectBattery = true; }">Vysunout tuto baterii</button>
+					<button @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteBattery = true; }">Vysunout / odstranit tuto baterii</button>
 				</td>
 			</tr>
 		}
@@ -147,20 +147,13 @@ else
 		<button type="button" @onclick="() => DeleteDevice(true)">Odstranit</button>
 	</div>
 }
-@if (batteryToEjectId is not null && showConfirmEjectBattery)
+@if (selectedBatteryId is not null && showConfirmEjectOrDeleteBattery)
 {
 	<div>
 		<p>Opravdu chcete vysunout tuto baterii ze zařízení?</p>
-		<button type="button" @onclick="() => { showConfirmEjectBattery = false; showConfirmDeleteEjectedBattery = true; }">Ano</button>
-		<button type="button" @onclick="() => { showConfirmEjectBattery = false; batteryToEjectId = null; }">Ne</button>
-	</div>
-}
-@if (batteryToEjectId is not null && showConfirmDeleteEjectedBattery)
-{
-	<div>
-		<p>Chcete tuto vysunutou baterii i odstranit?</p>
-		<button @onclick="async () => await EjectBatteryFromDevice(true)">Ano</button>
-		<button @onclick="async () => await EjectBatteryFromDevice(false)">Ne</button>
+		<button type="button" @onclick="async () => { await EjectBatteryFromDevice(false); }">Jen vysunout</button>
+		<button type="button" @onclick="async () => { selectedBatteryId = null; await EjectBatteryFromDevice(true); }">Vysunout a odstranit</button>
+		<button type="button" @onclick="() => { showConfirmEjectOrDeleteBattery = false; selectedBatteryId = null; }">Zrušit akci</button>
 	</div>
 }
 @if (showConfirmEjectOrDeleteAllBatteries)
@@ -175,11 +168,10 @@ else
 
 @code {
 	private string errorMessage = "";
-	private int? batteryToEjectId = null;
+	private int? selectedBatteryId = null;
 	private bool showConfirmDeleteDevice = false;
 	private bool showConfirmDeleteBatteryFromDeletedDevice = false;
-	private bool showConfirmEjectBattery = false;
-	private bool showConfirmDeleteEjectedBattery = false;
+	private bool showConfirmEjectOrDeleteBattery = false;
 	private bool showConfirmEjectOrDeleteAllBatteries = false;
 	private bool isDataLoaded = false;
 	private bool dataUpdated = false;
@@ -297,7 +289,9 @@ else
 				await LoadDeviceList();
 			}
 
+			showConfirmEjectOrDeleteBattery = false;
 			showConfirmEjectOrDeleteAllBatteries = false;
+			selectedBatteryId = null;
 		}
 		catch (Exception ex)
 		{
@@ -312,23 +306,23 @@ else
 	/// <returns>Asynchronní operace</returns>
 	private async Task EjectBatteryFromDevice(bool deleteEjectedBattery)
 	{
-		showConfirmDeleteEjectedBattery = false;
-
 		try
 		{
-			if (batteryToEjectId is null)
+			if (selectedBatteryId is null)
 			{
 				return;
 			}
 
 			if (deleteEjectedBattery)
 			{
-				await BatteryService.DeleteBatteryById(batteryToEjectId!.Value);
+				await BatteryService.DeleteBatteryById(selectedBatteryId!.Value);
 			}
 			else
 			{
-				await BatteryService.EjectBatteryFromDevice(batteryToEjectId!.Value, device.Name);
+				await BatteryService.EjectBatteryFromDevice(selectedBatteryId!.Value, device.Name);
 			}
+
+			showConfirmEjectOrDeleteBattery = false;
 
 			dataUpdated = true;
 			await LoadDeviceList();
@@ -338,7 +332,7 @@ else
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
 
-		batteryToEjectId = null;
+		selectedBatteryId = null;
 	}
 
 	/// <summary>
