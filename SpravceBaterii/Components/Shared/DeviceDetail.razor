@@ -104,7 +104,7 @@ else
 
 				<td>
 					<button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button>
-					<button @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteBattery = true; }">Vysunout / odstranit tuto baterii</button>
+					<button @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteSelectedBattery = true; }">Vysunout / odstranit tuto baterii</button>
 				</td>
 			</tr>
 		}
@@ -139,7 +139,7 @@ else
 		<button type="button" @onclick="() => showConfirmDeleteDevice = false">Ne</button>
 	</div>
 }
-@if (showConfirmDeleteBatteryFromDeletedDevice)
+@if (showConfirmKeepOrDeleteBatteryFromDeletedDevice)
 {
 	<div>
 		<p>Chcete baterie z odstraněného zařízení zachovat nebo také odstranit?</p>
@@ -147,7 +147,7 @@ else
 		<button type="button" @onclick="() => DeleteDevice(true)">Odstranit</button>
 	</div>
 }
-@if (selectedBatteryId is not null && showConfirmEjectOrDeleteBattery)
+@if (selectedBatteryId is not null && showConfirmEjectOrDeleteSelectedBattery)
 {
 	<div>
 		<p>Opravdu chcete vysunout tuto baterii ze zařízení?</p>
@@ -170,8 +170,8 @@ else
 	private string errorMessage = "";
 	private int? selectedBatteryId = null;
 	private bool showConfirmDeleteDevice = false;
-	private bool showConfirmDeleteBatteryFromDeletedDevice = false;
-	private bool showConfirmEjectOrDeleteBattery = false;
+	private bool showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
+	private bool showConfirmEjectOrDeleteSelectedBattery = false;
 	private bool showConfirmEjectOrDeleteAllBatteries = false;
 	private bool isDataLoaded = false;
 	private bool dataUpdated = false;
