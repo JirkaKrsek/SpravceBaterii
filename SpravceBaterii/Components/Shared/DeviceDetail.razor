@@ -245,6 +245,8 @@ else
 				await EjectBatteriesFromDevice(deleteInsertedBatteries);
 			}
 
+			showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
+
 			await DeviceService.DeleteDeviceById(DeviceId);
 
 			//Zavolání události v rodičovské komponentě
@@ -253,11 +255,11 @@ else
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
+			showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
 		}
 		finally
 		{
 			showConfirmDeleteDevice = false;
-			showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
 		}
 	}
 
