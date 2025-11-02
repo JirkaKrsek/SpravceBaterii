@@ -249,20 +249,7 @@ else
 			}
 			else
 			{
-				Battery battery = await BatteryService.GetUserBatteryById(batteryToEjectId!.Value);
-
-				StringBuilder stringBuilder = new();
-				stringBuilder.Append(battery.InsertionDate?.ToString() ?? "Datum vložení nebyl zadán");
-				stringBuilder.Append(" - ");
-				stringBuilder.Append(DateOnly.FromDateTime(DateTime.Today).ToShortDateString());
-				stringBuilder.Append(" byla použita v ");
-				stringBuilder.AppendLine(device.Name);
-
-				battery.UsageHistory += stringBuilder.ToString();
-				battery.DeviceId = null;
-				battery.InsertionDate = null;
-
-				await BatteryService.UpdateOnlyBattery(battery);
+				await BatteryService.EjectBatteryFromDevice(batteryToEjectId!.Value, device.Name);
 			}
 
 			dataUpdated = true;

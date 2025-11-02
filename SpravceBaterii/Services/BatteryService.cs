@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
+using System.Text;
 
 namespace SpravceBaterii.Services
 {
@@ -279,6 +280,31 @@ namespace SpravceBaterii.Services
             {
                 throw new UnauthorizedAccessException();
             }
+        }
+
+        /// <summary>
+        /// Vysunutí vybrané baterie ze zařízení
+        /// Nastavení textu do historie využití vysunuté baterie
+        /// </summary>
+        /// <param name="batteryId">ID vybrané baterie pro vysunutí</param>
+        /// <param name="deviceName">Název zařízení potřebný pro historii využití vysunuté baterie</param>
+        /// <returns>Asynchronní operace</returns>
+        public async Task EjectBatteryFromDevice(int batteryId, string deviceName)
+        {
+            Battery battery = await GetUserBatteryById(batteryId);
+
+            StringBuilder stringBuilder = new();
+            stringBuilder.Append(battery.InsertionDate?.ToString() ?? "Datum vložení nebyl zadán");
+            stringBuilder.Append(" - ");
+            stringBuilder.Append(DateOnly.FromDateTime(DateTime.Today).ToShortDateString());
+            stringBuilder.Append(" byla použita v ");
+            stringBuilder.AppendLine(deviceName);
+
+            battery.UsageHistory += stringBuilder.ToString();
+            battery.DeviceId = null;
+            battery.InsertionDate = null;
+
+            await UpdateOnlyBattery(battery);
         }
 
         /// <summary>
