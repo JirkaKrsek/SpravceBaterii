@@ -135,7 +135,7 @@ else
 {
 	<div>
 		<p>Opravdu chcete odstranit toto zařízení?</p>
-		<button type="button" @onclick="async () => { showConfirmDeleteDevice = false; await DeleteDevice(false); }">Ano</button>
+		<button type="button" @onclick="async () => await DeleteDevice(false)">Ano</button>
 		<button type="button" @onclick="() => showConfirmDeleteDevice = false">Ne</button>
 	</div>
 }
@@ -150,10 +150,10 @@ else
 @if (selectedBatteryId is not null && showConfirmEjectOrDeleteSelectedBattery)
 {
 	<div>
-		<p>Opravdu chcete vysunout tuto baterii ze zařízení?</p>
-		<button type="button" @onclick="async () => { await EjectBatteryFromDevice(false); }">Jen vysunout</button>
-		<button type="button" @onclick="async () => { selectedBatteryId = null; await EjectBatteryFromDevice(true); }">Vysunout a odstranit</button>
-		<button type="button" @onclick="() => { showConfirmEjectOrDeleteBattery = false; selectedBatteryId = null; }">Zrušit akci</button>
+		<p>Chcete tuto baterii jen vysunotou nebo vysunout a odstranit?</p>
+		<button type="button" @onclick="async () => await EjectBatteryFromDevice(false)">Jen vysunout</button>
+		<button type="button" @onclick="async () => await EjectBatteryFromDevice(true)">Vysunout a odstranit</button>
+		<button type="button" @onclick="() => { showConfirmEjectOrDeleteSelectedBattery = false; selectedBatteryId = null; }">Zrušit akci</button>
 	</div>
 }
 @if (showConfirmEjectOrDeleteAllBatteries)
@@ -236,15 +236,13 @@ else
 		{
 			if (device.Batteries?.Count > 0)
 			{
-				if (showConfirmDeleteBatteryFromDeletedDevice == false)
+				if (showConfirmKeepOrDeleteBatteryFromDeletedDevice == false)
 				{
-					showConfirmDeleteBatteryFromDeletedDevice = true;
+					showConfirmKeepOrDeleteBatteryFromDeletedDevice = true;
 					return;
 				}
 
 				await EjectBatteriesFromDevice(deleteInsertedBatteries);
-
-				showConfirmDeleteBatteryFromDeletedDevice = false;
 			}
 
 			await DeviceService.DeleteDeviceById(DeviceId);
@@ -255,7 +253,11 @@ else
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
-			showConfirmDeleteBatteryFromDeletedDevice = false;
+		}
+		finally
+		{
+			showConfirmDeleteDevice = false;
+			showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
 		}
 	}
 
@@ -288,14 +290,16 @@ else
 				dataUpdated = true;
 				await LoadDeviceList();
 			}
-
-			showConfirmEjectOrDeleteBattery = false;
-			showConfirmEjectOrDeleteAllBatteries = false;
-			selectedBatteryId = null;
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			showConfirmEjectOrDeleteSelectedBattery = false;
+			showConfirmEjectOrDeleteAllBatteries = false;
+			selectedBatteryId = null;
 		}
 	}
 
@@ -322,8 +326,6 @@ else
 				await BatteryService.EjectBatteryFromDevice(selectedBatteryId!.Value, device.Name);
 			}
 
-			showConfirmEjectOrDeleteBattery = false;
-
 			dataUpdated = true;
 			await LoadDeviceList();
 		}
@@ -331,8 +333,11 @@ else
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
-
-		selectedBatteryId = null;
+		finally
+		{
+			showConfirmEjectOrDeleteSelectedBattery = false;
+			selectedBatteryId = null;
+		}
 	}
 
 	/// <summary>
