@@ -91,7 +91,7 @@ else
 					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
 				}
 
-				<td><button @onclick="() => FormNavigationService.Open(typeof(BatteryForm), battery.Id)">Upravit</button></td>
+				<td><button @onclick="() => FormNavigationService.Open(typeof(BatteryDetail), battery.Id)">Detail baterie</button></td>
 			</tr>
 		}
 	</table>
