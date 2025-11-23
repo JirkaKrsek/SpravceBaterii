@@ -1,0 +1,320 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+
+@inject BatteryService BatteryService
+@inject DeviceService DeviceService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+@if (isDataLoaded)
+{
+	<h2>Detail baterie:</h2>
+
+	<table>
+		<tr>
+			<td>Typ: </td>
+			<td>@battery.BatteryType</td>
+		</tr>
+		<tr>
+			<td>Chemické složení: </td>
+			<td>@battery.ChemicalComposition</td>
+		</tr>
+		<tr>
+			<td>Počet: </td>
+			<td>@battery.Count</td>
+		</tr>
+		<tr>
+			<td>Výrobce: </td>
+			<td>@battery.Manufacturer</td>
+		</tr>
+		<tr>
+			<td>Popis: </td>
+			<td><textarea readonly>@battery.Description</textarea></td>
+		</tr>
+		<tr>
+			<td>Nabíjecí/jednorázová: </td>
+			@if (battery.IsRechargeable)
+			{
+				<td>Nabíjecí</td>
+			}
+			else
+			{
+				<td>Jednorázová</td>
+			}
+		</tr>
+		@if (battery.IsRechargeable)
+		{
+			<tr>
+				<td>Kapacita: </td>
+				<td>@battery.RechargeableBattery?.Capacity</td>
+			</tr>
+			<tr>
+				<td>Počet cyklů: </td>
+				<td>@battery.RechargeableBattery?.CycleCount</td>
+			</tr>
+		}
+		else
+		{
+			<tr>
+				<td>Datum expirace: </td>
+				<td>@battery.DisposableBattery?.ExpirationDate</td>
+			</tr>
+			<tr>
+				<td>Do konce expirace zbývá:  </td>
+				<td>
+					Do konce expirace zbývá <strong class="@batteryStatusExpirationDate?.CssClass">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</strong> dní
+				</td>
+			</tr>
+		}
+		<tr>
+			<td>Očekávaná doba životnosti (ve dnech): </td>
+			<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
+		</tr>
+		<tr>
+			<td>Byla použita v zařízení: </td>
+			<td><textarea readonly>@battery.UsageHistory</textarea></td>
+		</tr>
+	</table>
+}
+else
+{
+	<h2>Detail baterie</h2>
+}
+
+<hr>
+
+@if (battery.DeviceId is null)
+{
+	<h3>Tato baterie není vložena v žádném zařízení</h3>
+}
+else
+{
+	<h3>Vložena v zařízení:</h3>
+
+	<table>
+		<tr>
+			<td>Název zařízení: </td>
+			<td>@device.Name</td>
+		</tr>
+		<tr>
+			<td>Datum vložení baterie: </td>
+			<td>@battery.InsertionDate</td>
+		</tr>
+		<tr>
+			<td>Popis zařízení: </td>
+			<td><textarea readonly>@device.Description</textarea></td>
+		</tr>
+		<tr>
+			<td>Počet vložených baterií: </td>
+			<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
+		</tr>
+		<tr>
+			<td>Výrobce: </td>
+			<td>@device.Manufacturer</td>
+		</tr>
+		<tr>
+			<td>Umístění: </td>
+			<td>@device.Location?.Name</td>
+		</tr>
+	</table>
+}
+
+<hr>
+
+<h3>Akce:</h3>
+<button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit baterii</button>
+@if (battery.DeviceId is not null)
+{
+	<button type="button" @onclick="() => showConfirmEjectOrDeleteBattery = true">Vysunout baterii ze zařízení</button>
+}
+
+<button type="button" @onclick="() => showConfirmDeleteBattery = true">Odstranit tuto baterii</button>
+
+<hr>
+
+<button type="button" @onclick="Close">Zavřít</button>
+
+@if (showConfirmDeleteBattery)
+{
+	<div>
+		<p>Opravdu chcete odstranit tuto baterii?</p>
+		<button type="button" @onclick="async () => await DeleteBattery()">Ano</button>
+		<button type="button" @onclick="() => showConfirmDeleteBattery = false">Ne</button>
+	</div>
+}
+@if (showConfirmEjectOrDeleteBattery)
+{
+	<div>
+		<p>Chcete tuto baterii jen vysunotou nebo vysunout a odstranit?</p>
+		<button type="button" @onclick="async () => await EjectBatteryFromDevice(false)">Jen vysunout</button>
+		<button type="button" @onclick="async () => await EjectBatteryFromDevice(true)">Vysunout a odstranit</button>
+		<button type="button" @onclick="() => showConfirmEjectOrDeleteBattery = false">Zrušit akci</button>
+	</div>
+}
+
+@code {
+	private string errorMessage = "";
+	private bool showConfirmDeleteBattery = false;
+	private bool showConfirmEjectOrDeleteBattery = false;
+	private bool isDataLoaded = false;
+	private bool dataUpdated = false;
+
+	private Battery battery = new();
+	private Device device = new();
+
+	BatteryStatus? batteryStatusExpirationDate;
+	BatteryStatus? batteryStatusExpectedLifeSpan;
+
+	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
+	/// <summary>
+	/// Callback události z rodičovské komponenty
+	/// </summary>
+	[Parameter]
+	public int BatteryId { get; set; }
+	[Parameter]
+	public EventCallback Deleted { get; set; }
+	[Parameter]
+	public EventCallback<bool> Cancel { get; set; }
+	[Parameter]
+	public EventCallback<int> EditBattery { get; set; }
+
+
+	/// <summary>
+	/// Načtení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadBattery();
+	}
+
+	/// <summary>
+	/// Načtení potřebných informací z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadBattery()
+	{
+		try
+		{
+			battery = await BatteryService.GetUserBatteryByIdWithDetails(BatteryId);
+
+			if (battery.DeviceId is not null)
+			{
+				device = await DeviceService.GetUserDeviceByIdWithDetails(battery.DeviceId.Value);
+			}
+
+			batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+			batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
+
+			isDataLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Vysunutí / odstranění vybrané baterie ze zařízení
+	/// </summary>
+	/// <param name="deleteEjectedBattery">bool, zachovat / odstranit baterii</param>
+	/// <returns>Asynchronní operace</returns>
+	private async Task EjectBatteryFromDevice(bool deleteEjectedBattery)
+	{
+		try
+		{
+			if (battery.Device is null)
+			{
+				return;
+			}
+
+			if (deleteEjectedBattery)
+			{
+				await DeleteBattery();
+			}
+			else
+			{
+				await BatteryService.EjectBatteryFromDevice(battery.Id, device.Name);
+				dataUpdated = true;
+				await LoadBattery();
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			showConfirmEjectOrDeleteBattery = false;
+		}
+	}
+
+	/// <summary>
+	/// Odstranění baterie z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task DeleteBattery()
+	{
+		try
+		{
+			await BatteryService.DeleteBatteryById(battery.Id);
+
+			//Zavolání události v rodičovské komponentě
+			await Deleted.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			showConfirmDeleteBattery = false;
+		}
+	}
+
+	/// <summary>
+	/// Získání stavu baterie podle zbývajících dní do konce expirace
+	/// </summary>
+	/// <param name="battery">Baterie</param>
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpirate(Battery battery)
+	{
+		if (!battery.IsRechargeable && battery.DisposableBattery is not null)
+		{
+			return batteryStatusEvaluator.RemainingDaysToExpirate(battery.DisposableBattery.ExpirationDate);
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Získání stavu baterie podle zbývajících dní do předpokládaného data životnosti
+	/// </summary>
+	/// <param name="battery">Baterie</param>
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpectedLife(Battery battery)
+	{
+		if (battery.ExpectedLifespan is not null && battery.InsertionDate is not null)
+		{
+			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync(dataUpdated);
+	}
+}
