@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
+using System;
 
 namespace SpravceBaterii.Services
 {
@@ -33,6 +34,20 @@ namespace SpravceBaterii.Services
                 .Include(d => d.Location)
                 .Include(d => d.Batteries!)
                     .ThenInclude(b => b.DisposableBattery)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Načtení zařízení podle ID umístění
+        /// </summary>
+        /// <returns>List zařízení</returns>
+        public async Task<List<Device>> GetUserDevicesByLocationId(int locationId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Devices
+                .Where(d => d.UserId == userId && d.LocationId == locationId)
                 .AsNoTracking()
                 .ToListAsync();
         }
