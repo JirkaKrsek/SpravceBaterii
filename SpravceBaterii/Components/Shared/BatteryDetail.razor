@@ -132,10 +132,13 @@ else
 <button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit baterii</button>
 @if (battery.DeviceId is not null)
 {
-	<button type="button" @onclick="() => showConfirmEjectOrDeleteBattery = true">Vysunout baterii ze zařízení</button>
+	<button type="button" @onclick="() => showConfirmEjectBattery = true">Vysunout ze zařízení a ponechat baterii</button>
+	<button type="button" @onclick="() => showConfirmDeleteBattery = true">Vysunout ze zařízení a odstranit baterii</button>
 }
-
-<button type="button" @onclick="() => showConfirmDeleteBattery = true">Odstranit tuto baterii</button>
+else
+{
+	<button type="button" @onclick="() => showConfirmDeleteBattery = true">Odstranit tuto baterii</button>
+}
 
 <hr>
 
@@ -149,20 +152,19 @@ else
 		<button type="button" @onclick="() => showConfirmDeleteBattery = false">Ne</button>
 	</div>
 }
-@if (showConfirmEjectOrDeleteBattery)
+@if (showConfirmEjectBattery)
 {
 	<div>
-		<p>Chcete tuto baterii jen vysunotou nebo vysunout a odstranit?</p>
-		<button type="button" @onclick="async () => await EjectBatteryFromDevice(false)">Jen vysunout</button>
-		<button type="button" @onclick="async () => await EjectBatteryFromDevice(true)">Vysunout a odstranit</button>
-		<button type="button" @onclick="() => showConfirmEjectOrDeleteBattery = false">Zrušit akci</button>
+		<p>Chcete tuto baterii ze zařízení vysunout?</p>
+		<button type="button" @onclick="async () => await EjectBatteryFromDevice()">Ano</button>
+		<button type="button" @onclick="() => showConfirmEjectBattery = false">Ne</button>
 	</div>
 }
 
 @code {
 	private string errorMessage = "";
 	private bool showConfirmDeleteBattery = false;
-	private bool showConfirmEjectOrDeleteBattery = false;
+	private bool showConfirmEjectBattery = false;
 	private bool isDataLoaded = false;
 	private bool dataUpdated = false;
 
@@ -225,9 +227,8 @@ else
 	/// <summary>
 	/// Vysunutí / odstranění vybrané baterie ze zařízení
 	/// </summary>
-	/// <param name="deleteEjectedBattery">bool, zachovat / odstranit baterii</param>
 	/// <returns>Asynchronní operace</returns>
-	private async Task EjectBatteryFromDevice(bool deleteEjectedBattery)
+	private async Task EjectBatteryFromDevice()
 	{
 		try
 		{
@@ -236,16 +237,9 @@ else
 				return;
 			}
 
-			if (deleteEjectedBattery)
-			{
-				await DeleteBattery();
-			}
-			else
-			{
-				await BatteryService.EjectBatteryFromDevice(battery.Id, device.Name);
-				dataUpdated = true;
-				await LoadBattery();
-			}
+			await BatteryService.EjectBatteryFromDevice(battery.Id, device.Name);
+			dataUpdated = true;
+			await LoadBattery();
 		}
 		catch (Exception ex)
 		{
@@ -253,7 +247,7 @@ else
 		}
 		finally
 		{
-			showConfirmEjectOrDeleteBattery = false;
+			showConfirmEjectBattery = false;
 		}
 	}
 
