@@ -1,0 +1,121 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+@using System.ComponentModel.DataAnnotations
+
+@inject LocationService LocationService
+@inject DeviceService DeviceService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+<EditForm Model="@Input" OnValidSubmit="Save" FormName="SetLocation">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+    <table class="set">
+        <tr>
+            <th>Název</th>
+            <th>Podlaží</th>
+            <th>Popis</th>
+        </tr>
+        @foreach (Location location in Locations)
+        {
+            <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")">
+                <td>@location.Name</td>
+                <td>@location.Floor</td>
+                <td><textarea readonly>@location.Description</textarea></td>
+            </tr>
+        }
+    </table>
+
+	<hr>
+
+	<button type="submit">Uložit</button>
+    <button type="reset" @onclick="@(() => Input.selectedLocationId = null)">Žádné umístění</button>
+	<button type="button" @onclick="Close">Zavřít</button>
+</EditForm>
+
+@code {
+    private string errorMessage = "";
+    private bool showConfirm = false;
+    private InputModel Input = new();
+
+    /// <summary>
+    /// Callback události z rodičovské komponenty
+    /// </summary>
+    [Parameter]
+    public int DeviceId { get; set; }
+    [Parameter]
+    public EventCallback Saved { get; set; }
+    [Parameter]
+    public EventCallback Cancel { get; set; }
+    [Parameter]
+    public EventCallback<int> EditLocation { get; set; }
+
+    private Device device = new();
+    private List<Location> Locations = new();
+    
+
+    /// <summary>
+    /// Načtení potřebných dat při zobrazení komponenty
+    /// </summary>
+    /// <returns>Asynchronní operace</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            device = await DeviceService.GetUserDeviceById(DeviceId);
+            Input.selectedLocationId = device.LocationId;
+            Locations = await LocationService.GetLocations();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ExceptionHandlerService.HandleException(ex);
+        }
+    }
+
+    /// <summary>
+    /// Aktualizace umístění u zařízení v databázi
+    /// </summary>
+    /// <returns>Asynchronní operace</returns>
+    private async Task Save()
+    {
+        try
+        {
+            device.LocationId = Input.selectedLocationId;
+            await DeviceService.UpdateDevice(device);
+
+            //Zavolání události v rodičovské komponentě
+            await Saved.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync();
+	}
+
+
+    /// <summary>
+    /// Model pro vstupní data z formuláře
+    /// </summary>
+    private class InputModel
+    {
+        public int? selectedLocationId { get; set; } = null;
+    }
+}
