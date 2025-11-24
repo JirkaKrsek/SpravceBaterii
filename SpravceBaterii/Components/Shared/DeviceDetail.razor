@@ -120,6 +120,15 @@ else
 	<button @onclick="() => InsertBattery.InvokeAsync(device.Id)">Vložit baterii</button>
 }
 
+@if (device.LocationId is null)
+{
+	<button @onclick="() => SetLocation.InvokeAsync(device.Id)">Nastavit umístění</button>
+}
+else
+{
+	<button @onclick="() => SetLocation.InvokeAsync(device.Id)">Změnit umístění</button>
+}
+
 @if (device.Batteries?.Count > 0)
 {
 	<button type="button" @onclick="() => showConfirmEjectOrDeleteAllBatteries = true">Vysunout / odstranit všechny baterie z tohoto zařízení</button>
@@ -191,6 +200,8 @@ else
 	public EventCallback<int> EditDevice { get; set; }
 	[Parameter]
 	public EventCallback<int> InsertBattery { get; set; }
+	[Parameter]
+	public EventCallback<int> SetLocation { get; set; }
 
 	private Device device = new();
 	private List<Battery> Batteries = new();
