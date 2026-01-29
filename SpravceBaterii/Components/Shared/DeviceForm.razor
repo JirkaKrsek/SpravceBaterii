@@ -3,8 +3,9 @@
 @using SpravceBaterii.Services
 @using SpravceBaterii.Services.Tools
 
-@inject BatteryService BatteryService
 @inject DeviceService DeviceService
+@inject LocationService LocationService
+@inject BatteryTypeService BatteryTypeService
 @inject ExceptionHandlerService ExceptionHandlerService
 
 <h2>Formulář pro vytvoření/úpravu zařízení</h2>
@@ -20,12 +21,19 @@
 	<ValidationSummary />
 
 	<label for="input-Name">Název: </label>
-	<InputText id="input-Name" @bind-Value="device.Name"></InputText>
-
-	<span>Poloha zařízení: @(device.Location?.Name ?? "")</span>
+	<InputText id="input-Name" @bind-Value="device.Name" required></InputText>
 
 	<label for="input-Count">Maximální počet baterií: </label>
 	<InputNumber id="input-Count" @bind-Value="device.BatteryCount" min="1" required></InputNumber>
+
+	<label for="input-BatteryType">Typ baterií v zařízení: </label>
+	<InputSelect id="input-BatteryType" @bind-Value="device.BatteryTypeId" required>
+		<option value="">- Vyberte typ -</option>
+		@foreach (BatteryType batteryType in BatteryTypes)
+		{
+			<option value="@batteryType.Id">@batteryType.Name</option>
+		}
+	</InputSelect>
 
 	<label for="input-Description">Popis: </label>
 	<InputTextArea id="input-Description" @bind-Value="device.Description"></InputTextArea>
@@ -33,60 +41,14 @@
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="device.Manufacturer"></InputText>
 
-	<hr>
-
-	@if (Batteries.Count < 1)
-	{
-		<h3>Žádné vložené baterie</h3>
-	}
-	else
-	{
-		<p>Vložené baterie:</p>
-
-		<table>
-			<tr>
-				<th>Počet</th>
-				<th>Označení</th>
-				<th>Popis</th>
-				<th>Typ</th>
-				<th>Datum expirace</th>
-				<th>Do konce expirace zbývá dní</th>
-				<th>Datum vložení</th>
-				<th>Předpokládaná doba výdrže (ve dnech)</th>
-				<th>Zbývající předpokládaná životnost</th>
-				<th>Akce</th>
-			</tr>
-			@foreach (Battery battery in Batteries)
-			{
-				<tr>
-					<td>@battery.Count</td>
-					<td>@battery.BatteryType.Name</td>
-					<td><textarea readonly>@battery.Description</textarea></td>
-					@if (battery.IsRechargeable)
-					{
-						<td>Nabíjecí</td>
-						<td></td>
-						<td></td>
-					}
-					else
-					{
-						<td>Jednorázová</td>
-						<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-						BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-						<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-					}
-					<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-					<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-					@{
-						BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-						<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
-					}
-
-					<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit</button></td>
-				</tr>
-			}
-		</table>
-	}
+	<label for="input-Location">Umístění (kde se zařízení nachází): </label>
+	<InputSelect id="input-Location" @bind-Value="device.LocationId">
+		<option value="">- Vyberte umístění -</option>
+		@foreach (Location location in Locations)
+		{
+			<option value="@location.Id">@location.Name</option>
+		}
+	</InputSelect>
 
 	<hr>
 
@@ -118,10 +80,11 @@
 	[Parameter]
 	public EventCallback Cancel { get; set; }
 	[Parameter]
-	public EventCallback<int> EditBattery { get; set; }
+	public EventCallback<int> DeviceSavedShowDeviceDetail { get; set; }
 
 	private Device device = new();
-	private List<Battery> Batteries = new();
+	private List<Location> Locations = new();
+	private List<BatteryType> BatteryTypes = new();
 
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 
@@ -136,7 +99,6 @@
 			if (DeviceToUpdateId is not null)
 			{
 				device = await DeviceService.GetUserDeviceById(DeviceToUpdateId.Value);
-				Batteries = await BatteryService.GetUserBatteriesByDeviceId(device.Id);
 			}
 			else
 			{
@@ -145,6 +107,8 @@
 					BatteryCount = 1
 				};
 			}
+			Locations = await LocationService.GetLocations();
+			BatteryTypes = await BatteryTypeService.GetBatteryTypes();
 		}
 		catch (Exception ex)
 		{
@@ -163,15 +127,17 @@
 			if (DeviceToUpdateId is null)
 			{
 				await DeviceService.AddDevice(device);
+
+				//Zavolání události v rodičovské komponentě
+				await DeviceSavedShowDeviceDetail.InvokeAsync(device.Id);
 			}
 			else
 			{
 				await DeviceService.UpdateDevice(device);
+
+				//Zavolání události v rodičovské komponentě
+				await DeviceSaved.InvokeAsync();
 			}
-
-
-			//Zavolání události v rodičovské komponentě
-			await DeviceSaved.InvokeAsync();
 		}
 		catch (Exception ex)
 		{

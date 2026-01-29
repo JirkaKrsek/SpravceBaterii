@@ -1,0 +1,271 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+@using System.ComponentModel.DataAnnotations
+
+@inject BatteryService BatteryService
+@inject DeviceService DeviceService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+<EditForm Model="@Input" OnValidSubmit="Save" FormName="InsertBatteryToDevice">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	@if (Batteries.Count < 1)
+	{
+		<h3>Nejsou dostupné žádné volné baterie</h3>
+	}
+	else
+	{
+		<h3>Dostupné baterie:</h3>
+
+		<table>
+			<tr>
+				<th>Počet</th>
+				<th>Označení</th>
+				<th>Popis</th>
+				<th>Typ</th>
+				<th>Datum expirace</th>
+				<th>Do konce expirace zbývá dní</th>
+				<th>Datum vložení</th>
+				<th>Předpokládaná doba výdrže (ve dnech)</th>
+				<th>Akce</th>
+			</tr>
+			@foreach (Battery battery in Batteries)
+			{
+				<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })">
+					<td>@battery.Count</td>
+					<td>@battery.BatteryType.Name</td>
+					<td><textarea readonly>@battery.Description</textarea></td>
+					@if (battery.IsRechargeable)
+					{
+						<td>Nabíjecí</td>
+						<td></td>
+						<td></td>
+					}
+					else
+					{
+						<td>Jednorázová</td>
+						<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+						BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+						<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+					}
+					<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+					<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
+
+					<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
+				</tr>
+			}
+		</table>
+
+		<hr>
+
+		<label for="input-InsertionDate">Datum vložení: </label>
+		<InputDate id="input-InsertionDate" @bind-Value="Input.InsertionDate" required></InputDate>
+
+		@if (Input.selectedBatteryId is not null)
+		{
+			<span>Počet vložených baterií musí být v rozmezí 1 - @maxCount</span>
+
+			<label for="input-Count">Počet baterií: </label>
+
+			<InputNumber id="input-Count" @bind-Value="Input.batteryCountToInsert" min="1" max="@maxCount" required></InputNumber>
+
+			<button type="submit">Vložit</button>
+		}
+		else
+		{
+			<span>Pro zadání počtu baterií nejdříve vyberte baterii z nabídky</span>
+		}
+	}
+
+	<hr>
+
+	<button type="button" @onclick="Close">Zavřít</button>
+</EditForm>
+
+@code {
+	private string errorMessage = "";
+	private bool showConfirm = false;
+
+	/// <summary>
+	/// Callback události z rodičovské komponenty
+	/// </summary>
+	[Parameter]
+	public int DeviceId { get; set; }
+	[Parameter]
+	public EventCallback Saved { get; set; }
+	[Parameter]
+	public EventCallback Cancel { get; set; }
+	[Parameter]
+	public EventCallback<int> EditBattery { get; set; }
+
+	private Device device = new();
+	private List<Battery> Batteries = new();
+	private Battery? selectedBattery;
+	private InputModel Input = new();
+	private int maxCount = 1;
+
+	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
+	/// <summary>
+	/// Načtení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			device = await DeviceService.GetUserDeviceByIdWithBatteries(DeviceId);
+			Batteries = await BatteryService.GetUnUsedBatteriesByTypeId(device.BatteryTypeId);
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Uložení zadaných informací o baterii do databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Save()
+	{
+		try
+		{
+			if (Input.selectedBatteryId is not null)
+			{
+				selectedBattery = await BatteryService.GetUserBatteryById(Input.selectedBatteryId!.Value);
+			}
+			else
+			{
+				errorMessage = "Musí být vybrána baterie";
+				return;
+			}
+
+			if (device is not null && device.BatteryTypeId == selectedBattery.BatteryTypeId)
+			{
+				if (Input.batteryCountToInsert < selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
+				{
+					//Původní baterie nevložená do zařízení s aktualizací počtu
+					selectedBattery.Count = selectedBattery.Count - Input.batteryCountToInsert;
+					await BatteryService.UpdateOnlyBattery(selectedBattery);
+
+					//Nová baterie pro vložení do zařízení s nastaveným počtem přiřazených baterií
+					Battery newBattery = await BatteryService.CreateBatteryCopy(selectedBattery.Id);
+					newBattery.DeviceId = DeviceId;
+					newBattery.Count = Input.batteryCountToInsert;
+					newBattery.InsertionDate = Input.InsertionDate;
+					await BatteryService.AddBattery(newBattery);
+				}
+				else if (Input.batteryCountToInsert == selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
+				{
+					//Původní baterie pro vložení do zařízení se správným počtem
+					selectedBattery.DeviceId = DeviceId;
+					selectedBattery.InsertionDate = Input.InsertionDate;
+					await BatteryService.UpdateOnlyBattery(selectedBattery);
+				}
+				else
+				{
+					errorMessage = ("Počet vložených baterií musí být v rozmezí 1 - " + maxCount);
+					return;
+				}
+
+				//Zavolání události v rodičovské komponentě
+				await Saved.InvokeAsync();
+			}
+			else
+			{
+				errorMessage = "Musí být vybrána baterie správného typu";
+				return;
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Uložení vybrané baterie do proměnné
+	/// Nastavení maximálního možného počtu pro vložení baterií
+	/// </summary>
+	private async Task SelectBatteryAndSetInsertLimit()
+	{
+		if (Input.selectedBatteryId is not null)
+		{
+			selectedBattery = await BatteryService.GetUserBatteryById(Input.selectedBatteryId!.Value);
+		}
+		else
+		{
+			errorMessage = "Musí být vybrána baterie";
+			return;
+		}
+
+		if (device is not null && selectedBattery is not null)
+		{
+			int usedSlots = device.Batteries?.Sum(b => b.Count) ?? 0;
+			int freeSlots = device.BatteryCount - usedSlots;
+			int freeBatteryCount = selectedBattery.Count;
+
+			maxCount = Math.Min(freeSlots, freeBatteryCount);
+			Input.batteryCountToInsert = 1;
+		}
+		else
+		{
+			maxCount = 0;
+			errorMessage = "Musí být vybrána baterie";
+		}
+
+		if (Input.batteryCountToInsert > maxCount)
+		{
+			Input.batteryCountToInsert = maxCount;
+		}
+	}
+
+	/// <summary>
+	/// Získání stavu baterie podle zbývajících dní do konce expirace
+	/// </summary>
+	/// <param name="battery">Baterie</param>
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpirate(Battery battery)
+	{
+		if (!battery.IsRechargeable && battery.DisposableBattery is not null)
+		{
+			return batteryStatusEvaluator.RemainingDaysToExpirate(battery.DisposableBattery.ExpirationDate);
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync();
+	}
+
+	/// <summary>
+	/// Model pro vstupní data z formuláře
+	/// </summary>
+	private class InputModel
+	{
+		[Required(ErrorMessage = "Vyberte baterii")]
+		public int? selectedBatteryId { get; set; } = null;
+
+		[Required(ErrorMessage = "Zadejte počet baterií pro vložení")]
+		public int batteryCountToInsert { get; set; } = 1;
+
+		[Required(ErrorMessage = "Zadejte datum vložení baterie do zařízení")]
+		public DateOnly InsertionDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+	}
+}

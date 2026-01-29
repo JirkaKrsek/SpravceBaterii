@@ -21,7 +21,17 @@
 
 @if (isDataLoaded)
 {
-	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceDetail))
+	{
+		<DeviceDetail DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+					  EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+					  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
+					  InsertBattery="@(deviceId => FormNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
+					  SetLocation="@(deviceId => FormNavigationService.Open(typeof(SetLocation), deviceId))"
+					  Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+					  Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></DeviceDetail>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 	{
 		<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
 					 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
@@ -30,9 +40,22 @@
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
 	{
 		<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-					EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
-					Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></DeviceForm>
+					DeviceSavedShowDeviceDetail="@(async (deviceId) => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(DeviceDetail), deviceId);})"
+					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
+					Cancel="@(async () => FormNavigationService.Close())"></DeviceForm>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(InsertBatteryToDevice))
+	{
+		<InsertBatteryToDevice DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+							   Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
+							   Cancel="@(async () => FormNavigationService.Close())"></InsertBatteryToDevice>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(SetLocation))
+	{
+		<SetLocation DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							   Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
+							   Cancel="@(async () => FormNavigationService.Close())"></SetLocation>
 	}
 	else
 	{
@@ -81,7 +104,9 @@ else
 				<td>@device.Manufacturer</td>
 				<td>@device.Location?.Name</td>
 
-				<td><button @onclick="() => FormNavigationService.Open(typeof(DeviceForm), device.Id)">Upravit</button></td>
+				<td>
+					<button @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">Detail zařízení</button>
+				</td>
 			</tr>
 		}
 	</table>
@@ -104,6 +129,22 @@ else
 		await LoadDeviceList();
 	}
 
+	/// <summary>
+	/// Po vykreslení stránky se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	/// <param name="firstRender">bool, zda se stránka vykresluje poprvé</param>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (FormNavigationService.ShouldReload())
+		{
+			await LoadDeviceList();
+			FormNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
+		}
+	}
 	/// <summary>
 	/// Načtení informací o zařízeních uživatele z databáze
 	/// </summary>
@@ -144,20 +185,5 @@ else
 			return status;
 		}
 		return new BatteryStatus();
-	}
-
-	/// <summary>
-	/// Pokud je v FormNavigationService reloadList = true
-	/// Znovu se načtou data
-	/// FormNavigationService se nastaví na výchozí hodnoty
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task TryReloadList()
-	{
-		if (FormNavigationService.ShouldReload())
-		{
-			await LoadDeviceList();
-			FormNavigationService.Reset();
-		}
 	}
 }

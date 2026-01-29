@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
+using System.Text;
 
 namespace SpravceBaterii.Services
 {
@@ -60,6 +61,24 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Získání baterie podle ID s načtením informací o jednorázové a nabíjecí variantě
+        /// </summary>
+        /// <param name="batteryId">ID hledané baterie</param>
+        /// <returns>Nalezená baterie</returns>
+        /// <exception cref="KeyNotFoundException">Baterie nenalezena</exception>
+        public async Task<Battery> GetUserBatteryByIdWithDetails(int batteryId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Batteries
+                .Include(b => b.DisposableBattery)
+                .Include(b => b.RechargeableBattery)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.UserId == userId && b.Id == batteryId)
+                ?? throw new KeyNotFoundException();
+        }
+
+        /// <summary>
         /// Načtení baterií podle ID zařízení, ve kterém jsou vloženy
         /// </summary>
         /// <param name="deviceId">ID zařízení</param>
@@ -74,6 +93,48 @@ namespace SpravceBaterii.Services
                 .Include(b => b.DisposableBattery)
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        /// <summary>
+        /// Načtení baterií, které nejsou vloženy v žádném zařízení, podle ID jejich typu
+        /// </summary>
+        /// <param name="typeId">ID typu baterie</param>
+        /// <returns>List baterií</returns>
+        public async Task<List<Battery>> GetUnUsedBatteriesByTypeId(int typeId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Batteries
+                .Where(b => b.UserId == userId && b.DeviceId == null && b.BatteryTypeId == typeId)
+                .Include(b => b.BatteryType)
+                .Include(b => b.DisposableBattery)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Aktualizace samotné baterie v databázi
+        /// </summary>
+        /// <param name="battery">Upravená baterie</param>
+        /// <returns>Asynchronní operace</returns>
+        /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
+        public async Task UpdateOnlyBattery(Battery battery)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            if (battery.UserId == userId)
+            {
+                applicationDbContext.Update(battery);
+                //Uložení
+                await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení od slednování EF Core
+                applicationDbContext.Entry(battery).State = EntityState.Detached;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
         }
 
         /// <summary>
@@ -219,6 +280,81 @@ namespace SpravceBaterii.Services
             {
                 throw new UnauthorizedAccessException();
             }
+        }
+
+        /// <summary>
+        /// Vysunutí vybrané baterie ze zařízení
+        /// Nastavení textu do historie využití vysunuté baterie
+        /// </summary>
+        /// <param name="batteryId">ID vybrané baterie pro vysunutí</param>
+        /// <param name="deviceName">Název zařízení potřebný pro historii využití vysunuté baterie</param>
+        /// <returns>Asynchronní operace</returns>
+        public async Task EjectBatteryFromDevice(int batteryId, string deviceName)
+        {
+            Battery battery = await GetUserBatteryById(batteryId);
+
+            StringBuilder stringBuilder = new();
+            stringBuilder.Append(battery.InsertionDate?.ToString() ?? "Datum vložení nebyl zadán");
+            stringBuilder.Append(" - ");
+            stringBuilder.Append(DateOnly.FromDateTime(DateTime.Today).ToShortDateString());
+            stringBuilder.Append(" byla použita v ");
+            stringBuilder.AppendLine(deviceName);
+
+            battery.UsageHistory += stringBuilder.ToString();
+            battery.DeviceId = null;
+            battery.InsertionDate = null;
+
+            await UpdateOnlyBattery(battery);
+        }
+
+        /// <summary>
+        /// Vytvoření kopie objektu baterie
+        /// </summary>
+        /// <param name="batteryId">ID zdrojové baterie</param>
+        /// <returns>Kopie baterie</returns>
+        public async Task<Battery> CreateBatteryCopy(int batteryId)
+        {
+            Battery sourceBattery = await GetUserBatteryByIdWithDetails(batteryId);
+
+            RechargeableBattery? rechargeableBattery = null;
+            DisposableBattery? disposableBattery = null;
+
+            if (sourceBattery.IsRechargeable && sourceBattery.RechargeableBattery is not null)
+            {
+                rechargeableBattery = new()
+                {
+                    Capacity = sourceBattery.RechargeableBattery!.Capacity,
+                    CycleCount = sourceBattery.RechargeableBattery!.CycleCount
+                };
+                disposableBattery = null;
+            }
+            else if (!sourceBattery.IsRechargeable && sourceBattery.DisposableBattery is not null)
+            {
+                disposableBattery = new()
+                {
+                    ExpirationDate = sourceBattery.DisposableBattery!.ExpirationDate
+                };
+                rechargeableBattery = null;
+            }
+
+            Battery batteryCopy = new()
+            {
+                BatteryTypeId = sourceBattery.BatteryTypeId,
+                ChemicalCompositionId = sourceBattery.ChemicalCompositionId,
+                IsRechargeable = sourceBattery.IsRechargeable,
+                DisposableBattery = disposableBattery,
+                RechargeableBattery = rechargeableBattery,
+                Description = sourceBattery.Description,
+                Manufacturer = sourceBattery.Manufacturer,
+                ExpectedLifespan = sourceBattery.ExpectedLifespan,
+                InsertionDate = sourceBattery.InsertionDate,
+                UsageHistory = sourceBattery.UsageHistory,
+                UserId = sourceBattery.UserId,
+                DeviceId = sourceBattery.DeviceId,
+                Count = sourceBattery.Count
+            };
+
+            return batteryCopy;
         }
     }
 }

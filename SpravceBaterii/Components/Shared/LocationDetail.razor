@@ -1,0 +1,206 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+
+@inject LocationService LocationService
+@inject DeviceService DeviceService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p>@errorMessage</p>
+}
+
+@if (isDataLoaded)
+{
+	<h2>Detail umístění: @location.Name</h2>
+
+	<table>
+		<tr>
+			<td>Název umístění: </td>
+			<td>@location.Name</td>
+		</tr>
+		<tr>
+			<td>Podlaží: </td>
+			<td>@location.Floor</td>
+		</tr>
+		<tr>
+			<td>Popis: </td>
+			<td><textarea readonly>@location.Description</textarea></td>
+		</tr>
+	</table>
+}
+else
+{
+	<h2>Detail baterie</h2>
+}
+
+<hr>
+
+@if (DeviceList.Count < 1)
+{
+	<h3>V tomto umístění nejsou žádná zařízení</h3>
+}
+else
+{
+	<h3>Zařízení v tomto umístění:</h3>
+
+	<table>
+		<tr>
+			<th>Název zařízení</th>
+			<th>Popis zařízení</th>
+			<th>Výrobce</th>
+			<th>Počet vložených baterií</th>
+			<th>Nejbližší datum expirace vložených baterií</th>
+			<th>Do konce expirace zbývá dní</th>
+			
+		</tr>
+		@foreach (Device device in DeviceList)
+		{
+			<tr>
+				<td>@device.Name</td>
+				<td><textarea readonly>@device.Description</textarea></td>
+				<td>@device.Manufacturer</td>
+				<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
+
+				@{
+					DateOnly? date = GetExpirationDate(device);
+					<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
+
+					BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
+					<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
+				}
+			</tr>
+		}
+	</table>
+}
+
+<hr>
+
+<h3>Akce:</h3>
+<button @onclick="() => EditLocation.InvokeAsync(location.Id)">Upravit umístění</button>
+<button type="button" @onclick="() => showConfirmDeleteLocation = true">Odstranit toto umístění</button>
+
+<hr>
+
+<button type="button" @onclick="Close">Zavřít</button>
+
+@if (showConfirmDeleteLocation)
+{
+	<div>
+		<p>Opravdu chcete odstranit toto umístění?</p>
+		<button type="button" @onclick="async () => await DeleteLocation()">Ano</button>
+		<button type="button" @onclick="() => showConfirmDeleteLocation = false">Ne</button>
+	</div>
+}
+
+@code {
+	private string errorMessage = "";
+	private bool showConfirmDeleteLocation = false;
+	private bool isDataLoaded = false;
+	private bool dataUpdated = false;
+
+	private Location location = new();
+	private List<Device> DeviceList = new();
+
+	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
+	/// <summary>
+	/// Callback události z rodičovské komponenty
+	/// </summary>
+	[Parameter]
+	public int LocationId { get; set; }
+	[Parameter]
+	public EventCallback Deleted { get; set; }
+	[Parameter]
+	public EventCallback<bool> Cancel { get; set; }
+	[Parameter]
+	public EventCallback<int> EditLocation { get; set; }
+
+
+	/// <summary>
+	/// Načtení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadLocation();
+	}
+
+	/// <summary>
+	/// Načtení potřebných informací z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadLocation()
+	{
+		try
+		{
+			location = await LocationService.GetUserLocationById(LocationId);
+			DeviceList = await DeviceService.GetUserDevicesByLocationId(location.Id);
+
+			isDataLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Odstranění umístění z databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task DeleteLocation()
+	{
+		try
+		{
+			await LocationService.DeleteLocationById(location.Id);
+
+			//Zavolání události v rodičovské komponentě
+			await Deleted.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			showConfirmDeleteLocation = false;
+		}
+	}
+
+	private DateOnly? GetExpirationDate(Device device)
+	{
+		return device.Batteries?
+					.Where(b => b.DisposableBattery?.ExpirationDate != null)
+					.Min(b => b.DisposableBattery?.ExpirationDate);
+	}
+
+	/// <summary>
+	/// Získání stavu baterie podle zbývajících dní do konce expirace
+	/// </summary>
+	/// <param name="device">Zařízení</param>
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpirate(Device device)
+	{
+		DateOnly? date = GetExpirationDate(device);
+		if (date is not null)
+		{
+			BatteryStatus status = batteryStatusEvaluator.RemainingDaysToExpirate(date.Value);
+			return status;
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync(dataUpdated);
+	}
+}
