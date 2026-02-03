@@ -50,20 +50,24 @@
 }
 else
 {
-	<table>
-		<tr>
-			<th>Název umístění</th>
-			<th>Podlaží</th>
-			<th>Popis</th>
-		</tr>
-		@foreach (Location location in LocationList)
-		{
-				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)">
-				<td>@location.Name</td>
-				<td>@(location.Floor ?? "")</td>
-				<td><textarea readonly>@location.Description</textarea></td>
+	<table class="selectable">
+		<thead>
+			<tr>
+				<th>Název umístění</th>
+				<th>Podlaží</th>
+				<th>Popis</th>
 			</tr>
-		}
+		</thead>
+		<tbody>
+			@foreach (Location location in LocationList)
+			{
+				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)">
+					<td>@location.Name</td>
+					<td>@(location.Floor ?? "")</td>
+					<td><textarea readonly>@location.Description</textarea></td>
+				</tr>
+			}
+		</tbody>
 	</table>
 }
 

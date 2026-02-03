@@ -26,7 +26,8 @@
 	{
 		<h3>Dostupné baterie:</h3>
 
-		<table>
+		<table class="selectable">
+			<thead>
 			<tr>
 				<th>Počet</th>
 				<th>Označení</th>
@@ -38,6 +39,8 @@
 				<th>Předpokládaná doba výdrže (ve dnech)</th>
 				<th>Akce</th>
 			</tr>
+			</thead>
+			<tbody>
 			@foreach (Battery battery in Batteries)
 			{
 				<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })">
@@ -63,6 +66,7 @@
 					<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
 				</tr>
 			}
+			</tbody>
 		</table>
 
 		<hr>

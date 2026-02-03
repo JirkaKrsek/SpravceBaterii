@@ -73,37 +73,41 @@
 }
 else
 {
-	<table>
-		<tr>
-			<th>Název zařízení</th>
-			<th>Popis zařízení</th>
-			<th>Max. počet baterií v zařízení</th>
-			<th>Počet vložených baterií</th>
-			<th>Nejbližší datum expirace vložených baterií</th>
-			<th>Do konce expirace zbývá dní</th>
-			<th>Výrobce</th>
-			<th>Umístění</th>
-		</tr>
-		@foreach (Device device in DeviceList)
-		{
-				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">
-				<td>@device.Name</td>
-				<td><textarea readonly>@device.Description</textarea></td>
-				<td>@device.BatteryCount</td>
-				<td>@(device.Batteries?.Sum(b => b.Count) ?? 0)</td>
-
-				@{
-					DateOnly? date = GetExpirationDate(device);
-					<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
-
-					BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
-					<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
-				}
-
-				<td>@device.Manufacturer</td>
-				<td>@device.Location?.Name</td>
+	<table class="selectable">
+		<thead>
+			<tr>
+				<th>Název zařízení</th>
+				<th>Popis zařízení</th>
+				<th>Max. počet baterií v zařízení</th>
+				<th>Počet vložených baterií</th>
+				<th>Nejbližší datum expirace vložených baterií</th>
+				<th>Do konce expirace zbývá dní</th>
+				<th>Výrobce</th>
+				<th>Umístění</th>
 			</tr>
-		}
+		</thead>
+		<tbody>
+			@foreach (Device device in DeviceList)
+			{
+				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">
+					<td>@device.Name</td>
+					<td><textarea readonly>@device.Description</textarea></td>
+					<td>@device.BatteryCount</td>
+					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0)</td>
+
+					@{
+						DateOnly? date = GetExpirationDate(device);
+						<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
+
+						BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
+						<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
+					}
+
+					<td>@device.Manufacturer</td>
+					<td>@device.Location?.Name</td>
+				</tr>
+			}
+		</tbody>
 	</table>
 }
 
