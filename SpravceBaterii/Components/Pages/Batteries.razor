@@ -62,11 +62,10 @@ else
 			<th>Datum vložení</th>
 			<th>Předpokládaná doba výdrže (ve dnech)</th>
 			<th>Zbývající předpokládaná životnost</th>
-			<th>Akce</th>
 		</tr>
 		@foreach (Battery battery in BatteryList)
 		{
-			<tr>
+				<tr @onclick="() => FormNavigationService.Open(typeof(BatteryDetail), battery.Id)">
 				<td>@(battery.Device?.Name ?? "")</td>
 				<td>@battery.Count</td>
 				<td>@battery.BatteryType.Name</td>
@@ -90,8 +89,6 @@ else
 					BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
 					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
 				}
-
-				<td><button @onclick="() => FormNavigationService.Open(typeof(BatteryDetail), battery.Id)">Detail baterie</button></td>
 			</tr>
 		}
 	</table>

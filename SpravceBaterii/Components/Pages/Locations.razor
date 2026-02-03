@@ -55,16 +55,13 @@ else
 			<th>Název umístění</th>
 			<th>Podlaží</th>
 			<th>Popis</th>
-			<th>Akce</th>
 		</tr>
 		@foreach (Location location in LocationList)
 		{
-			<tr>
+				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)">
 				<td>@location.Name</td>
 				<td>@(location.Floor ?? "")</td>
 				<td><textarea readonly>@location.Description</textarea></td>
-
-				<td><button @onclick="() => FormNavigationService.Open(typeof(LocationForm), location.Id)">Upravit</button></td>
 			</tr>
 		}
 	</table>

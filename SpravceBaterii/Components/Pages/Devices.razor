@@ -83,11 +83,10 @@ else
 			<th>Do konce expirace zbývá dní</th>
 			<th>Výrobce</th>
 			<th>Umístění</th>
-			<th>Akce</th>
 		</tr>
 		@foreach (Device device in DeviceList)
 		{
-			<tr>
+				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">
 				<td>@device.Name</td>
 				<td><textarea readonly>@device.Description</textarea></td>
 				<td>@device.BatteryCount</td>
@@ -103,10 +102,6 @@ else
 
 				<td>@device.Manufacturer</td>
 				<td>@device.Location?.Name</td>
-
-				<td>
-					<button @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">Detail zařízení</button>
-				</td>
 			</tr>
 		}
 	</table>
