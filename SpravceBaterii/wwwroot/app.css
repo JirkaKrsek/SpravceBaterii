@@ -54,6 +54,9 @@ body {
     padding: 20px;
     border-radius: 12px;
 }
+hr {
+    margin: 20px 0;
+}
 
 /* Navigační menu */
 nav {
