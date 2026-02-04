@@ -173,6 +173,9 @@ table.selectable tr.selected {
 table.selectable tr.selected:hover {
     background-color: #b7dbff;
 }
+table.selectable textarea {
+    padding: 6px;
+}
 
 /* Formuláře */
 form {
