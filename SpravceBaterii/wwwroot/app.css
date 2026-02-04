@@ -38,6 +38,22 @@ h1:focus {
 }
 
 
+
+/* Celkový vzhled stránky */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    /*background-color: #f3f6fb;*/
+    background-color: #0f172a;
+    margin: 0;
+    padding: 0;
+}
+#page {
+    margin: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+}
 /* Vyhodnocený stav baterie */
 .status-unknown {
     color: black;
