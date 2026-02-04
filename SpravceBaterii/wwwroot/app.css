@@ -132,3 +132,41 @@ nav a.active {
     color: white;
     background-color: red;
 }
+
+/* Tabulka */
+table.selectable {
+    border-collapse: collapse;
+    width: 100%;
+}
+table.selectable tr {
+    border-bottom: 1px solid gray;
+}
+table.selectable thead tr {
+    background-color: lightcyan;
+}
+table.selectable thead tr th {
+    padding: 10px;
+}
+table.selectable thead tr th:first-child {
+    border-top-left-radius: 10px;
+}
+table.selectable thead tr th:last-child {
+    border-top-right-radius: 10px;
+}
+table.selectable tbody tr {
+    transition: background-color 0.2s ease;
+}
+table.selectable tbody tr:hover {
+    cursor: pointer;
+    background-color: lightgray;
+}
+table.selectable tbody tr td {
+    padding: 4px;
+    padding-left: 10px;
+}
+table.selectable tr.selected {
+    background-color: #cfe8ff;
+}
+table.selectable tr.selected:hover {
+    background-color: #b7dbff;
+}
