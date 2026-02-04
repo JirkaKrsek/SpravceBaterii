@@ -179,6 +179,12 @@ form {
     box-shadow: 0 5px 20px black;
     border-radius: 20px;
 }
+form.account {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
 form.add-update {
     display: grid;
     grid-template-columns: 1fr 1fr;
