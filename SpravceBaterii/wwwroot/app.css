@@ -54,6 +54,41 @@ body {
     padding: 20px;
     border-radius: 12px;
 }
+
+/* Navigační menu */
+nav {
+    top: 0;
+    position: sticky;
+    background-color: #1e3261;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+nav a {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    text-decoration: none;
+    color: white;
+    transition: color 0.2s ease;
+}
+nav a:first-child {
+    border-left: none;
+}
+nav a:last-child {
+    border-right: none;
+}
+nav a:hover {
+    background-color: #4e76d3;
+}
+nav a.active {
+    background-color: #acc5ff;
+    color: black;
+}
+
+
 /* Vyhodnocený stav baterie */
 .status-unknown {
     color: black;
