@@ -170,3 +170,50 @@ table.selectable tr.selected {
 table.selectable tr.selected:hover {
     background-color: #b7dbff;
 }
+
+/* Formuláře */
+form {
+    margin: auto;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 5px 20px black;
+    border-radius: 20px;
+}
+form.add-update {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    align-items: center;
+}
+form.add-update hr {
+    grid-column: 1 / -1;
+    margin: 4px 0;
+}
+form.add-update span, form .validation-errors {
+    grid-column: 1 / -1;
+}
+form.add-update textarea {
+    grid-column: span 2;
+}
+form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+form input, form select, textarea {
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 10px;
+    font-size: 16px;
+}
+form #input-IsRechargeable input[type="radio"], form #input-IsRechargeable label {
+    cursor: pointer;
+}
+form #input-IsRechargeable input[type="radio"] {
+    width: 16px;
+    height: 16px;
+}
+form input#input-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}

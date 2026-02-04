@@ -19,7 +19,7 @@
 	<p>@errorMessage</p>
 }
 
-<EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm">
+<EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -79,12 +79,19 @@
 	</InputSelect>
 
 	<label for="input-IsRechargeable">Nabíjecí/jednorázová: </label>
-	<InputRadioGroup id="input-IsRechargeable" @bind-Value="battery.IsRechargeable" required>
+	<div id="input-IsRechargeable">
+		<InputRadioGroup @bind-Value="battery.IsRechargeable" required>
+			<div>
 		<InputRadio Value="true" id="input-IsRechargeable-true">Nabíjecí</InputRadio>
 		<label for="input-IsRechargeable-true">Nabíjecí</label>
+			</div>
+			<div>
 		<InputRadio Value="false" id="input-IsRechargeable-false">Jednorázová</InputRadio>
 		<label for="input-IsRechargeable-false">Jednorázová</label>
+			</div>
+			
 	</InputRadioGroup>
+	</div>
 
 	@if (battery.IsRechargeable)
 	{
