@@ -177,6 +177,27 @@ table.selectable textarea {
     padding: 6px;
 }
 
+/* Tlačítka */
+button {
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    transition: background-color 0.2s ease;
+    background-color: #0078d4;
+    color: white;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #005fa3;
+}
+button.close {
+    background-color: crimson;
+}
+button.close:hover {
+    background-color: darkred;
+}
+
 /* Formuláře */
 form {
     margin: auto;
