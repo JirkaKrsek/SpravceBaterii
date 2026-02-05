@@ -250,3 +250,10 @@ form input#input-checkbox {
     height: 16px;
     cursor: pointer;
 }
+
+/* Chybová zpráva */
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin: 20px;
+}

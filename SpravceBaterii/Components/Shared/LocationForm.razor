@@ -11,7 +11,7 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 <EditForm Model="@location" OnValidSubmit="SaveLocation" FormName="LocationForm" class="add-update">
