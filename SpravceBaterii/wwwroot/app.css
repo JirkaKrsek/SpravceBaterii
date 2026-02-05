@@ -57,6 +57,23 @@ body {
 hr {
     margin: 20px 0;
 }
+footer {
+    margin: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: darkred;
+    color: white;
+    border-radius: 12px;
+}
+footer a {
+    color: white;
+    text-decoration: underline;
+    font-weight: bold;
+}
+footer a:hover {
+    color: #4e76d3;
+    text-decoration: none;
+}
 
 /* Navigační menu */
 nav {
