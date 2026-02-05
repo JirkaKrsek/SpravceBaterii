@@ -57,6 +57,15 @@ body {
 hr {
     margin: 20px 0;
 }
+p.switch-account-page a {
+    color: darkblue;
+    text-decoration: underline;
+    font-weight: bold;
+}
+p.switch-account-page a:hover {
+    color: red;
+    text-decoration: none;
+}
 footer {
     margin: 20px;
     padding: 20px;
