@@ -1,7 +1,7 @@
 h1:focus {
     outline: none;
 }
-
+/*
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }
@@ -9,7 +9,7 @@ h1:focus {
 .invalid {
     outline: 1px solid #e50000;
 }
-
+*/
 .validation-message {
     color: #e50000;
 }
@@ -249,6 +249,11 @@ form input#input-checkbox {
     width: 16px;
     height: 16px;
     cursor: pointer;
+}
+
+/* Barevné označení požadovaných a chybně vyplněných položek */
+:required:invalid {
+    border: 2px solid red;
 }
 
 /* Chybová zpráva */
