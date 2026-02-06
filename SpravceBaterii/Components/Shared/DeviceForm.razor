@@ -28,7 +28,7 @@
 
 	<label for="input-BatteryType">Typ baterií v zařízení: </label>
 	<InputSelect id="input-BatteryType" @bind-Value="device.BatteryTypeId" required>
-		<option value="">- Vyberte typ -</option>
+		<option value="0">- Vyberte typ -</option>
 		@foreach (BatteryType batteryType in BatteryTypes)
 		{
 			<option value="@batteryType.Id">@batteryType.Name</option>
