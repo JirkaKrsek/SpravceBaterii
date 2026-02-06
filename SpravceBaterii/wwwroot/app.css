@@ -294,8 +294,8 @@ form input#input-checkbox {
     cursor: pointer;
 }
 
-/* Barevné označení požadovaných a chybně vyplněných položek */
-:required:invalid {
+/* Barevné označení povinných a chybně vyplněných vstupů */
+:required:invalid, .invalid, select[required]:has(option[value="0"]:checked) {
     border: 2px solid red;
 }
 
