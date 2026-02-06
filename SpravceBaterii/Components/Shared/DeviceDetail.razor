@@ -63,51 +63,55 @@ else
 {
 	<h3>Vložené baterie:</h3>
 
-	<table>
-		<tr>
-			<th>Počet</th>
-			<th>Označení</th>
-			<th>Popis</th>
-			<th>Typ</th>
-			<th>Datum expirace</th>
-			<th>Do konce expirace zbývá dní</th>
-			<th>Datum vložení</th>
-			<th>Předpokládaná doba výdrže (ve dnech)</th>
-			<th>Zbývající předpokládaná životnost</th>
-			<th>Akce</th>
-		</tr>
-		@foreach (Battery battery in Batteries)
-		{
+	<table class="selectable">
+		<thead>
 			<tr>
-				<td>@battery.Count</td>
-				<td>@battery.BatteryType.Name</td>
-				<td><textarea readonly>@battery.Description</textarea></td>
-				@if (battery.IsRechargeable)
-				{
-					<td>Nabíjecí</td>
-					<td></td>
-					<td></td>
-				}
-				else
-				{
-					<td>Jednorázová</td>
-					<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-					BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-					<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-				}
-				<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-				<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-				@{
-					BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-					<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
-				}
-
-				<td>
-					<button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button>
-					<button @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteSelectedBattery = true; }">Vysunout / odstranit tuto baterii</button>
-				</td>
+				<th>Počet</th>
+				<th>Označení</th>
+				<th>Popis</th>
+				<th>Typ</th>
+				<th>Datum expirace</th>
+				<th>Do konce expirace zbývá dní</th>
+				<th>Datum vložení</th>
+				<th>Předpokládaná doba výdrže (ve dnech)</th>
+				<th>Zbývající předpokládaná životnost</th>
+				<th>Akce</th>
 			</tr>
-		}
+		</thead>
+		<tbody>
+			@foreach (Battery battery in Batteries)
+			{
+				<tr>
+					<td>@battery.Count</td>
+					<td>@battery.BatteryType.Name</td>
+					<td><textarea readonly>@battery.Description</textarea></td>
+					@if (battery.IsRechargeable)
+					{
+						<td>Nabíjecí</td>
+						<td></td>
+						<td></td>
+					}
+					else
+					{
+						<td>Jednorázová</td>
+						<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+						BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+						<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+					}
+					<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+					<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
+					@{
+						BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
+						<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
+					}
+
+					<td>
+						<button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button>
+						<button @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteSelectedBattery = true; }">Vysunout / odstranit tuto baterii</button>
+					</td>
+				</tr>
+			}
+		</tbody>
 	</table>
 }
 
