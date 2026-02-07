@@ -189,19 +189,4 @@ else
 		}
 		return new BatteryStatus();
 	}
-
-	/// <summary>
-	/// Pokud je v FormNavigationService reloadList = true
-	/// Znovu se načtou data
-	/// FormNavigationService se nastaví na výchozí hodnoty
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task TryReloadList()
-	{
-		if (FormNavigationService.ShouldReload())
-		{
-			await LoadBatteryList();
-			FormNavigationService.Reset();
-		}
-	}
 }
