@@ -142,6 +142,8 @@
 	public EventCallback Deleted { get; set; }
 	[Parameter]
 	public EventCallback Cancel { get; set; }
+	[Parameter]
+	public EventCallback<int> BatterySavedShowBatteryDetail { get; set; }
 
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
@@ -225,14 +227,17 @@
 			if (BatteryToUpdateId is null)
 			{
 				await BatteryService.AddBattery(battery);
+
+				//Zavolání události v rodičovské komponentě
+				await BatterySavedShowBatteryDetail.InvokeAsync(battery.Id);
 			}
 			else
 			{
 				await BatteryService.UpdateBattery(battery);
-			}
 
 			//Zavolání události v rodičovské komponentě
 			await BatterySaved.InvokeAsync();
+		}
 		}
 		catch (Exception ex)
 		{

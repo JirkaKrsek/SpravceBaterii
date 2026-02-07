@@ -58,6 +58,8 @@
 	public EventCallback Deleted { get; set; }
 	[Parameter]
 	public EventCallback Cancel { get; set; }
+	[Parameter]
+	public EventCallback<int> LocationSavedShowLocationDetail { get; set; }
 
 	private Location location = new();
 
@@ -95,14 +97,17 @@
 			if (LocationToUpdateId is null)
 			{
 				await LocationService.AddLocation(location);
+
+				//Zavolání události v rodičovské komponentě
+				await LocationSavedShowLocationDetail.InvokeAsync(location.Id);
 			}
 			else
 			{
 				await LocationService.UpdateLocation(location);
-			}
 
 			//Zavolání události v rodičovské komponentě
 			await LocationSaved.InvokeAsync();
+		}
 		}
 		catch (Exception ex)
 		{

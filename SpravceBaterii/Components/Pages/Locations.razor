@@ -37,7 +37,7 @@
 		<div class="overlay">
 			<div class="overlay-content">
 				<LocationForm LocationToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-							  LocationSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
+							  LocationSavedShowLocationDetail="@(async (locationId) => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(LocationDetail), locationId); })"
 							  LocationSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
 							  Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload();})"
 							  Cancel="@(async () => FormNavigationService.Close())"></LocationForm>

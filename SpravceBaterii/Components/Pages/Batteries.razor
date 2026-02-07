@@ -37,7 +37,7 @@
 		<div class="overlay">
 			<div class="overlay-content">
 				<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-							 BatterySaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
+							 BatterySavedShowBatteryDetail="@(async (batteryId) => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(BatteryDetail), batteryId); })"
 							 BatterySaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
 							 Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
 							 Cancel="@(async () => FormNavigationService.Close())"></BatteryForm>
