@@ -71,6 +71,8 @@ namespace SpravceBaterii.Services
             string userId = await userService.GetUserIdAsync();
 
             return await applicationDbContext.Batteries
+                .Include(b => b.BatteryType)
+                .Include(b => b.ChemicalComposition)
                 .Include(b => b.DisposableBattery)
                 .Include(b => b.RechargeableBattery)
                 .AsNoTracking()
