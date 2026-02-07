@@ -136,6 +136,10 @@
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
+		finally
+		{
+			showConfirm = false;
+		}
 	}
 
 	/// <summary>
