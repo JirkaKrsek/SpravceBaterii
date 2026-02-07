@@ -54,7 +54,10 @@
 
 	<button type="submit">Uložit</button>
 	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+	@if(DeviceToUpdateId is not null)
+	{
 	<button type="button" @onclick="() => showConfirm = true">Smazat toto zařízení</button>
+	}
 
 	@if (showConfirm)
 	{

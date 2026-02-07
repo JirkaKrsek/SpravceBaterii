@@ -31,7 +31,10 @@
 
 	<button type="submit">Uložit</button>
 	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+	@if (LocationToUpdateId is not null)
+	{
 	<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
+	}
 
 	@if (showConfirm)
 	{
