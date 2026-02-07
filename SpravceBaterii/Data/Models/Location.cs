@@ -24,7 +24,6 @@ namespace SpravceBaterii.Data.Models
 
         public string UserId { get; set; } = null!;
 
-        [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } = null!;
 
         public ICollection<Device>? Devices { get; set; }

@@ -25,7 +25,6 @@ namespace SpravceBaterii.Data.Models
         [Range(1, int.MaxValue, ErrorMessage = "Vyberte platný typ baterie")]
         public int BatteryTypeId { get; set; }
 
-        [ForeignKey("BatteryTypeId")]
         public BatteryType BatteryType { get; set; } = null!;
 
         [StringLength(100, ErrorMessage = "Výrobce může mít max. 100 znaků")]
@@ -33,12 +32,10 @@ namespace SpravceBaterii.Data.Models
 
         public int? LocationId { get; set; }
 
-        [ForeignKey("LocationId")]
         public Location? Location { get; set; }
 
         public string UserId { get; set; } = null!;
 
-        [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } = null!;
 
         public ICollection<Battery>? Batteries { get; set; }

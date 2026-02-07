@@ -30,23 +30,19 @@ namespace SpravceBaterii.Data.Models
 
         public string UserId { get; set; } = null!;
 
-        [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } = null!;
 
         public int? DeviceId { get; set; }
 
-        [ForeignKey("DeviceId")]
         public Device? Device { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Vyberte platný typ baterie")]
         public int BatteryTypeId { get; set; }
 
-        [ForeignKey("BatteryTypeId")]
         public BatteryType BatteryType { get; set; } = null!;
 
         public int? ChemicalCompositionId { get; set; }
 
-        [ForeignKey("ChemicalCompositionId")]
         public ChemicalComposition? ChemicalComposition { get; set; }
 
         public bool IsRechargeable { get; set; }

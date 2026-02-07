@@ -20,7 +20,6 @@ namespace SpravceBaterii.Data.Models
 
         public int BatteryId { get; set; }
 
-        [ForeignKey("BatteryId")]
         public Battery Battery { get; set; } = null!;
 
         public ICollection<ChargingHistory>? ChargingHistories { get; set; }
