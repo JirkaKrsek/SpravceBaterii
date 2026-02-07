@@ -13,7 +13,7 @@ namespace SpravceBaterii.Data.Models
         public int Id { get; set; }
 
         [StringLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public ICollection<Battery>? Batteries { get; set; }
     }

@@ -20,6 +20,6 @@ namespace SpravceBaterii.Data.Models
         public int RechargeableBatteryId { get; set; }
 
         [ForeignKey("RechargeableBatteryId")]
-        public RechargeableBattery RechargeableBattery { get; set; }
+        public RechargeableBattery RechargeableBattery { get; set; } = null!;
     }
 }

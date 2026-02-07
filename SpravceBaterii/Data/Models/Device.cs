@@ -14,7 +14,7 @@ namespace SpravceBaterii.Data.Models
 
         [Required(ErrorMessage = "Vyplňte název")]
         [StringLength(100, ErrorMessage = "Název může mít max. 100 znaků")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [StringLength(200, ErrorMessage = "Popis může mít max. 200 znaků")]
         public string? Description { get; set; }
@@ -26,7 +26,7 @@ namespace SpravceBaterii.Data.Models
         public int BatteryTypeId { get; set; }
 
         [ForeignKey("BatteryTypeId")]
-        public BatteryType BatteryType { get; set; }
+        public BatteryType BatteryType { get; set; } = null!;
 
         [StringLength(100, ErrorMessage = "Výrobce může mít max. 100 znaků")]
         public string? Manufacturer { get; set; }
@@ -36,10 +36,10 @@ namespace SpravceBaterii.Data.Models
         [ForeignKey("LocationId")]
         public Location? Location { get; set; }
 
-        public string UserId { get; set; }
+        public string UserId { get; set; } = null!;
 
         [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; }
+        public ApplicationUser User { get; set; } = null!;
 
         public ICollection<Battery>? Batteries { get; set; }
     }

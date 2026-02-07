@@ -28,10 +28,10 @@ namespace SpravceBaterii.Data.Models
         [StringLength(200, ErrorMessage = "Popis může mít max. 200 znaků")]
         public string? Description { get; set; }
 
-        public string UserId { get; set; }
+        public string UserId { get; set; } = null!;
 
         [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; }
+        public ApplicationUser User { get; set; } = null!;
 
         public int? DeviceId { get; set; }
 
@@ -42,7 +42,7 @@ namespace SpravceBaterii.Data.Models
         public int BatteryTypeId { get; set; }
 
         [ForeignKey("BatteryTypeId")]
-        public BatteryType BatteryType { get; set; }
+        public BatteryType BatteryType { get; set; } = null!;
 
         public int? ChemicalCompositionId { get; set; }
 
