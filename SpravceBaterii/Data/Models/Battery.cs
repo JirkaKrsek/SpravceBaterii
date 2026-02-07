@@ -19,13 +19,13 @@ namespace SpravceBaterii.Data.Models
 
         public int? ExpectedLifespan { get; set; }
 
-        [MaxLength(100)]
+        [StringLength(100, ErrorMessage = "Výrobce může mít max. 100 znaků")]
         public string? Manufacturer { get; set; }
 
-        [StringLength(200)]
+        [StringLength(200, ErrorMessage = "Historie použití může mít max. 200 znaků")]
         public string? UsageHistory { get; set; }
 
-        [StringLength(200)]
+        [StringLength(200, ErrorMessage = "Popis může mít max. 200 znaků")]
         public string? Description { get; set; }
 
         public string UserId { get; set; }

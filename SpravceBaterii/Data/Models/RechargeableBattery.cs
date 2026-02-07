@@ -12,8 +12,10 @@ namespace SpravceBaterii.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Kapacita baterie je min. 1")]
         public int? Capacity { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Počet cyklů baterie je min. 1")]
         public int? CycleCount { get; set; }
 
         public int BatteryId { get; set; }

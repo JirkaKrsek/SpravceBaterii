@@ -12,14 +12,14 @@ namespace SpravceBaterii.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        [Required(ErrorMessage = "Vyplňte název")]
+        [StringLength(100, ErrorMessage = "Název může mít max. 100 znaků")]
         public string Name { get; set; }
 
-        [StringLength(200)]
+        [StringLength(200, ErrorMessage = "Popis může mít max. 200 znaků")]
         public string? Description { get; set; }
 
-        [StringLength(100)]
+        [StringLength(100, ErrorMessage = "Podlaží může mít max. 100 znaků")]
         public string? Floor { get; set; }
 
         public string UserId { get; set; }

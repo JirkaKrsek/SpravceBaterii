@@ -14,6 +14,7 @@ namespace SpravceBaterii.Data.Models
 
         public DateOnly ChargeDate { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Kapacita je min. 1")]
         public int? CapacityAfterCharge { get; set; }
 
         public int RechargeableBatteryId { get; set; }
