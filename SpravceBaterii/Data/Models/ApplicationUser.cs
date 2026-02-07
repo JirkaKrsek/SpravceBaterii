@@ -8,9 +8,9 @@ namespace SpravceBaterii.Data.Models
     /// </summary>
     public class ApplicationUser : IdentityUser
     {
-        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
+        public DateTime RegistrationDate { get; set; }
 
-        public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
+        public DateTime LastLoginDate { get; set; }
 
         public ICollection<Battery>? Batteries { get; set; }
         public ICollection<Device>? Devices { get; set; }
