@@ -160,6 +160,10 @@ else
 	{
 		try
 		{
+			if (DeviceList.Count > 0)
+			{
+				await DeviceService.UnassignDevicesInLocationById(location.Id);
+			}
 			await LocationService.DeleteLocationById(location.Id);
 
 			//Zavolání události v rodičovské komponentě

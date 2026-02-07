@@ -4,6 +4,7 @@
 @using SpravceBaterii.Services.Tools
 
 @inject LocationService LocationService
+@inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
 
 <h2>Formulář pro zadání nové baterie</h2>
@@ -127,6 +128,11 @@
 	{
 		try
 		{
+			if (anyDevicesInLocation)
+			{
+				await DeviceService.UnassignDevicesInLocationById(location.Id);
+			}
+
 			await LocationService.DeleteLocationById(locationId);
 
 			//Zavolání události v rodičovské komponentě
