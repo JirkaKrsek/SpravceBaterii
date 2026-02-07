@@ -115,17 +115,19 @@ else
 	}
 
 	/// <summary>
-	/// Pokud je v FormNavigationService reloadList = true
-	/// Znovu se načtou data
-	/// FormNavigationService se nastaví na výchozí hodnoty
+	/// Po vykreslení stránky se zkontroluje, zda nejsou potřeba znovunačíst data
 	/// </summary>
+	/// <param name="firstRender">bool, zda se stránka vykresluje poprvé</param>
 	/// <returns>Asynchronní operace</returns>
-	private async Task TryReloadList()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (FormNavigationService.ShouldReload())
 		{
 			await LoadLocationList();
 			FormNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
 		}
 	}
 }

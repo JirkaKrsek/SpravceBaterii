@@ -125,6 +125,23 @@ else
 	}
 
 	/// <summary>
+	/// Po vykreslení stránky se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	/// <param name="firstRender">bool, zda se stránka vykresluje poprvé</param>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (FormNavigationService.ShouldReload())
+		{
+			await LoadBatteryList();
+			FormNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
+		}
+	}
+
+	/// <summary>
 	/// Načtení informací o bateriích uživatele z databáze
 	/// </summary>
 	/// <returns>Asynchronní operace</returns>
