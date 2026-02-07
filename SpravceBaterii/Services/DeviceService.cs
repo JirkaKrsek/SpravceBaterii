@@ -148,6 +148,31 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Odpojení všech zařízení z daného umístění
+        /// </summary>
+        /// <param name="locationId">ID umístění</param>
+        /// <returns>Asynchronní operace</returns>
+        public async Task UnassignDevicesInLocationById(int locationId)
+        {
+            List<Device> devices = await GetUserDevicesByLocationId(locationId);
+
+            foreach (Device device in devices)
+            {
+                device.LocationId = null;
+            }
+
+            applicationDbContext.UpdateRange(devices);
+            //Uložení
+            await applicationDbContext.SaveChangesAsync();
+
+            foreach (Device device in devices)
+            {
+                //Odpojení od slednování EF Core
+                applicationDbContext.Entry(device).State = EntityState.Detached;
+            }
+        }
+
+        /// <summary>
         /// Odstranění zařízení z databáze
         /// </summary>
         /// <param name="batteryId">ID zařízení</param>
