@@ -37,6 +37,14 @@
         }
 
         /// <summary>
+        /// Zavření všech otevřených komponent
+        /// </summary>
+        public void CloseAll()
+        {
+            history.Clear();
+        }
+
+        /// <summary>
         /// Nastavení reloadList hodnoty na true
         /// </summary>
         public void MarkForReload()
