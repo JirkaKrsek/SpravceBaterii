@@ -55,6 +55,8 @@
 	[Parameter]
 	public EventCallback LocationSaved { get; set; }
 	[Parameter]
+	public EventCallback Deleted { get; set; }
+	[Parameter]
 	public EventCallback Cancel { get; set; }
 
 	private Location location = new();
@@ -120,7 +122,7 @@
 			await LocationService.DeleteLocationById(locationId);
 
 			//Zavolání události v rodičovské komponentě
-			await LocationSaved.InvokeAsync();
+			await Deleted.InvokeAsync();
 		}
 		catch (Exception ex)
 		{

@@ -78,6 +78,8 @@
 	[Parameter]
 	public EventCallback DeviceSaved { get; set; }
 	[Parameter]
+	public EventCallback Deleted { get; set; }
+	[Parameter]
 	public EventCallback Cancel { get; set; }
 	[Parameter]
 	public EventCallback<int> DeviceSavedShowDeviceDetail { get; set; }
@@ -157,7 +159,7 @@
 			await DeviceService.DeleteDeviceById(deviceId);
 
 			//Zavolání události v rodičovské komponentě
-			await DeviceSaved.InvokeAsync();
+			await Deleted.InvokeAsync();
 		}
 		catch (Exception ex)
 		{

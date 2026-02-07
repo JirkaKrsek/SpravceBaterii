@@ -139,6 +139,8 @@
 	[Parameter]
 	public EventCallback BatterySaved { get; set; }
 	[Parameter]
+	public EventCallback Deleted { get; set; }
+	[Parameter]
 	public EventCallback Cancel { get; set; }
 
 	private List<BatteryType> BatteryTypes = new();
@@ -250,7 +252,7 @@
 			await BatteryService.DeleteBatteryById(batteryId);
 
 			//Zavolání události v rodičovské komponentě
-			await BatterySaved.InvokeAsync();
+			await Deleted.InvokeAsync();
 		}
 		catch (Exception ex)
 		{
