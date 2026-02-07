@@ -19,11 +19,11 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@((MarkupString)errorMessage)</p>
+    <p class="error-message">@((MarkupString)errorMessage)</p>
 }
 
 <!--Formulář pro registraci-->
-<EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm">
+<EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm" class="account">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -38,6 +38,8 @@
 
     <button type="submit">Registrovat se</button>
 </EditForm>
+
+<p class="switch-account-page">Již máte účet? <a href="/ucet/prihlaseni">Přihlásit se</a></p>
 
 @code {
     [SupplyParameterFromForm]

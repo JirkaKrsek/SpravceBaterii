@@ -1,7 +1,7 @@
 h1:focus {
     outline: none;
 }
-
+/*
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }
@@ -9,7 +9,7 @@ h1:focus {
 .invalid {
     outline: 1px solid #e50000;
 }
-
+*/
 .validation-message {
     color: #e50000;
 }
@@ -38,6 +38,129 @@ h1:focus {
 }
 
 
+
+/* Celkový vzhled stránky */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    /*background-color: #f3f6fb;*/
+    background-color: #0f172a;
+    margin: 0;
+    padding: 0;
+}
+#page {
+    margin: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+hr {
+    margin: 20px 0;
+}
+p.switch-account-page a {
+    color: darkblue;
+    text-decoration: underline;
+    font-weight: bold;
+}
+p.switch-account-page a:hover {
+    color: red;
+    text-decoration: none;
+}
+footer {
+    margin: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: darkred;
+    color: white;
+    border-radius: 12px;
+}
+footer a {
+    color: white;
+    text-decoration: underline;
+    font-weight: bold;
+}
+footer a:hover {
+    color: #4e76d3;
+    text-decoration: none;
+}
+
+/* Navigační menu */
+nav {
+    top: 0;
+    position: sticky;
+    background-color: #1e3261;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: 50px;
+}
+nav a {
+    flex: 1;
+    text-align: center;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: color 0.2s ease;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+nav a:first-child {
+    border-left: none;
+}
+nav a:last-child {
+    border-right: none;
+}
+nav a.active {
+    background-color: #acc5ff;
+    color: black;
+}
+nav a:hover {
+    background-color: #4e76d3;
+    color: white;
+}
+nav a.logo {
+    flex: 0.5;
+    background-color: #e2e9ff;
+    color: black;
+    gap: 12px;
+}
+nav a.logo img {
+    max-height: calc(100% - 8px);
+    width: auto;
+}
+
+/* Modální overlay komponenty */
+.overlay {
+    position: fixed;
+    margin: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    overflow: auto;
+}
+.overlay-content {
+    margin: 20px;
+    background-color: white;
+    width: auto;
+    height: auto;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px black;
+    overflow: auto;
+    max-height: 88%;
+}
+
 /* Vyhodnocený stav baterie */
 .status-unknown {
     color: black;
@@ -54,4 +177,131 @@ h1:focus {
 .status-expired {
     color: white;
     background-color: red;
+}
+
+/* Tabulka */
+table.selectable {
+    border-collapse: collapse;
+    width: 100%;
+}
+table.selectable tr {
+    border-bottom: 1px solid gray;
+}
+table.selectable thead tr {
+    background-color: lightcyan;
+}
+table.selectable thead tr th {
+    padding: 10px;
+}
+table.selectable thead tr th:first-child {
+    border-top-left-radius: 10px;
+}
+table.selectable thead tr th:last-child {
+    border-top-right-radius: 10px;
+}
+table.selectable tbody tr {
+    transition: background-color 0.2s ease;
+}
+table.selectable tbody tr:hover {
+    cursor: pointer;
+    background-color: lightgray;
+}
+table.selectable tbody tr td {
+    padding: 4px;
+    padding-left: 10px;
+}
+table.selectable tr.selected {
+    background-color: #cfe8ff;
+}
+table.selectable tr.selected:hover {
+    background-color: #b7dbff;
+}
+table.selectable textarea {
+    padding: 6px;
+}
+
+/* Tlačítka */
+button {
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    transition: background-color 0.2s ease;
+    background-color: #0078d4;
+    color: white;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #005fa3;
+}
+button.close {
+    background-color: crimson;
+}
+button.close:hover {
+    background-color: darkred;
+}
+
+/* Formuláře */
+form {
+    margin: auto;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 5px 20px black;
+    border-radius: 20px;
+}
+form.account {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+form.add-update {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    align-items: center;
+}
+form.add-update hr {
+    grid-column: 1 / -1;
+    margin: 4px 0;
+}
+form.add-update span, form .validation-errors {
+    grid-column: 1 / -1;
+}
+form.add-update textarea {
+    grid-column: span 2;
+}
+form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+form input, form select, textarea {
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 10px;
+    font-size: 16px;
+}
+form #input-IsRechargeable input[type="radio"], form #input-IsRechargeable label {
+    cursor: pointer;
+}
+form #input-IsRechargeable input[type="radio"] {
+    width: 16px;
+    height: 16px;
+}
+form input#input-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Barevné označení povinných a chybně vyplněných vstupů */
+:required:invalid, .invalid, select[required]:has(option[value="0"]:checked) {
+    border: 2px solid red;
+}
+
+/* Chybová zpráva */
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin: 20px;
 }

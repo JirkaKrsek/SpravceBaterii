@@ -10,7 +10,7 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 @if (isDataLoaded)
@@ -142,7 +142,7 @@ else
 
 <hr>
 
-<button type="button" @onclick="Close">Zavřít</button>
+<button type="button" class="close" @onclick="Close">Zavřít</button>
 
 @if (showConfirmDeleteBattery)
 {

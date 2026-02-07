@@ -19,25 +19,29 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+    <p class="error-message">@errorMessage</p>
 }
 
 <!--Formulář pro registraci-->
-<EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm">
+<EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm" class="account">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-	<label for="input-email">Email: </label>
-	<InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Email@email.com" required></InputText>
+    <label for="input-email">Email: </label>
+    <InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Email@email.com" required></InputText>
 
 	<label for="input-password">Heslo: </label>
 	<InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="TajneHeslo" required></InputText>
 
-	<InputCheckbox id="input-checkbox" @bind-Value="Input.RememberMe"></InputCheckbox>
-	<label for="input-checkbox" title="Po zavření prohlížeče zůstanete přihlášeni">Zůstat přihlášen(a)</label>
+    <div>
+        <InputCheckbox id="input-checkbox" @bind-Value="Input.RememberMe"></InputCheckbox>
+        <label for="input-checkbox" title="Po zavření prohlížeče zůstanete přihlášeni">Zůstat přihlášen(a)</label>
+    </div>
 
 	<button type="submit">Přihlásit se</button>
 </EditForm>
+
+<p class="switch-account-page">Ještě nemáte účet? <a href="/ucet/registrace">Zaregistrovat se</a></p>
 
 @code {
     [SupplyParameterFromForm]

@@ -16,46 +16,66 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 @if (isDataLoaded)
 {
 	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceDetail))
 	{
-		<DeviceDetail DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-					  EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-					  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
-					  InsertBattery="@(deviceId => FormNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
-					  SetLocation="@(deviceId => FormNavigationService.Open(typeof(SetLocation), deviceId))"
-					  Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-					  Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></DeviceDetail>
+		<div class="overlay">
+			<div class="overlay-content">
+				<DeviceDetail DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							  EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+							  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
+							  InsertBattery="@(deviceId => FormNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
+							  SetLocation="@(deviceId => FormNavigationService.Open(typeof(SetLocation), deviceId))"
+							  Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+							  Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></DeviceDetail>
+			</div>
+		</div>
 	}
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 	{
-		<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-					 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-					 Cancel="@(() => FormNavigationService.Close())"></BatteryForm>
+		<div class="overlay">
+			<div class="overlay-content">
+				<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+							 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+							 Cancel="@(() => FormNavigationService.Close())"></BatteryForm>
+			</div>
+		</div>
 	}
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
 	{
-		<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-					DeviceSavedShowDeviceDetail="@(async (deviceId) => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(DeviceDetail), deviceId);})"
-					DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
-					Cancel="@(async () => FormNavigationService.Close())"></DeviceForm>
+		<div class="overlay">
+			<div class="overlay-content">
+				<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+							DeviceSavedShowDeviceDetail="@(async (deviceId) => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(DeviceDetail), deviceId);})"
+							DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
+							Cancel="@(async () => FormNavigationService.Close())"></DeviceForm>
+			</div>
+		</div>
 	}
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(InsertBatteryToDevice))
 	{
-		<InsertBatteryToDevice DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-							   Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
-							   Cancel="@(async () => FormNavigationService.Close())"></InsertBatteryToDevice>
+		<div class="overlay">
+			<div class="overlay-content">
+				<InsertBatteryToDevice DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+									   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+									   Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
+									   Cancel="@(async () => FormNavigationService.Close())"></InsertBatteryToDevice>
+			</div>
+		</div>
 	}
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(SetLocation))
 	{
-		<SetLocation DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							   Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
-							   Cancel="@(async () => FormNavigationService.Close())"></SetLocation>
+		<div class="overlay">
+			<div class="overlay-content">
+				<SetLocation DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							 Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
+							 Cancel="@(async () => FormNavigationService.Close())"></SetLocation>
+			</div>
+		</div>
 	}
 	else
 	{
@@ -73,42 +93,41 @@
 }
 else
 {
-	<table>
-		<tr>
-			<th>Název zařízení</th>
-			<th>Popis zařízení</th>
-			<th>Max. počet baterií v zařízení</th>
-			<th>Počet vložených baterií</th>
-			<th>Nejbližší datum expirace vložených baterií</th>
-			<th>Do konce expirace zbývá dní</th>
-			<th>Výrobce</th>
-			<th>Umístění</th>
-			<th>Akce</th>
-		</tr>
-		@foreach (Device device in DeviceList)
-		{
+	<table class="selectable">
+		<thead>
 			<tr>
-				<td>@device.Name</td>
-				<td><textarea readonly>@device.Description</textarea></td>
-				<td>@device.BatteryCount</td>
-				<td>@(device.Batteries?.Sum(b => b.Count) ?? 0)</td>
-
-				@{
-					DateOnly? date = GetExpirationDate(device);
-					<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
-
-					BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
-					<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
-				}
-
-				<td>@device.Manufacturer</td>
-				<td>@device.Location?.Name</td>
-
-				<td>
-					<button @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">Detail zařízení</button>
-				</td>
+				<th>Název zařízení</th>
+				<th>Popis zařízení</th>
+				<th>Max. počet baterií v zařízení</th>
+				<th>Počet vložených baterií</th>
+				<th>Nejbližší datum expirace vložených baterií</th>
+				<th>Do konce expirace zbývá dní</th>
+				<th>Výrobce</th>
+				<th>Umístění</th>
 			</tr>
-		}
+		</thead>
+		<tbody>
+			@foreach (Device device in DeviceList)
+			{
+				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">
+					<td>@device.Name</td>
+					<td><textarea readonly>@device.Description</textarea></td>
+					<td>@device.BatteryCount</td>
+					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0)</td>
+
+					@{
+						DateOnly? date = GetExpirationDate(device);
+						<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
+
+						BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
+						<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
+					}
+
+					<td>@device.Manufacturer</td>
+					<td>@device.Location?.Name</td>
+				</tr>
+			}
+		</tbody>
 	</table>
 }
 

@@ -13,10 +13,10 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
-<EditForm Model="@device" OnValidSubmit="SaveDevice" FormName="DeviceForm">
+<EditForm Model="@device" OnValidSubmit="SaveDevice" FormName="DeviceForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -28,7 +28,7 @@
 
 	<label for="input-BatteryType">Typ baterií v zařízení: </label>
 	<InputSelect id="input-BatteryType" @bind-Value="device.BatteryTypeId" required>
-		<option value="">- Vyberte typ -</option>
+		<option value="0">- Vyberte typ -</option>
 		@foreach (BatteryType batteryType in BatteryTypes)
 		{
 			<option value="@batteryType.Id">@batteryType.Name</option>
@@ -53,7 +53,7 @@
 	<hr>
 
 	<button type="submit">Uložit</button>
-	<button type="button" @onclick="Close">Zavřít bez uložení</button>
+	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
 	<button type="button" @onclick="() => showConfirm = true">Smazat toto zařízení</button>
 
 	@if (showConfirm)

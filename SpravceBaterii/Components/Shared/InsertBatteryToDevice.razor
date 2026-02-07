@@ -11,7 +11,7 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 <EditForm Model="@Input" OnValidSubmit="Save" FormName="InsertBatteryToDevice">
@@ -26,43 +26,47 @@
 	{
 		<h3>Dostupné baterie:</h3>
 
-		<table>
-			<tr>
-				<th>Počet</th>
-				<th>Označení</th>
-				<th>Popis</th>
-				<th>Typ</th>
-				<th>Datum expirace</th>
-				<th>Do konce expirace zbývá dní</th>
-				<th>Datum vložení</th>
-				<th>Předpokládaná doba výdrže (ve dnech)</th>
-				<th>Akce</th>
-			</tr>
-			@foreach (Battery battery in Batteries)
-			{
-				<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })">
-					<td>@battery.Count</td>
-					<td>@battery.BatteryType.Name</td>
-					<td><textarea readonly>@battery.Description</textarea></td>
-					@if (battery.IsRechargeable)
-					{
-						<td>Nabíjecí</td>
-						<td></td>
-						<td></td>
-					}
-					else
-					{
-						<td>Jednorázová</td>
-						<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-						BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-						<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-					}
-					<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-					<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-
-					<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
+		<table class="selectable">
+			<thead>
+				<tr>
+					<th>Počet</th>
+					<th>Označení</th>
+					<th>Popis</th>
+					<th>Typ</th>
+					<th>Datum expirace</th>
+					<th>Do konce expirace zbývá dní</th>
+					<th>Datum vložení</th>
+					<th>Předpokládaná doba výdrže (ve dnech)</th>
+					<th>Akce</th>
 				</tr>
-			}
+			</thead>
+			<tbody>
+				@foreach (Battery battery in Batteries)
+				{
+					<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")">
+						<td>@battery.Count</td>
+						<td>@battery.BatteryType.Name</td>
+						<td><textarea readonly>@battery.Description</textarea></td>
+						@if (battery.IsRechargeable)
+						{
+							<td>Nabíjecí</td>
+							<td></td>
+							<td></td>
+						}
+						else
+						{
+							<td>Jednorázová</td>
+							<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+							BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+							<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+						}
+						<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+						<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
+
+						<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
+					</tr>
+				}
+			</tbody>
 		</table>
 
 		<hr>
@@ -88,7 +92,7 @@
 
 	<hr>
 
-	<button type="button" @onclick="Close">Zavřít</button>
+	<button type="button" class="close" @onclick="Close">Zavřít</button>
 </EditForm>
 
 @code {

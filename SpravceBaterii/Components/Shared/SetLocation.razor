@@ -11,34 +11,38 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+    <p class="error-message">@errorMessage</p>
 }
 
 <EditForm Model="@Input" OnValidSubmit="Save" FormName="SetLocation">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-    <table class="set">
-        <tr>
-            <th>Název</th>
-            <th>Podlaží</th>
-            <th>Popis</th>
-        </tr>
-        @foreach (Location location in Locations)
-        {
-            <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")">
-                <td>@location.Name</td>
-                <td>@location.Floor</td>
-                <td><textarea readonly>@location.Description</textarea></td>
+    <table class="selectable">
+        <thead>
+            <tr>
+                <th>Název</th>
+                <th>Podlaží</th>
+                <th>Popis</th>
             </tr>
-        }
+        </thead>
+        <tbody>
+            @foreach (Location location in Locations)
+            {
+                <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")">
+                    <td>@location.Name</td>
+                    <td>@location.Floor</td>
+                    <td><textarea readonly>@location.Description</textarea></td>
+                </tr>
+            }
+        </tbody>
     </table>
 
 	<hr>
 
 	<button type="submit">Uložit</button>
     <button type="reset" @onclick="@(() => Input.selectedLocationId = null)">Žádné umístění</button>
-	<button type="button" @onclick="Close">Zavřít</button>
+    <button type="button" class="close" @onclick="Close">Zavřít</button>
 </EditForm>
 
 @code {

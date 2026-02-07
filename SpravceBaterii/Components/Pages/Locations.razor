@@ -16,23 +16,31 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 @if (isDataLoaded)
 {
 	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(LocationDetail))
 	{
-		<LocationDetail LocationId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-					    EditLocation="@(locationId => FormNavigationService.Open(typeof(LocationForm), locationId))"
-					    Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-					    Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></LocationDetail>
+		<div class="overlay">
+			<div class="overlay-content">
+				<LocationDetail LocationId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+								EditLocation="@(locationId => FormNavigationService.Open(typeof(LocationForm), locationId))"
+								Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+								Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></LocationDetail>
+			</div>
+		</div>
 	}
 	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(LocationForm))
 	{
-		<LocationForm LocationToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-					  LocationSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
-					  Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></LocationForm>
+		<div class="overlay">
+			<div class="overlay-content">
+				<LocationForm LocationToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
+							  LocationSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
+							  Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></LocationForm>
+			</div>
+		</div>
 	}
 	else
 	{
@@ -50,23 +58,24 @@
 }
 else
 {
-	<table>
-		<tr>
-			<th>Název umístění</th>
-			<th>Podlaží</th>
-			<th>Popis</th>
-			<th>Akce</th>
-		</tr>
-		@foreach (Location location in LocationList)
-		{
+	<table class="selectable">
+		<thead>
 			<tr>
-				<td>@location.Name</td>
-				<td>@(location.Floor ?? "")</td>
-				<td><textarea readonly>@location.Description</textarea></td>
-
-				<td><button @onclick="() => FormNavigationService.Open(typeof(LocationForm), location.Id)">Upravit</button></td>
+				<th>Název umístění</th>
+				<th>Podlaží</th>
+				<th>Popis</th>
 			</tr>
-		}
+		</thead>
+		<tbody>
+			@foreach (Location location in LocationList)
+			{
+				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)">
+					<td>@location.Name</td>
+					<td>@(location.Floor ?? "")</td>
+					<td><textarea readonly>@location.Description</textarea></td>
+				</tr>
+			}
+		</tbody>
 	</table>
 }
 

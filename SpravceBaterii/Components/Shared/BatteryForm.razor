@@ -16,10 +16,10 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p>@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
-<EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm">
+<EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -79,12 +79,19 @@
 	</InputSelect>
 
 	<label for="input-IsRechargeable">Nabíjecí/jednorázová: </label>
-	<InputRadioGroup id="input-IsRechargeable" @bind-Value="battery.IsRechargeable" required>
+	<div id="input-IsRechargeable">
+		<InputRadioGroup @bind-Value="battery.IsRechargeable" required>
+			<div>
 		<InputRadio Value="true" id="input-IsRechargeable-true">Nabíjecí</InputRadio>
 		<label for="input-IsRechargeable-true">Nabíjecí</label>
+			</div>
+			<div>
 		<InputRadio Value="false" id="input-IsRechargeable-false">Jednorázová</InputRadio>
 		<label for="input-IsRechargeable-false">Jednorázová</label>
+			</div>
+			
 	</InputRadioGroup>
+	</div>
 
 	@if (battery.IsRechargeable)
 	{
@@ -107,7 +114,7 @@
 	<hr>
 
 	<button type="submit">Uložit</button>
-	<button type="button" @onclick="Close">Zavřít bez uložení</button>
+	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
 	<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
 
 	@if (showConfirm)
