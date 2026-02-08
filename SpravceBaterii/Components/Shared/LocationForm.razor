@@ -34,12 +34,16 @@
 	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
 	@if (LocationToUpdateId is not null)
 	{
-	<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
+		<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
 	}
 
 	@if (showConfirm)
 	{
 		<div>
+			@if (anyDevicesInLocation)
+			{
+				<p>Zařízení zůstanou zachována.</p>
+			}
 			<p>Opravdu chcete odstranit toto umístění?</p>
 			<button type="button" @onclick="() => DeleteLocation(location.Id)">Ano</button>
 			<button type="button" @onclick="() => showConfirm = false">Ne</button>
@@ -66,6 +70,7 @@
 	public EventCallback<int> LocationSavedShowLocationDetail { get; set; }
 
 	private Location location = new();
+	private bool anyDevicesInLocation;
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -78,6 +83,7 @@
 			if (LocationToUpdateId is not null)
 			{
 				location = await LocationService.GetUserLocationById(LocationToUpdateId.Value);
+				anyDevicesInLocation = await DeviceService.AnyDevicesInLocationById(location.Id);
 			}
 			else
 			{
@@ -109,9 +115,9 @@
 			{
 				await LocationService.UpdateLocation(location);
 
-			//Zavolání události v rodičovské komponentě
-			await LocationSaved.InvokeAsync();
-		}
+				//Zavolání události v rodičovské komponentě
+				await LocationSaved.InvokeAsync();
+			}
 		}
 		catch (Exception ex)
 		{

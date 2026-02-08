@@ -49,34 +49,34 @@ else
 
 	<table class="selectable">
 		<thead>
-		<tr>
-			<th>Název zařízení</th>
-			<th>Popis zařízení</th>
-			<th>Výrobce</th>
-			<th>Počet vložených baterií</th>
-			<th>Nejbližší datum expirace vložených baterií</th>
-			<th>Do konce expirace zbývá dní</th>
+			<tr>
+				<th>Název zařízení</th>
+				<th>Popis zařízení</th>
+				<th>Výrobce</th>
+				<th>Počet vložených baterií</th>
+				<th>Nejbližší datum expirace vložených baterií</th>
+				<th>Do konce expirace zbývá dní</th>
 			
-		</tr>
+			</tr>
 		</thead>
 		<tbody>
-		@foreach (Device device in DeviceList)
-		{
-			<tr>
-				<td>@device.Name</td>
-				<td><textarea readonly>@device.Description</textarea></td>
-				<td>@device.Manufacturer</td>
-				<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
+			@foreach (Device device in DeviceList)
+			{
+				<tr>
+					<td>@device.Name</td>
+					<td><textarea readonly>@device.Description</textarea></td>
+					<td>@device.Manufacturer</td>
+					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
 
-				@{
-					DateOnly? date = GetExpirationDate(device);
-					<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
+					@{
+						DateOnly? date = GetExpirationDate(device);
+						<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
 
-					BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
-					<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
-				}
-			</tr>
-		}
+						BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
+						<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
+					}
+				</tr>
+			}
 		</tbody>
 	</table>
 }
@@ -94,6 +94,10 @@ else
 @if (showConfirmDeleteLocation)
 {
 	<div>
+		@if (DeviceList.Count > 0)
+		{
+			<p>Zařízení zůstanou zachována.</p>
+		}
 		<p>Opravdu chcete odstranit toto umístění?</p>
 		<button type="button" @onclick="async () => await DeleteLocation()">Ano</button>
 		<button type="button" @onclick="() => showConfirmDeleteLocation = false">Ne</button>
