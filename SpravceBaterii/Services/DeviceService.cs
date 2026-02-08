@@ -41,6 +41,7 @@ namespace SpravceBaterii.Services
         /// <summary>
         /// Načtení zařízení podle ID umístění
         /// </summary>
+        /// <param name="locationId">ID umístění</param>
         /// <returns>List zařízení</returns>
         public async Task<List<Device>> GetUserDevicesByLocationId(int locationId)
         {
@@ -68,7 +69,7 @@ namespace SpravceBaterii.Services
         /// <summary>
         /// Získání zařízení podle ID
         /// </summary>
-        /// <param name="batteryId">ID hledaného zařízení</param>
+        /// <param name="deviceId">ID hledaného zařízení</param>
         /// <returns>Nalezené zařízení</returns>
         /// <exception cref="KeyNotFoundException">Zařízení nenalezeno</exception>
         public async Task<Device> GetUserDeviceById(int deviceId)
@@ -137,7 +138,7 @@ namespace SpravceBaterii.Services
         /// <summary>
         /// Aktualizace zařízení v databázi
         /// </summary>
-        /// <param name="battery">Upravené zařízení</param>
+        /// <param name="device">Upravené zařízení</param>
         /// <returns>Asynchronní operace</returns>
         /// <exception cref="InvalidOperationException">Neplatná data</exception>
         /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
@@ -188,7 +189,7 @@ namespace SpravceBaterii.Services
         /// <summary>
         /// Odstranění zařízení z databáze
         /// </summary>
-        /// <param name="batteryId">ID zařízení</param>
+        /// <param name="deviceId">ID zařízení</param>
         /// <returns>Asynchronní operace</returns>
         /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
         public async Task DeleteDeviceById(int deviceId)
