@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
-using System;
 
 namespace SpravceBaterii.Services
 {
