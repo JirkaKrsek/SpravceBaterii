@@ -14,7 +14,12 @@ builder.Services.AddRazorComponents()
 
 
 // Název systémové promìnné pro pøístup k databázi
-string systemVariableName = "SpravceBateriiDatabaze";
+string? systemVariableName = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(systemVariableName))
+{
+    throw new InvalidOperationException("The connection string name in appsettings.json is missing or empty.");
+}
 
 // Naètení connection stringu ze systémové promìnné
 var connectionString = Environment.GetEnvironmentVariable(systemVariableName);
