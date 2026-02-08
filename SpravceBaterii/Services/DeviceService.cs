@@ -53,6 +53,19 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Zjištění, zda umístění obsahuje zařízení
+        /// </summary>
+        /// <param name="locationId">ID umístění</param>
+        /// <returns>bool</returns>
+        public async Task<bool> AnyDevicesInLocationById(int locationId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Devices
+                .AnyAsync(d => d.UserId == userId && d.LocationId == locationId);
+        }
+
+        /// <summary>
         /// Získání zařízení podle ID
         /// </summary>
         /// <param name="batteryId">ID hledaného zařízení</param>
