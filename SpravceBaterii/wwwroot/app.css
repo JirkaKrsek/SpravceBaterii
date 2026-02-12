@@ -161,6 +161,37 @@ nav a.logo img {
     max-height: 88%;
 }
 
+/* Požadavky na heslo */
+div#show-password-requirements label {
+    cursor: pointer;
+    color: darkblue;
+    text-decoration: underline;
+    font-weight: bold;
+}
+div#show-password-requirements label:hover {
+    color: red;
+    text-decoration: none;
+}
+input#checkbox-show-password-requirements {
+    display: none;
+}
+input#checkbox-show-password-requirements:not(:checked) ~ div#password-requirements {
+    display: none;
+}
+input#checkbox-show-password-requirements:checked ~ div#password-requirements {
+    display: block;
+}
+input#checkbox-show-password-requirements ~ label:after {
+    content: "↓";
+    display: inline-block;
+    margin-left: 6px;
+    transition: transform 0.4s ease;
+    padding-bottom: 2px;
+}
+input#checkbox-show-password-requirements:checked ~ label:after {
+    transform: rotate(180deg);
+}
+
 /* Vyhodnocený stav baterie */
 .status-unknown {
     color: black;
