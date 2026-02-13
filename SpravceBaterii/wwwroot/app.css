@@ -193,10 +193,6 @@ input#checkbox-show-password-requirements:checked ~ label:after {
 }
 
 /* Vyhodnocený stav baterie */
-.status-unknown {
-    color: black;
-    background-color: white;
-}
 .status-ok {
     color: white;
     background-color: green;
