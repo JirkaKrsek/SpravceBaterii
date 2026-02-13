@@ -214,6 +214,7 @@ input#checkbox-show-password-requirements:checked ~ label:after {
 table.selectable {
     border-collapse: collapse;
     width: 100%;
+    text-align: center;
 }
 table.selectable tr {
     border-bottom: 1px solid gray;
@@ -238,8 +239,7 @@ table.selectable tbody tr:hover {
     background-color: lightgray;
 }
 table.selectable tbody tr td {
-    padding: 4px;
-    padding-left: 10px;
+    padding: 4px 6px;
 }
 table.selectable tr.selected {
     background-color: #cfe8ff;
@@ -248,7 +248,11 @@ table.selectable tr.selected:hover {
     background-color: #b7dbff;
 }
 table.selectable textarea {
-    padding: 6px;
+    padding: 4px 6px;
+    cursor: inherit;
+    border-radius: 8px;
+    display: block;
+    width: calc(100% - 14px);
 }
 
 /* Tlačítka */
