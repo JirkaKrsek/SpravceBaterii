@@ -24,7 +24,12 @@
 	<InputText id="input-Name" @bind-Value="device.Name" required></InputText>
 
 	<label for="input-Count">Maximální počet baterií: </label>
-	<InputNumber id="input-Count" @bind-Value="device.BatteryCount" min="1" required></InputNumber>
+	<InputNumber id="input-Count" @bind-Value="device.BatteryCount" min="@minBatteryCount" required></InputNumber>
+	@if (usedSlots > 0)
+	{
+		<span>Zařízení již obsahuje tento počet baterií: @usedSlots</span>
+		<span>Pokud chcete nastavit nižší počet, vyjmětě nejdříve baterie.</span>
+	}
 
 	<label for="input-BatteryType">Typ baterií v zařízení: </label>
 	<InputSelect id="input-BatteryType" @bind-Value="device.BatteryTypeId" required>
@@ -90,7 +95,8 @@
 	private Device device = new();
 	private List<Location> Locations = new();
 	private List<BatteryType> BatteryTypes = new();
-
+	private int minBatteryCount = 1;
+	private int usedSlots = 0;
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 
 	/// <summary>
@@ -103,7 +109,13 @@
 		{
 			if (DeviceToUpdateId is not null)
 			{
-				device = await DeviceService.GetUserDeviceById(DeviceToUpdateId.Value);
+				device = await DeviceService.GetUserDeviceByIdWithBatteries(DeviceToUpdateId.Value);
+
+				if (device.Batteries?.Count > 0)
+				{
+					usedSlots = device.Batteries?.Sum(b => b.Count) ?? 0;
+					minBatteryCount = Math.Max(usedSlots, 1);
+				}
 			}
 			else
 			{
@@ -129,6 +141,11 @@
 	{
 		try
 		{
+			if (device.BatteryCount < minBatteryCount)
+			{
+				errorMessage = "Maximální počet baterií musí být alespoň: " + minBatteryCount + ", protože zařízení již obsahuje tento počet baterií.";
+				return;
+			}
 			if (DeviceToUpdateId is null)
 			{
 				await DeviceService.AddDevice(device);

@@ -49,7 +49,11 @@
 	}
 
 	<label for="input-Count">Počet: </label>
-	<InputNumber id="input-Count" @bind-Value="battery.Count" min="1" required></InputNumber>
+	<InputNumber id="input-Count" @bind-Value="battery.Count" min="1" max="@maxBatteryCount" required></InputNumber>
+	@if (maxBatteryCount is not null)
+	{
+		<span>Počet dostupných slotů v zařízení pro tuto baterii: @maxBatteryCount</span>
+	}
 
 	<label for="input-Description">Popis: </label>
 	<InputTextArea id="input-Description" @bind-Value="battery.Description"></InputTextArea>
@@ -152,6 +156,8 @@
 	private List<ChemicalComposition> ChemicalCompositions = new();
 	private List<Device> Devices = new();
 	private Battery battery = new();
+	private Device? device = null;
+	private int? maxBatteryCount = null;
 	private RechargeableBattery rechargeableBattery = new();
 	private DisposableBattery disposableBattery = new();
 
@@ -172,6 +178,17 @@
 			{
 				battery = await BatteryService.GetUserBatteryById(BatteryToUpdateId.Value);
 
+				if (battery.DeviceId is not null)
+				{
+					device = await DeviceService.GetUserDeviceByIdWithBatteries(battery.DeviceId.Value);
+				}
+				if (device is not null)
+				{
+					int usedSlots = device.Batteries?.Sum(b => b.Count) ?? 0;
+					int freeSlots = device.BatteryCount - usedSlots;
+					maxBatteryCount = battery.Count + freeSlots;
+				}
+				
 				if (!battery.IsRechargeable)
 				{
 					disposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id) ?? new()
@@ -236,6 +253,15 @@
 			}
 			else
 			{
+				if (maxBatteryCount is not null)
+				{
+					if (battery.Count > maxBatteryCount)
+					{
+						errorMessage = "Počet baterií může být maximálně: " + maxBatteryCount + ", protože v zařízení již není dostupné místo.";
+						return;
+					}
+				}
+
 				await BatteryService.UpdateBattery(battery);
 
 				//Zavolání události v rodičovské komponentě
