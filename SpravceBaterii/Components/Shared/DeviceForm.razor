@@ -8,7 +8,14 @@
 @inject BatteryTypeService BatteryTypeService
 @inject ExceptionHandlerService ExceptionHandlerService
 
-<h2>Formulář pro vytvoření/úpravu zařízení</h2>
+@if (DeviceToUpdateId is null)
+{
+	<h2>Formulář pro zadání nového zařízení</h2>
+}
+else
+{
+	<h2>Formulář pro úpravu zařízení</h2>
+}
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))

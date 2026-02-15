@@ -11,7 +11,15 @@
 @inject DisposableBatteryService DisposableBatteryService
 @inject RechargeableBatteryService RechargeableBatteryService
 
-<h2>Formulář pro zadání nové baterie</h2>
+@if (BatteryToUpdateId is null)
+{
+	<h2>Formulář pro zadání nové baterie</h2>
+}
+else
+{
+	<h2>Formulář pro úpravu baterie</h2>
+}
+
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -123,7 +131,7 @@
 	}
 </EditForm>
 
-@code {
+	@code {
 	private string errorMessage = "";
 	private bool showConfirm = false;
 
