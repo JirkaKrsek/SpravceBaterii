@@ -23,17 +23,6 @@
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-	<label for="input-Device">Zařízení (ve kterém je umístěna): </label>
-	<InputSelect id="input-Device" @bind-Value="battery.DeviceId" @bind-Value:after="SetDeviceLocation">
-		<option value="">- Vyberte typ -</option>
-		@foreach (Device device in Devices)
-		{
-			<option value="@device.Id">@device.Name</option>
-		}
-	</InputSelect>
-
-	<span>Poloha vybraného zařízení: @selectedDeviceLocation</span>
-
 	@if (battery.DeviceId is not null)
 	{
 		<label for="input-InsertionDate">Datum vložení: </label>
@@ -154,14 +143,12 @@
 
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
-	private List<Device> Devices = new();
 	private Battery battery = new();
 	private Device? device = null;
 	private int? maxBatteryCount = null;
 	private RechargeableBattery rechargeableBattery = new();
 	private DisposableBattery disposableBattery = new();
 
-	private string selectedDeviceLocation = "";
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 	private BatteryStatus batteryStatusExpirationDate = new();
 	private BatteryStatus batteryStatusExpectedLifeSpan = new();
@@ -221,11 +208,9 @@
 
 			BatteryTypes = await BatteryTypeService.GetBatteryTypes();
 			ChemicalCompositions = await ChemicalCompositionService.GetChemicalCompositions();
-			Devices = await DeviceService.GetDevices();
 
 			SetRemainingDaysToExpirate();
 			SetRemainingDaysToExpectedLife();
-			SetDeviceLocation();
 		}
 		catch (Exception ex)
 		{
@@ -318,14 +303,6 @@
 		{
 			batteryStatusExpectedLifeSpan = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
-	}
-
-	/// <summary>
-	/// Nastavení názvu umístění aktuálně vybraného zařízení
-	/// </summary>
-	private void SetDeviceLocation()
-	{
-		selectedDeviceLocation = Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name ?? "-";
 	}
 
 	/// <summary>
