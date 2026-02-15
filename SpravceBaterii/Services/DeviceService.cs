@@ -130,8 +130,8 @@ namespace SpravceBaterii.Services
             applicationDbContext.Devices.Add(device);
             await applicationDbContext.SaveChangesAsync();
 
-            //Odpojení od slednování EF Core
-            applicationDbContext.Entry(device).State = EntityState.Detached;
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
@@ -151,8 +151,8 @@ namespace SpravceBaterii.Services
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
 
-                //Odpojení od slednování EF Core
-                applicationDbContext.Entry(device).State = EntityState.Detached;
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {
@@ -178,11 +178,8 @@ namespace SpravceBaterii.Services
             //Uložení
             await applicationDbContext.SaveChangesAsync();
 
-            foreach (Device device in devices)
-            {
-                //Odpojení od slednování EF Core
-                applicationDbContext.Entry(device).State = EntityState.Detached;
-            }
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
@@ -201,6 +198,9 @@ namespace SpravceBaterii.Services
                 applicationDbContext.Remove(device);
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {

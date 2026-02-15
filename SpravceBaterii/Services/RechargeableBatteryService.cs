@@ -38,8 +38,8 @@ namespace SpravceBaterii.Services
             //Uložení
             await applicationDbContext.SaveChangesAsync();
 
-            //Odpojení od slednování EF Core
-            applicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace SpravceBaterii.Services
             //Uložení
             await applicationDbContext.SaveChangesAsync();
 
-            //Odpojení od slednování EF Core
-            applicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
@@ -65,7 +65,11 @@ namespace SpravceBaterii.Services
         public async Task Delete(RechargeableBattery battery)
         {
             applicationDbContext.RechargeableBatteries.Remove(battery);
+            //Uložení
             await applicationDbContext.SaveChangesAsync();
+
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
     }
 }
