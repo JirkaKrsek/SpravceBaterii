@@ -115,6 +115,21 @@ nav a:first-child {
 nav a:last-child {
     border-right: none;
 }
+nav a.logo {
+    flex: 0.5;
+    background-color: #e2e9ff;
+    color: black;
+    gap: 12px;
+    font-size: 20px;
+}
+nav a.logo img {
+    max-height: calc(100% - 8px);
+    width: auto;
+}
+nav a.logout {
+    background-color: darkgray;
+    color: black;
+}
 nav a.active {
     background-color: #acc5ff;
     color: black;
@@ -122,16 +137,6 @@ nav a.active {
 nav a:hover {
     background-color: #4e76d3;
     color: white;
-}
-nav a.logo {
-    flex: 0.5;
-    background-color: #e2e9ff;
-    color: black;
-    gap: 12px;
-}
-nav a.logo img {
-    max-height: calc(100% - 8px);
-    width: auto;
 }
 
 /* Modální overlay komponenty */
