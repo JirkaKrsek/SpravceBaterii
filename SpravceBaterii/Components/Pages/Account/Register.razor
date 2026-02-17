@@ -28,14 +28,14 @@
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-	<label for="input-email">Email: </label>
-	<InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Email@email.com" required></InputText>
+	<label for="input-email">E-mail: </label>
+	<InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Zadejte e-mail" required></InputText>
 
 	<label for="input-password">Heslo: </label>
-	<InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="TajneHeslo" required></InputText>
+	<InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="Zadejte heslo" required></InputText>
 
-	<label for="input-confirm-password">Zadejte heslo znovu: </label>
-	<InputText id="input-confirm-password" @bind-Value="Input.ConfirmPassword" type="password" placeholder="TajneHesloZnovu" required></InputText>
+	<label for="input-confirm-password">Potvrzení hesla: </label>
+	<InputText id="input-confirm-password" @bind-Value="Input.ConfirmPassword" type="password" placeholder="Zadejte heslo znovu" required></InputText>
 
 	<button type="submit">Registrovat se</button>
 
