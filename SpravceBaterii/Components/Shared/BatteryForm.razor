@@ -11,21 +11,24 @@
 @inject DisposableBatteryService DisposableBatteryService
 @inject RechargeableBatteryService RechargeableBatteryService
 
-@if (BatteryToUpdateId is null)
-{
-	<h2>Formulář pro zadání nové baterie</h2>
-}
-else
-{
-	<h2>Formulář pro úpravu baterie</h2>
-}
-
-
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
 	<p class="error-message">@errorMessage</p>
 }
+
+<div class="component-header">
+	@if (BatteryToUpdateId is null)
+	{
+		<h2>Formulář pro zadání nové baterie</h2>
+	}
+	else
+	{
+		<h2>Formulář pro úpravu baterie</h2>
+	}
+
+	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+</div>
 
 <EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm" class="add-update">
 	<DataAnnotationsValidator />
@@ -115,7 +118,7 @@ else
 	<hr>
 
 	<button type="submit">Uložit</button>
-	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+
 	@if (BatteryToUpdateId is not null)
 	{
 		<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>

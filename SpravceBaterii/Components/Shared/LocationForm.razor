@@ -7,20 +7,24 @@
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
 
-@if (LocationToUpdateId is null)
-{
-	<h2>Formulář pro zadání nového umístění</h2>
-}
-else
-{
-	<h2>Formulář pro úpravu umístění</h2>
-}
-
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
 	<p class="error-message">@errorMessage</p>
 }
+
+<div class="component-header">
+	@if (LocationToUpdateId is null)
+	{
+		<h2>Formulář pro zadání nového umístění</h2>
+	}
+	else
+	{
+		<h2>Formulář pro úpravu umístění</h2>
+	}
+
+	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+</div>
 
 <EditForm Model="@location" OnValidSubmit="SaveLocation" FormName="LocationForm" class="add-update">
 	<DataAnnotationsValidator />
@@ -38,7 +42,7 @@ else
 	<hr>
 
 	<button type="submit">Uložit</button>
-	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+
 	@if (LocationToUpdateId is not null)
 	{
 		<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>

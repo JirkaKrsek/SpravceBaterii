@@ -276,6 +276,11 @@ button.close {
 button.close:hover {
     background-color: darkred;
 }
+div.component-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 /* Formuláře */
 form {

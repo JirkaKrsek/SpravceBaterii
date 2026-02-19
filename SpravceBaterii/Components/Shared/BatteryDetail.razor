@@ -13,10 +13,14 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<div class="component-header">
+	<h2>Detail baterie</h2>
+
+	<button type="button" class="close" @onclick="Close">Zavřít</button>
+</div>
+
 @if (isDataLoaded)
 {
-	<h2>Detail baterie:</h2>
-
 	<table>
 		<tr>
 			<td>Typ: </td>
@@ -128,7 +132,6 @@ else
 
 <hr>
 
-<h3>Akce:</h3>
 <button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit baterii</button>
 @if (battery.DeviceId is not null)
 {
@@ -139,10 +142,6 @@ else
 {
 	<button type="button" @onclick="() => showConfirmDeleteBattery = true">Odstranit tuto baterii</button>
 }
-
-<hr>
-
-<button type="button" class="close" @onclick="Close">Zavřít</button>
 
 @if (showConfirmDeleteBattery)
 {

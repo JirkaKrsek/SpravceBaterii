@@ -14,6 +14,12 @@
     <p class="error-message">@errorMessage</p>
 }
 
+<div class="component-header">
+    <h2>Výběr umístění</h2>
+
+    <button type="button" class="close" @onclick="Close">Zavřít</button>
+</div>
+
 <EditForm Model="@Input" OnValidSubmit="Save" FormName="SetLocation">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
@@ -42,7 +48,6 @@
 
 	<button type="submit">Uložit</button>
     <button type="reset" @onclick="@(() => Input.selectedLocationId = null)">Žádné umístění</button>
-    <button type="button" class="close" @onclick="Close">Zavřít</button>
 </EditForm>
 
 @code {

@@ -8,20 +8,24 @@
 @inject BatteryTypeService BatteryTypeService
 @inject ExceptionHandlerService ExceptionHandlerService
 
-@if (DeviceToUpdateId is null)
-{
-	<h2>Formulář pro zadání nového zařízení</h2>
-}
-else
-{
-	<h2>Formulář pro úpravu zařízení</h2>
-}
-
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
 	<p class="error-message">@errorMessage</p>
 }
+
+<div class="component-header">
+	@if (DeviceToUpdateId is null)
+	{
+		<h2>Formulář pro zadání nového zařízení</h2>
+	}
+	else
+	{
+		<h2>Formulář pro úpravu zařízení</h2>
+	}
+
+	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+</div>
 
 <EditForm Model="@device" OnValidSubmit="SaveDevice" FormName="DeviceForm" class="add-update">
 	<DataAnnotationsValidator />
@@ -65,7 +69,7 @@ else
 	<hr>
 
 	<button type="submit">Uložit</button>
-	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
+
 	@if(DeviceToUpdateId is not null)
 	{
 		<button type="button" @onclick="() => showConfirm = true">Smazat toto zařízení</button>

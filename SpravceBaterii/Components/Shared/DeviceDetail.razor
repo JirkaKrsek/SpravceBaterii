@@ -13,10 +13,20 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<div class="component-header">
+	<h2>
+		Detail zařízení
 @if (isDataLoaded)
 {
-	<h2>Detail zařízení: @device.Name</h2>
+			@(": " + device.Name)
+		}
+	</h2>
 
+	<button type="button" class="close" @onclick="Close">Zavřít</button>
+</div>
+
+@if (isDataLoaded)
+{
 	<table>
 		<tr>
 			<td>Název zařízení: </td>
@@ -117,7 +127,6 @@ else
 
 <hr>
 
-<h3>Akce:</h3>
 <button @onclick="() => EditDevice.InvokeAsync(device.Id)">Upravit zařízení</button>
 @if ((device.Batteries?.Sum(b => b.Count) ?? 0) < device.BatteryCount)
 {
@@ -139,10 +148,6 @@ else
 }
 
 <button type="button" @onclick="() => showConfirmDeleteDevice = true">Odstranit toto zařízení</button>
-
-<hr>
-
-<button type="button" class="close" @onclick="Close">Zavřít</button>
 
 @if (showConfirmDeleteDevice)
 {
