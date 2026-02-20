@@ -111,8 +111,7 @@ else
 			<tr>
 				<th>Název zařízení</th>
 				<th>Popis zařízení</th>
-				<th>Max. počet baterií v zařízení</th>
-				<th>Počet vložených baterií</th>
+				<th>Počet baterií (vloženo / max)</th>
 				<th>Nejbližší datum expirace vložených baterií</th>
 				<th>Do konce expirace zbývá dní</th>
 				<th>Výrobce</th>
@@ -125,8 +124,7 @@ else
 				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">
 					<td>@device.Name</td>
 					<td><textarea readonly>@device.Description</textarea></td>
-					<td>@device.BatteryCount</td>
-					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0)</td>
+					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
 
 					@{
 						DateOnly? date = GetExpirationDate(device);
