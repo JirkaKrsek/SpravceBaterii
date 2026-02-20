@@ -78,7 +78,7 @@ else
 		<tbody>
 			@foreach (Battery battery in BatteryList)
 			{
-				<tr @onclick="() => FormNavigationService.Open(typeof(BatteryDetail), battery.Id)">
+				<tr @onclick="() => FormNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
 					<td>@(battery.Device?.Name ?? "")</td>
 					<td>@battery.Count</td>
 					<td>@battery.BatteryType.Name</td>

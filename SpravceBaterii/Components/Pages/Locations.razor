@@ -71,7 +71,7 @@ else
 		<tbody>
 			@foreach (Location location in LocationList)
 			{
-				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)">
+				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)" title="Zobrazit detail">
 					<td>@location.Name</td>
 					<td>@(location.Floor ?? "")</td>
 					<td><textarea readonly>@location.Description</textarea></td>

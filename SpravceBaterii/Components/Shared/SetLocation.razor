@@ -35,7 +35,7 @@
         <tbody>
             @foreach (Location location in Locations)
             {
-                <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")">
+                <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")" title="Vybrat">
                     <td>@location.Name</td>
                     <td>@location.Floor</td>
                     <td><textarea readonly>@location.Description</textarea></td>

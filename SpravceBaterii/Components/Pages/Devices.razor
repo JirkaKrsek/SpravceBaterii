@@ -121,7 +121,7 @@ else
 		<tbody>
 			@foreach (Device device in DeviceList)
 			{
-				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)">
+				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
 					<td>@device.Name</td>
 					<td><textarea readonly>@device.Description</textarea></td>
 					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>

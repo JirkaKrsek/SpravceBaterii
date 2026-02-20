@@ -16,8 +16,8 @@
 <div class="component-header">
 	<h2>
 		Detail zařízení
-@if (isDataLoaded)
-{
+		@if (isDataLoaded)
+		{
 			@(": " + device.Name)
 		}
 	</h2>
@@ -91,7 +91,7 @@ else
 		<tbody>
 			@foreach (Battery battery in Batteries)
 			{
-				<tr @onclick="() => BatteryDetail.InvokeAsync(battery.Id)">
+				<tr @onclick="() => BatteryDetail.InvokeAsync(battery.Id)" title="Zobrazit detail">
 					<td>@battery.Count</td>
 					<td>@battery.BatteryType.Name</td>
 					<td><textarea readonly>@battery.Description</textarea></td>
@@ -116,7 +116,7 @@ else
 					}
 
 					<td>
-						<button @onclick:stopPropagation="true" @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteSelectedBattery = true; }">Vysunout / odstranit</button>
+						<button @onclick:stopPropagation="true" @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteSelectedBattery = true; }" title="">Vysunout / odstranit</button>
 					</td>
 				</tr>
 			}
@@ -152,6 +152,7 @@ else
 {
 	<div>
 		<p>Opravdu chcete odstranit toto zařízení?</p>
+		<p>Vložené baterie budou ponechány.</p>
 		<button type="button" @onclick="async () => await DeleteDevice(false)">Ano</button>
 		<button type="button" @onclick="() => showConfirmDeleteDevice = false">Ne</button>
 	</div>

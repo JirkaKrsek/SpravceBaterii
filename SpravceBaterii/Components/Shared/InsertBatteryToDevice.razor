@@ -50,7 +50,7 @@
 			<tbody>
 				@foreach (Battery battery in Batteries)
 				{
-					<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")">
+					<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")" title="Vybrat">
 						<td>@battery.Count</td>
 						<td>@battery.ChemicalComposition?.Name</td>
 						<td><textarea readonly>@battery.Description</textarea></td>
