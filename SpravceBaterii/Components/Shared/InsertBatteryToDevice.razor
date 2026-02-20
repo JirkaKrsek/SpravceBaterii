@@ -36,7 +36,7 @@
 			<thead>
 				<tr>
 					<th>Počet</th>
-					<th>Označení</th>
+					<th>Chemické složení</th>
 					<th>Popis</th>
 					<th>Typ</th>
 					<th>Datum expirace</th>
@@ -52,7 +52,7 @@
 				{
 					<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")">
 						<td>@battery.Count</td>
-						<td>@battery.BatteryType.Name</td>
+						<td>@battery.ChemicalComposition?.Name</td>
 						<td><textarea readonly>@battery.Description</textarea></td>
 						@if (battery.IsRechargeable)
 						{

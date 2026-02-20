@@ -108,7 +108,7 @@ namespace SpravceBaterii.Services
 
             return await applicationDbContext.Batteries
                 .Where(b => b.UserId == userId && b.DeviceId == null && b.BatteryTypeId == typeId)
-                .Include(b => b.BatteryType)
+                .Include(b => b.ChemicalComposition)
                 .Include(b => b.DisposableBattery)
                 .AsNoTracking()
                 .ToListAsync();
