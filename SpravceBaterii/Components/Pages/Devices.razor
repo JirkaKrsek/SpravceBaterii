@@ -26,12 +26,23 @@
 		<div class="overlay">
 			<div class="overlay-content">
 				<DeviceDetail DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							  EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+							  BatteryDetail="@(batteryId => FormNavigationService.Open(typeof(BatteryDetail), batteryId))"
 							  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
 							  InsertBattery="@(deviceId => FormNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
 							  SetLocation="@(deviceId => FormNavigationService.Open(typeof(SetLocation), deviceId))"
 							  Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
 							  Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></DeviceDetail>
+			</div>
+		</div>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
+	{
+		<div class="overlay">
+			<div class="overlay-content">
+				<BatteryDetail BatteryId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+							   Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
+							   Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></BatteryDetail>
 			</div>
 		</div>
 	}
