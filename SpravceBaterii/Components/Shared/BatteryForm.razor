@@ -84,18 +84,17 @@
 		}
 	</InputSelect>
 
-	<label for="input-IsRechargeable">Nabíjecí/jednorázová: </label>
+	<label for="input-IsRechargeable">Jednorázová/nabíjecí: </label>
 	<div id="input-IsRechargeable">
 		<InputRadioGroup @bind-Value="battery.IsRechargeable" required>
-			<div>
-				<InputRadio Value="true" id="input-IsRechargeable-true">Nabíjecí</InputRadio>
-				<label for="input-IsRechargeable-true">Nabíjecí</label>
-			</div>
 			<div>
 				<InputRadio Value="false" id="input-IsRechargeable-false">Jednorázová</InputRadio>
 				<label for="input-IsRechargeable-false">Jednorázová</label>
 			</div>
-			
+			<div>
+				<InputRadio Value="true" id="input-IsRechargeable-true">Nabíjecí</InputRadio>
+				<label for="input-IsRechargeable-true">Nabíjecí</label>
+			</div>
 		</InputRadioGroup>
 	</div>
 
