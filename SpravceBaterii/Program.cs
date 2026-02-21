@@ -5,6 +5,7 @@ using SpravceBaterii.Components;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
 using SpravceBaterii.Services;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +78,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/ucet/prihlaseni";
     options.LogoutPath = "/ucet/odhlaseni";
 });
+
+// Nastavení výchozí kultury na èeštinu
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("cs-CZ");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("cs-CZ");
 
 // Registrace služeb
 builder.Services.AddScoped<ApplicationUserService>();
