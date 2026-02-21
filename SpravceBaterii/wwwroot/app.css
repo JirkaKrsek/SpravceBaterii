@@ -299,7 +299,7 @@ form.account {
 form.add-update {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px 20px;
+    gap: 8px 20px;
     align-items: center;
 }
 form.add-update hr {
@@ -308,9 +308,6 @@ form.add-update hr {
 }
 form.add-update span, form .validation-errors {
     grid-column: 1 / -1;
-}
-form.add-update textarea {
-    grid-column: span 2;
 }
 form label {
     margin-bottom: 5px;
