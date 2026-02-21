@@ -335,7 +335,23 @@ form input#input-checkbox {
     cursor: pointer;
 }
 
-/* Barevné označení povinných a chybně vyplněných vstupů */
+/* Označení povinných a chybně vyplněných vstupů */
+label:has(+ input[required])::after, label:has(+ select[required])::after {
+    content: " *";
+    color: red;
+    font-size: x-large;
+    vertical-align: middle;
+}
+p.required-info {
+    color: red;
+    font-weight: bold;
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+}
+p.required-info span {
+    font-size: x-large;
+    vertical-align: middle;
+}
 :required:invalid, .invalid, select[required]:has(option[value="0"]:checked) {
     border: 2px solid red;
 }
