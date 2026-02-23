@@ -48,6 +48,8 @@ namespace SpravceBaterii.Services
 
             return await applicationDbContext.Devices
                 .Where(d => d.UserId == userId && d.LocationId == locationId)
+                .Include(d => d.Batteries!)
+                    .ThenInclude(b => b.DisposableBattery)
                 .AsNoTracking()
                 .ToListAsync();
         }
