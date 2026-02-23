@@ -94,6 +94,15 @@
 
 			<InputNumber id="input-Count" @bind-Value="Input.batteryCountToInsert" min="1" max="@maxCount" required></InputNumber>
 
+			<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
+			<InputNumber id="input-ExpectedLifespan" @bind-Value="Input.ExpectedLifespan"></InputNumber>
+
+			@if (Input.ExpectedLifespan is not null)
+			{
+				BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife();
+				<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@(batteryStatusExpectedLifeSpan.Days?.ToString() ?? "")</strong> dní</span>
+			}
+
 			<button type="submit">Vložit</button>
 		}
 		else
@@ -174,6 +183,7 @@
 					newBattery.DeviceId = DeviceId;
 					newBattery.Count = Input.batteryCountToInsert;
 					newBattery.InsertionDate = Input.InsertionDate;
+					newBattery.ExpectedLifespan = Input.ExpectedLifespan;
 					await BatteryService.AddBattery(newBattery);
 				}
 				else if (Input.batteryCountToInsert == selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
@@ -181,6 +191,7 @@
 					//Původní baterie pro vložení do zařízení se správným počtem
 					selectedBattery.DeviceId = DeviceId;
 					selectedBattery.InsertionDate = Input.InsertionDate;
+					selectedBattery.ExpectedLifespan = Input.ExpectedLifespan;
 					await BatteryService.UpdateOnlyBattery(selectedBattery);
 				}
 				else
@@ -256,6 +267,18 @@
 	}
 
 	/// <summary>
+	/// Nastavení zbývajících dní do předpokládaného data životnosti
+	/// </summary>
+	private BatteryStatus SetRemainingDaysToExpectedLife()
+	{
+		if (Input.ExpectedLifespan is not null)
+		{
+			return batteryStatusEvaluator.RemainingDaysToExpectedLife(Input.InsertionDate, Input.ExpectedLifespan.Value);
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
 	/// Zavření této komponety s formulářem bez uložení zadaných dat
 	/// </summary>
 	/// <returns>Asynchronní operace</returns>
@@ -275,6 +298,8 @@
 
 		[Required(ErrorMessage = "Zadejte počet baterií pro vložení")]
 		public int batteryCountToInsert { get; set; } = 1;
+
+		public int? ExpectedLifespan { get; set; } = null;
 
 		[Required(ErrorMessage = "Zadejte datum vložení baterie do zařízení")]
 		public DateOnly InsertionDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
