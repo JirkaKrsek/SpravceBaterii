@@ -134,10 +134,10 @@ nav a.logo {
     background-color: #e2e9ff;
     color: black;
     gap: 12px;
-    font-size: 20px;
+    font-size: 18px;
 }
 nav a.logo img {
-    max-height: calc(100% - 8px);
+    max-height: calc(100% - 16px);
     width: auto;
 }
 nav a.logout {
