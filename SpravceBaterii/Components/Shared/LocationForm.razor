@@ -52,7 +52,8 @@
 
 	@if (showConfirm)
 	{
-		<div>
+		<div class="overlay">
+			<div class="overlay-content">
 			@if (anyDevicesInLocation)
 			{
 				<p>Zařízení zůstanou zachována.</p>
@@ -61,6 +62,7 @@
 			<button type="button" @onclick="() => DeleteLocation(location.Id)">Ano</button>
 			<button type="button" @onclick="() => showConfirm = false">Ne</button>
 		</div>
+			</div>
 	}
 </EditForm>
 

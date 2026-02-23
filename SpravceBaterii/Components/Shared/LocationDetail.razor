@@ -98,7 +98,8 @@ else
 
 @if (showConfirmDeleteLocation)
 {
-	<div>
+	<div class="overlay">
+		<div class="overlay-content">
 		@if (DeviceList.Count > 0)
 		{
 			<p>Zařízení zůstanou zachována.</p>
@@ -107,6 +108,7 @@ else
 		<button type="button" @onclick="async () => await DeleteLocation()">Ano</button>
 		<button type="button" @onclick="() => showConfirmDeleteLocation = false">Ne</button>
 	</div>
+		</div>
 }
 
 @code {

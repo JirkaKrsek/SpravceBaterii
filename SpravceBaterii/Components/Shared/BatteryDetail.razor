@@ -145,19 +145,23 @@ else
 
 @if (showConfirmDeleteBattery)
 {
-	<div>
+	<div class="overlay">
+		<div class="overlay-content">
 		<p>Opravdu chcete odstranit tuto baterii?</p>
 		<button type="button" @onclick="async () => await DeleteBattery()">Ano</button>
 		<button type="button" @onclick="() => showConfirmDeleteBattery = false">Ne</button>
 	</div>
+	</div>
 }
 @if (showConfirmEjectBattery)
 {
-	<div>
+	<div class="overlay">
+		<div class="overlay-content">
 		<p>Chcete tuto baterii ze zařízení vysunout?</p>
 		<button type="button" @onclick="async () => await EjectBatteryFromDevice()">Ano</button>
 		<button type="button" @onclick="() => showConfirmEjectBattery = false">Ne</button>
 	</div>
+		</div>
 }
 
 @code {

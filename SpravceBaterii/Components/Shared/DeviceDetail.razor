@@ -150,38 +150,46 @@ else
 
 @if (showConfirmDeleteDevice)
 {
-	<div>
+	<div class="overlay">
+		<div class="overlay-content">
 		<p>Opravdu chcete odstranit toto zařízení?</p>
 		<p>Vložené baterie budou ponechány.</p>
 		<button type="button" @onclick="async () => await DeleteDevice(false)">Ano</button>
 		<button type="button" @onclick="() => showConfirmDeleteDevice = false">Ne</button>
 	</div>
+		</div>
 }
 @if (showConfirmKeepOrDeleteBatteryFromDeletedDevice)
 {
-	<div>
+	<div class="overlay">
+		<div class="overlay-content">
 		<p>Chcete baterie z odstraněného zařízení zachovat nebo také odstranit?</p>
 		<button type="button" @onclick="() => DeleteDevice(false)">Zachovat</button>
 		<button type="button" @onclick="() => DeleteDevice(true)">Odstranit</button>
 	</div>
+		</div>
 }
 @if (selectedBatteryId is not null && showConfirmEjectOrDeleteSelectedBattery)
 {
-	<div>
+	<div class="overlay">
+		<div class="overlay-content">
 		<p>Chcete tuto baterii jen vysunotou nebo vysunout a odstranit?</p>
 		<button type="button" @onclick="async () => await EjectBatteryFromDevice(false)">Jen vysunout</button>
 		<button type="button" @onclick="async () => await EjectBatteryFromDevice(true)">Vysunout a odstranit</button>
 		<button type="button" @onclick="() => { showConfirmEjectOrDeleteSelectedBattery = false; selectedBatteryId = null; }">Zrušit akci</button>
 	</div>
+		</div>
 }
 @if (showConfirmEjectOrDeleteAllBatteries)
 {
-	<div>
+	<div class="overlay">
+		<div class="overlay-content">
 		<p>Chcete všechny baterie z tohoto zařízení jen vysunotou nebo vysunout a odstranit?</p>
 		<button @onclick="async () => await EjectBatteriesFromDevice(false)">Jen vysunout</button>
 		<button @onclick="async () => await EjectBatteriesFromDevice(true)">Vysunout a odstranit</button>
 		<button @onclick="() => showConfirmEjectOrDeleteAllBatteries = false">Zrušit tuto akci</button>
 	</div>
+		</div>
 }
 
 @code {

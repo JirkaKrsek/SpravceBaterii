@@ -127,10 +127,12 @@
 
 	@if (showConfirm)
 	{
-		<div>
+		<div class="overlay">
+			<div class="overlay-content">
 			<p>Opravdu chcete odstranit tuto baterii?</p>
 			<button type="button" @onclick="() => DeleteBattery(battery.Id)">Ano</button>
 			<button type="button" @onclick="() => showConfirm = false">Ne</button>
+		</div>
 		</div>
 	}
 </EditForm>
