@@ -82,7 +82,7 @@ else
 					<td>@(battery.Device?.Name ?? "")</td>
 					<td>@battery.Count</td>
 					<td>@battery.BatteryType.Name</td>
-					<td><textarea readonly>@battery.Description</textarea></td>
+					<td><textarea disabled>@battery.Description</textarea></td>
 					@if (battery.IsRechargeable)
 					{
 						<td>Nabíjecí</td>

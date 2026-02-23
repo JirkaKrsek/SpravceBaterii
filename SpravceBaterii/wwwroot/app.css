@@ -265,6 +265,9 @@ table.selectable textarea {
     display: block;
     width: calc(100% - 14px);
 }
+table.selectable textarea:disabled {
+    color: black;
+}
 
 /* Tlačítka */
 button {

@@ -74,7 +74,7 @@ else
 				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)" title="Zobrazit detail">
 					<td>@location.Name</td>
 					<td>@(location.Floor ?? "")</td>
-					<td><textarea readonly>@location.Description</textarea></td>
+					<td><textarea disabled>@location.Description</textarea></td>
 				</tr>
 			}
 		</tbody>

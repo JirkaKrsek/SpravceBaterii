@@ -123,7 +123,7 @@ else
 			{
 				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
 					<td>@device.Name</td>
-					<td><textarea readonly>@device.Description</textarea></td>
+					<td><textarea disabled>@device.Description</textarea></td>
 					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
 
 					@{
