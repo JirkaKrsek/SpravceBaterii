@@ -71,10 +71,8 @@
 				<td>@battery.DisposableBattery?.ExpirationDate</td>
 			</tr>
 			<tr>
-				<td>Do konce expirace zbývá:  </td>
-				<td>
-					Do konce expirace zbývá <strong class="@batteryStatusExpirationDate?.CssClass">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</strong> dní
-				</td>
+				<td>Do konce expirace zbývá dní: </td>
+				<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
 			</tr>
 		}
 		<tr>
