@@ -222,6 +222,9 @@ input#checkbox-show-password-requirements:checked ~ label:after {
 }
 
 /* Tabulka */
+.table-container {
+    overflow-x: auto;
+}
 table.selectable {
     border-collapse: collapse;
     width: 100%;

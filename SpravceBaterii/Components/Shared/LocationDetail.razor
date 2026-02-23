@@ -57,38 +57,40 @@ else
 {
 	<h3>Zařízení v tomto umístění:</h3>
 
-	<table class="selectable">
-		<thead>
-			<tr>
-				<th>Název zařízení</th>
-				<th>Popis zařízení</th>
-				<th>Výrobce</th>
-				<th>Počet vložených baterií</th>
-				<th>Nejbližší datum expirace vložených baterií</th>
-				<th>Do konce expirace zbývá dní</th>
-			
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (Device device in DeviceList)
-			{
+	<div class="table-container">
+		<table class="selectable">
+			<thead>
 				<tr>
-					<td>@device.Name</td>
-					<td><textarea readonly>@device.Description</textarea></td>
-					<td>@device.Manufacturer</td>
-					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
-
-					@{
-						DateOnly? date = GetExpirationDate(device);
-						<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
-
-						BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
-						<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
-					}
+					<th>Název zařízení</th>
+					<th>Popis zařízení</th>
+					<th>Výrobce</th>
+					<th>Počet vložených baterií</th>
+					<th>Nejbližší datum expirace vložených baterií</th>
+					<th>Do konce expirace zbývá dní</th>
+			
 				</tr>
-			}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				@foreach (Device device in DeviceList)
+				{
+					<tr>
+						<td>@device.Name</td>
+						<td><textarea readonly>@device.Description</textarea></td>
+						<td>@device.Manufacturer</td>
+						<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
+
+						@{
+							DateOnly? date = GetExpirationDate(device);
+							<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
+
+							BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
+							<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 }
 
 <hr>

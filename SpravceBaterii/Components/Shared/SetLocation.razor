@@ -24,25 +24,27 @@
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-    <table class="selectable">
-        <thead>
-            <tr>
-                <th>Název</th>
-                <th>Podlaží</th>
-                <th>Popis</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Location location in Locations)
-            {
-                <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")" title="Vybrat">
-                    <td>@location.Name</td>
-                    <td>@location.Floor</td>
-                    <td><textarea readonly>@location.Description</textarea></td>
+    <div class="table-container">
+        <table class="selectable">
+            <thead>
+                <tr>
+                    <th>Název</th>
+                    <th>Podlaží</th>
+                    <th>Popis</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (Location location in Locations)
+                {
+                    <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")" title="Vybrat">
+                        <td>@location.Name</td>
+                        <td>@location.Floor</td>
+                        <td><textarea readonly>@location.Description</textarea></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+	</div>
 
 	<hr>
 

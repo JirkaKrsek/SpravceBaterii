@@ -34,50 +34,52 @@
 
 		<h3>Dostupné baterie:</h3>
 
-		<table class="selectable">
-			<thead>
-				<tr>
-					<th>Počet</th>
-					<th>Chemické složení</th>
-					<th>Popis</th>
-					<th>Typ</th>
-					<th>Datum expirace</th>
-					<th>Do konce expirace zbývá dní</th>
-					<th>Datum vložení</th>
-					<th>Předpokládaná doba výdrže (ve dnech)</th>
-					<th>Byla použita v zařízení</th>
-					<th>Akce</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (Battery battery in Batteries)
-				{
-					<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")" title="Vybrat">
-						<td>@battery.Count</td>
-						<td>@battery.ChemicalComposition?.Name</td>
-						<td><textarea readonly>@battery.Description</textarea></td>
-						@if (battery.IsRechargeable)
-						{
-							<td>Nabíjecí</td>
-							<td></td>
-							<td></td>
-						}
-						else
-						{
-							<td>Jednorázová</td>
-							<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-							BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-							<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-						}
-						<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-						<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-						<td><textarea readonly>@battery.UsageHistory</textarea></td>
-
-						<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
+		<div class="table-container">
+			<table class="selectable">
+				<thead>
+					<tr>
+						<th>Počet</th>
+						<th>Chemické složení</th>
+						<th>Popis</th>
+						<th>Typ</th>
+						<th>Datum expirace</th>
+						<th>Do konce expirace zbývá dní</th>
+						<th>Datum vložení</th>
+						<th>Předpokládaná doba výdrže (ve dnech)</th>
+						<th>Byla použita v zařízení</th>
+						<th>Akce</th>
 					</tr>
-				}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					@foreach (Battery battery in Batteries)
+					{
+						<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")" title="Vybrat">
+							<td>@battery.Count</td>
+							<td>@battery.ChemicalComposition?.Name</td>
+							<td><textarea readonly>@battery.Description</textarea></td>
+							@if (battery.IsRechargeable)
+							{
+								<td>Nabíjecí</td>
+								<td></td>
+								<td></td>
+							}
+							else
+							{
+								<td>Jednorázová</td>
+								<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+								BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+								<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+							}
+							<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+							<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
+							<td><textarea readonly>@battery.UsageHistory</textarea></td>
+
+							<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
 
 		<hr>
 
