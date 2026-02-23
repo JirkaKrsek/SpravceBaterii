@@ -132,7 +132,9 @@ else
 
 <hr>
 
+<div class="action-buttons">
 <button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit baterii</button>
+
 @if (battery.DeviceId is not null)
 {
 	<button type="button" @onclick="() => showConfirmEjectBattery = true">Vysunout ze zařízení a ponechat baterii</button>
@@ -142,14 +144,16 @@ else
 {
 	<button type="button" @onclick="() => showConfirmDeleteBattery = true">Odstranit tuto baterii</button>
 }
-
+</div>
 @if (showConfirmDeleteBattery)
 {
 	<div class="overlay">
 		<div class="overlay-content">
 		<p>Opravdu chcete odstranit tuto baterii?</p>
+			<div class="action-buttons">
 		<button type="button" @onclick="async () => await DeleteBattery()">Ano</button>
 		<button type="button" @onclick="() => showConfirmDeleteBattery = false">Ne</button>
+	</div>
 	</div>
 	</div>
 }
@@ -158,10 +162,12 @@ else
 	<div class="overlay">
 		<div class="overlay-content">
 		<p>Chcete tuto baterii ze zařízení vysunout?</p>
+			<div class="action-buttons">
 		<button type="button" @onclick="async () => await EjectBatteryFromDevice()">Ano</button>
 		<button type="button" @onclick="() => showConfirmEjectBattery = false">Ne</button>
 	</div>
 		</div>
+	</div>
 }
 
 @code {

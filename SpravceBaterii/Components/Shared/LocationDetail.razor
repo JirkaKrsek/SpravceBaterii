@@ -93,22 +93,26 @@ else
 
 <hr>
 
-<button @onclick="() => EditLocation.InvokeAsync(location.Id)">Upravit umístění</button>
-<button type="button" @onclick="() => showConfirmDeleteLocation = true">Odstranit toto umístění</button>
+<div class="action-buttons">
+	<button @onclick="() => EditLocation.InvokeAsync(location.Id)">Upravit umístění</button>
+	<button type="button" @onclick="() => showConfirmDeleteLocation = true">Odstranit toto umístění</button>
+</div>
 
 @if (showConfirmDeleteLocation)
 {
 	<div class="overlay">
 		<div class="overlay-content">
-		@if (DeviceList.Count > 0)
-		{
-			<p>Zařízení zůstanou zachována.</p>
-		}
-		<p>Opravdu chcete odstranit toto umístění?</p>
-		<button type="button" @onclick="async () => await DeleteLocation()">Ano</button>
-		<button type="button" @onclick="() => showConfirmDeleteLocation = false">Ne</button>
-	</div>
+			@if (DeviceList.Count > 0)
+			{
+				<p>Zařízení zůstanou zachována.</p>
+			}
+			<p>Opravdu chcete odstranit toto umístění?</p>
+			<div class="action-buttons">
+				<button type="button" @onclick="async () => await DeleteLocation()">Ano</button>
+				<button type="button" @onclick="() => showConfirmDeleteLocation = false">Ne</button>
+			</div>
 		</div>
+	</div>
 }
 
 @code {

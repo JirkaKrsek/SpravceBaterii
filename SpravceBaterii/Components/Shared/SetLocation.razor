@@ -46,8 +46,10 @@
 
 	<hr>
 
-	<button type="submit">Uložit</button>
-    <button type="reset" @onclick="@(() => Input.selectedLocationId = null)">Žádné umístění</button>
+    <div class="action-buttons">
+	    <button type="submit">Uložit</button>
+        <button type="reset" @onclick="@(() => Input.selectedLocationId = null)">Žádné umístění</button>
+    </div>
 </EditForm>
 
 @code {

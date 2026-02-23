@@ -166,6 +166,16 @@ nav a:hover {
     max-height: 88%;
 }
 
+/* Akční tlačítka */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.action-buttons button {
+    flex: 1;
+}
+
 /* Požadavky na heslo */
 div#show-password-requirements label {
     cursor: pointer;

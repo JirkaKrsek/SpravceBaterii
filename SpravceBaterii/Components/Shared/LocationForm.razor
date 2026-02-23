@@ -54,15 +54,17 @@
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-			@if (anyDevicesInLocation)
-			{
-				<p>Zařízení zůstanou zachována.</p>
-			}
-			<p>Opravdu chcete odstranit toto umístění?</p>
-			<button type="button" @onclick="() => DeleteLocation(location.Id)">Ano</button>
-			<button type="button" @onclick="() => showConfirm = false">Ne</button>
-		</div>
+				@if (anyDevicesInLocation)
+				{
+					<p>Zařízení zůstanou zachována.</p>
+				}
+				<p>Opravdu chcete odstranit toto umístění?</p>
+				<div class="action-buttons">
+					<button type="button" @onclick="() => DeleteLocation(location.Id)">Ano</button>
+					<button type="button" @onclick="() => showConfirm = false">Ne</button>
+				</div>
 			</div>
+		</div>
 	}
 </EditForm>
 
