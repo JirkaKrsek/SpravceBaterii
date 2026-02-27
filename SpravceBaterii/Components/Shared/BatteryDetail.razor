@@ -131,7 +131,12 @@ else
 <hr>
 
 <div class="action-buttons">
-<button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit baterii</button>
+	<button type ="button" @onclick ="() => FormNavigationService.Open(typeof(BatteryForm), battery.Id)">Upravit baterii</button>
+
+	@if (battery.DeviceId is not null && battery.IsRechargeable)
+	{
+		<button @onclick="() => ChargeBattery.InvokeAsync(battery.Id)">Nabít</button>
+	}
 
 @if (battery.DeviceId is not null)
 {
@@ -194,6 +199,8 @@ else
 	public EventCallback<bool> Cancel { get; set; }
 	[Parameter]
 	public EventCallback<int> EditBattery { get; set; }
+	[Parameter]
+	public EventCallback<int> ChargeBattery { get; set; }
 
 
 	/// <summary>

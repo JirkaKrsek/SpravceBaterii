@@ -27,6 +27,7 @@
 			<div class="overlay-content">
 				<BatteryDetail BatteryId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
 							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
+							   ChargeBattery="@(batteryId => FormNavigationService.Open(typeof(ChargeBattery), batteryId))"
 							   Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
 							   Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></BatteryDetail>
 			</div>
@@ -41,6 +42,16 @@
 							 BatterySaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
 							 Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
 							 Cancel="@(async () => FormNavigationService.Close())"></BatteryForm>
+			</div>
+		</div>
+	}
+	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(ChargeBattery))
+	{
+		<div class="overlay">
+			<div class="overlay-content">
+				<ChargeBattery BatteryId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							 Saved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
+							 Cancel="@(async () => FormNavigationService.Close())"></ChargeBattery>
 			</div>
 		</div>
 	}
