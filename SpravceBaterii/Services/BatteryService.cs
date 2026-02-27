@@ -323,6 +323,7 @@ namespace SpravceBaterii.Services
 
             battery.DeviceId = null;
             battery.InsertionDate = null;
+            battery.ExpectedLifespan = null;
 
             await UpdateOnlyBattery(battery);
         }
