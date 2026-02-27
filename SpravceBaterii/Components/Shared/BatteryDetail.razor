@@ -75,10 +75,17 @@
 				<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
 			</tr>
 		}
+		@if (battery.DeviceId is not null)
+		{
 		<tr>
 			<td>Očekávaná doba životnosti (ve dnech): </td>
+				<td>@battery.ExpectedLifespan</td>
+			</tr>
+			<tr>
+				<td>Do konce životnosti zbývá dní: </td>
 			<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
 		</tr>
+		}
 		<tr>
 			<td>Byla použita v zařízení: </td>
 			<td><textarea readonly>@battery.UsageHistory</textarea></td>
