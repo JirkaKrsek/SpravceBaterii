@@ -93,7 +93,7 @@ builder.Services.AddScoped<ChemicalCompositionService>();
 builder.Services.AddScoped<DisposableBatteryService>();
 builder.Services.AddScoped<RechargeableBatteryService>();
 builder.Services.AddScoped<ExceptionHandlerService>();
-builder.Services.AddScoped<FormNavigationService>();
+builder.Services.AddScoped<ModalNavigationService>();
 
 var app = builder.Build();
 

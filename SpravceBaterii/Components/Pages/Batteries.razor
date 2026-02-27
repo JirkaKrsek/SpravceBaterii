@@ -7,7 +7,7 @@
 
 @inject BatteryService BatteryService
 @inject ExceptionHandlerService ExceptionHandlerService
-@inject FormNavigationService FormNavigationService
+@inject ModalNavigationService ModalNavigationService
 
 <PageTitle>Správce baterií - Baterie</PageTitle>
 
@@ -21,43 +21,43 @@
 
 @if (isDataLoaded)
 {
-	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
+	@if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryDetail BatteryId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-							   ChargeBattery="@(batteryId => FormNavigationService.Open(typeof(ChargeBattery), batteryId))"
-							   Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
-							   Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></BatteryDetail>
+				<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							   EditBattery="@(batteryId => ModalNavigationService.Open(typeof(BatteryForm), batteryId))"
+							   ChargeBattery="@(batteryId => ModalNavigationService.Open(typeof(ChargeBattery), batteryId))"
+							   Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
+							   Cancel="@(async (dataChanged) => { ModalNavigationService.Close(); if (dataChanged) {ModalNavigationService.MarkForReload();} })"></BatteryDetail>
 			</div>
 		</div>
 	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-							 BatterySavedShowBatteryDetail="@(async (batteryId) => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(BatteryDetail), batteryId); })"
-							 BatterySaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-							 Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
-							 Cancel="@(async () => FormNavigationService.Close())"></BatteryForm>
+				<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentForm()?.SelectedId"
+							 BatterySavedShowBatteryDetail="@(async (batteryId) => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); ModalNavigationService.Open(typeof(BatteryDetail), batteryId); })"
+							 BatterySaved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
+							 Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
+							 Cancel="@(async () => ModalNavigationService.Close())"></BatteryForm>
 			</div>
 		</div>
 	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(ChargeBattery))
+	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(ChargeBattery))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<ChargeBattery BatteryId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							 Saved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-							 Cancel="@(async () => FormNavigationService.Close())"></ChargeBattery>
+				<ChargeBattery BatteryId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							 Saved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
+							 Cancel="@(async () => ModalNavigationService.Close())"></ChargeBattery>
 			</div>
 		</div>
 	}
 	else
 	{
-		<button @onclick="() => FormNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
+		<button @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
 	}
 }
 
@@ -90,7 +90,7 @@ else
 		<tbody>
 			@foreach (Battery battery in BatteryList)
 			{
-				<tr @onclick="() => FormNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
+					<tr @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
 					<td>@(battery.Device?.Name ?? "")</td>
 					<td>@battery.Count</td>
 					<td>@battery.BatteryType.Name</td>
@@ -133,7 +133,7 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
-		FormNavigationService.Reset();
+		ModalNavigationService.Reset();
 
 		await LoadBatteryList();
 	}
@@ -145,10 +145,10 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (FormNavigationService.ShouldReload())
+		if (ModalNavigationService.ShouldReload())
 		{
 			await LoadBatteryList();
-			FormNavigationService.Reset();
+			ModalNavigationService.Reset();
 
 			//Aktualizace UI
 			StateHasChanged();

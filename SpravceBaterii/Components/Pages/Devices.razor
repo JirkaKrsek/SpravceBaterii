@@ -7,7 +7,7 @@
 
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
-@inject FormNavigationService FormNavigationService
+@inject ModalNavigationService ModalNavigationService
 
 <PageTitle>Správce baterií - Zařízení</PageTitle>
 
@@ -21,78 +21,78 @@
 
 @if (isDataLoaded)
 {
-	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceDetail))
+	@if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceDetail))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<DeviceDetail DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							  BatteryDetail="@(batteryId => FormNavigationService.Open(typeof(BatteryDetail), batteryId))"
-							  EditDevice="@(deviceId => FormNavigationService.Open(typeof(DeviceForm), deviceId))"
-							  InsertBattery="@(deviceId => FormNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
-							  SetLocation="@(deviceId => FormNavigationService.Open(typeof(SetLocation), deviceId))"
-							  Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
-							  Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></DeviceDetail>
+				<DeviceDetail DeviceId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							  BatteryDetail="@(batteryId => ModalNavigationService.Open(typeof(BatteryDetail), batteryId))"
+							  EditDevice="@(deviceId => ModalNavigationService.Open(typeof(DeviceForm), deviceId))"
+							  InsertBattery="@(deviceId => ModalNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
+							  SetLocation="@(deviceId => ModalNavigationService.Open(typeof(SetLocation), deviceId))"
+							  Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
+							  Cancel="@(async (dataChanged) => { ModalNavigationService.Close(); if (dataChanged) {ModalNavigationService.MarkForReload();} })"></DeviceDetail>
 			</div>
 		</div>
 	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
+	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryDetail BatteryId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-							   Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
-							   Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></BatteryDetail>
+				<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							   EditBattery="@(batteryId => ModalNavigationService.Open(typeof(BatteryForm), batteryId))"
+							   Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
+							   Cancel="@(async (dataChanged) => { ModalNavigationService.Close(); if (dataChanged) {ModalNavigationService.MarkForReload();} })"></BatteryDetail>
 			</div>
 		</div>
 	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-							 BatterySaved="@(() => { FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-							 Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
-							 Cancel="@(() => FormNavigationService.Close())"></BatteryForm>
+				<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentForm()?.SelectedId"
+							 BatterySaved="@(() => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
+							 Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
+							 Cancel="@(() => ModalNavigationService.Close())"></BatteryForm>
 			</div>
 		</div>
 	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
+	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<DeviceForm DeviceToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-							DeviceSavedShowDeviceDetail="@(async (deviceId) => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); FormNavigationService.Open(typeof(DeviceDetail), deviceId);})"
-							DeviceSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
-							Deleted="@(async () => { FormNavigationService.CloseAll(); FormNavigationService.MarkForReload(); })"
-							Cancel="@(async () => FormNavigationService.Close())"></DeviceForm>
+				<DeviceForm DeviceToUpdateId="@ModalNavigationService.GetCurrentForm()?.SelectedId"
+							DeviceSavedShowDeviceDetail="@(async (deviceId) => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); ModalNavigationService.Open(typeof(DeviceDetail), deviceId);})"
+							DeviceSaved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); })"
+							Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
+							Cancel="@(async () => ModalNavigationService.Close())"></DeviceForm>
 			</div>
 		</div>
 	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(InsertBatteryToDevice))
+	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(InsertBatteryToDevice))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<InsertBatteryToDevice DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-									   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-									   Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
-									   Cancel="@(async () => FormNavigationService.Close())"></InsertBatteryToDevice>
+				<InsertBatteryToDevice DeviceId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+									   EditBattery="@(batteryId => ModalNavigationService.Open(typeof(BatteryForm), batteryId))"
+									   Saved="@(async () => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); })"
+									   Cancel="@(async () => ModalNavigationService.Close())"></InsertBatteryToDevice>
 			</div>
 		</div>
 	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(SetLocation))
+	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(SetLocation))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<SetLocation DeviceId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							 Saved="@(async () => { FormNavigationService.Close(); FormNavigationService.MarkForReload(); })"
-							 Cancel="@(async () => FormNavigationService.Close())"></SetLocation>
+				<SetLocation DeviceId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+							 Saved="@(async () => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); })"
+							 Cancel="@(async () => ModalNavigationService.Close())"></SetLocation>
 			</div>
 		</div>
 	}
 	else
 	{
-		<button @onclick="() => FormNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
+		<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
 	}
 }
 
@@ -122,7 +122,7 @@ else
 		<tbody>
 			@foreach (Device device in DeviceList)
 			{
-				<tr @onclick="() => FormNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
+				<tr @onclick="() => ModalNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
 					<td>@device.Name</td>
 					<td><textarea disabled>@device.Description</textarea></td>
 					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
@@ -156,7 +156,7 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
-		FormNavigationService.Reset();
+		ModalNavigationService.Reset();
 
 		await LoadDeviceList();
 	}
@@ -168,10 +168,10 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (FormNavigationService.ShouldReload())
+		if (ModalNavigationService.ShouldReload())
 		{
 			await LoadDeviceList();
-			FormNavigationService.Reset();
+			ModalNavigationService.Reset();
 
 			//Aktualizace UI
 			StateHasChanged();

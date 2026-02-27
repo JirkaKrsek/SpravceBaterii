@@ -1,16 +1,16 @@
 ﻿namespace SpravceBaterii.Services
 {
-    public record FormNavigationEntry(Type ComponentType, int? SelectedId);
+    public record ModalNavigationEntry(Type ComponentType, int? SelectedId);
 
-    public class FormNavigationService
+    public class ModalNavigationService
     {
-        private readonly List<FormNavigationEntry> history = [];
+        private readonly List<ModalNavigationEntry> history = [];
         private bool reload = false;
 
         /// <summary>
         /// Získání formuláře, který má být zobrazen
         /// </summary>
-        public FormNavigationEntry? GetCurrentForm()
+        public ModalNavigationEntry? GetCurrentForm()
         {
             return history.LastOrDefault();
         }
@@ -18,11 +18,11 @@
         /// <summary>
         /// Přidání komponenty k zobrazení
         /// </summary>
-        /// <param name="formType">Typ formulářové komponenty</param>
+        /// <param name="componentType">Typ komponenty</param>
         /// <param name="selectedId">ID vybrané položky, která má být zobrazena v komponentě / null, pokud žádná položka není vybraná</param>
-        public void Open(Type formType, int? selectedId)
+        public void Open(Type componentType, int? selectedId)
         {
-            history.Add(new FormNavigationEntry(formType, selectedId));
+            history.Add(new ModalNavigationEntry(componentType, selectedId));
         }
 
         /// <summary>
