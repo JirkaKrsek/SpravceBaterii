@@ -21,11 +21,11 @@
 
 @if (isDataLoaded)
 {
-	@if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceDetail))
+	@if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(DeviceDetail))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<DeviceDetail DeviceId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+				<DeviceDetail DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
 							  BatteryDetail="@(batteryId => ModalNavigationService.Open(typeof(BatteryDetail), batteryId))"
 							  EditDevice="@(deviceId => ModalNavigationService.Open(typeof(DeviceForm), deviceId))"
 							  InsertBattery="@(deviceId => ModalNavigationService.Open(typeof(InsertBatteryToDevice), deviceId))"
@@ -35,33 +35,33 @@
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryDetail))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+				<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
 							   EditBattery="@(batteryId => ModalNavigationService.Open(typeof(BatteryForm), batteryId))"
 							   Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
 							   Cancel="@(async (dataChanged) => { ModalNavigationService.Close(); if (dataChanged) {ModalNavigationService.MarkForReload();} })"></BatteryDetail>
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryForm))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentForm()?.SelectedId"
+				<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId"
 							 BatterySaved="@(() => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
 							 Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
 							 Cancel="@(() => ModalNavigationService.Close())"></BatteryForm>
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(DeviceForm))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(DeviceForm))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<DeviceForm DeviceToUpdateId="@ModalNavigationService.GetCurrentForm()?.SelectedId"
+				<DeviceForm DeviceToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId"
 							DeviceSavedShowDeviceDetail="@(async (deviceId) => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); ModalNavigationService.Open(typeof(DeviceDetail), deviceId);})"
 							DeviceSaved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); })"
 							Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
@@ -69,22 +69,22 @@
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(InsertBatteryToDevice))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(InsertBatteryToDevice))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<InsertBatteryToDevice DeviceId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+				<InsertBatteryToDevice DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
 									   EditBattery="@(batteryId => ModalNavigationService.Open(typeof(BatteryForm), batteryId))"
 									   Saved="@(async () => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); })"
 									   Cancel="@(async () => ModalNavigationService.Close())"></InsertBatteryToDevice>
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(SetLocation))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(SetLocation))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<SetLocation DeviceId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+				<SetLocation DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
 							 Saved="@(async () => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); })"
 							 Cancel="@(async () => ModalNavigationService.Close())"></SetLocation>
 			</div>

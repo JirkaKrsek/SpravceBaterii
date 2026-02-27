@@ -21,22 +21,22 @@
 
 @if (isDataLoaded)
 {
-	@if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(LocationDetail))
+	@if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationDetail))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<LocationDetail LocationId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+				<LocationDetail LocationId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
 								EditLocation="@(locationId => ModalNavigationService.Open(typeof(LocationForm), locationId))"
 								Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload();})"
 								Cancel="@(async (dataChanged) => { ModalNavigationService.Close(); if (dataChanged) {ModalNavigationService.MarkForReload();} })"></LocationDetail>
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(LocationForm))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationForm))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<LocationForm LocationToUpdateId="@ModalNavigationService.GetCurrentForm()?.SelectedId"
+				<LocationForm LocationToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId"
 							  LocationSavedShowLocationDetail="@(async (locationId) => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); ModalNavigationService.Open(typeof(LocationDetail), locationId); })"
 							  LocationSaved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
 							  Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload();})"

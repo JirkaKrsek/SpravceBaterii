@@ -8,9 +8,9 @@
         private bool reload = false;
 
         /// <summary>
-        /// Získání formuláře, který má být zobrazen
+        /// Získání komponenty, který má být zobrazena
         /// </summary>
-        public ModalNavigationEntry? GetCurrentForm()
+        public ModalNavigationEntry? GetCurrentComponent()
         {
             return history.LastOrDefault();
         }

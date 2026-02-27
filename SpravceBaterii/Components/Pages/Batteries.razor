@@ -21,11 +21,11 @@
 
 @if (isDataLoaded)
 {
-	@if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
+	@if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryDetail))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+				<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
 							   EditBattery="@(batteryId => ModalNavigationService.Open(typeof(BatteryForm), batteryId))"
 							   ChargeBattery="@(batteryId => ModalNavigationService.Open(typeof(ChargeBattery), batteryId))"
 							   Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
@@ -33,11 +33,11 @@
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryForm))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentForm()?.SelectedId"
+				<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId"
 							 BatterySavedShowBatteryDetail="@(async (batteryId) => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); ModalNavigationService.Open(typeof(BatteryDetail), batteryId); })"
 							 BatterySaved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
 							 Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
@@ -45,11 +45,11 @@
 			</div>
 		</div>
 	}
-	else if (ModalNavigationService.GetCurrentForm()?.ComponentType == typeof(ChargeBattery))
+	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(ChargeBattery))
 	{
 		<div class="overlay">
 			<div class="overlay-content">
-				<ChargeBattery BatteryId="@ModalNavigationService.GetCurrentForm()!.SelectedId!.Value"
+				<ChargeBattery BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
 							 Saved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
 							 Cancel="@(async () => ModalNavigationService.Close())"></ChargeBattery>
 			</div>
