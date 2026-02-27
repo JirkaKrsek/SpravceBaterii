@@ -63,8 +63,11 @@
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="battery.Manufacturer"></InputText>
 
+	@if (BatteryToUpdateId is not null)
+	{
 	<label for="input-UsageHistory">Byla použita v zařízení: </label>
 	<InputTextArea id="input-UsageHistory" @bind-Value="battery.UsageHistory"></InputTextArea>
+	}
 
 	<label for="input-BatteryType">Typ: </label>
 	<InputSelect id="input-BatteryType" @bind-Value="battery.BatteryTypeId" required>
