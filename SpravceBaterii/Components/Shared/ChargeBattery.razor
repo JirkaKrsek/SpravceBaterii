@@ -1,0 +1,134 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using SpravceBaterii.Services.Tools
+@using System.ComponentModel.DataAnnotations
+
+@inject BatteryService BatteryService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p class="error-message">@errorMessage</p>
+}
+
+<div class="component-header">
+	<h2>
+		Nabití baterie
+		@if (isDataLoaded && battery.Manufacturer is not null)
+		{
+			@(": " + battery.Manufacturer)
+		}
+	</h2>
+
+	<button type="button" class="close" @onclick="Close">Zavřít</button>
+</div>
+
+<EditForm Model="@battery" OnValidSubmit="Save" FormName="ChargeBattery" class="add-update">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	@if (isDataLoaded)
+	{
+		<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
+
+		<label for="input-InsertionDate">Datum vložení nabité baterie: </label>
+		<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate"></InputDate>
+
+		<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
+		<InputNumber id="input-ExpectedLifespan" @bind-Value="battery.ExpectedLifespan"></InputNumber>
+
+		@if (battery.InsertionDate is not null && battery.ExpectedLifespan is not null)
+		{
+			BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife();
+			<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@(batteryStatusExpectedLifeSpan.Days?.ToString() ?? "")</strong> dní</span>
+		}
+	}
+	else
+	{
+		<h3>Načítání baterie</h3>
+	}
+
+	<hr>
+
+	<button type="submit">Uložit</button>
+</EditForm>
+
+@code {
+	private string errorMessage = "";
+
+	/// <summary>
+	/// Callback události z rodičovské komponenty
+	/// </summary>
+	[Parameter]
+	public int BatteryId { get; set; }
+	[Parameter]
+	public EventCallback Saved { get; set; }
+	[Parameter]
+	public EventCallback Cancel { get; set; }
+
+	private Battery battery = new();
+	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+	private bool isDataLoaded = false;
+
+	/// <summary>
+	/// Načtení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			battery = await BatteryService.GetUserBatteryById(BatteryId);
+			battery.InsertionDate = DateOnly.FromDateTime(DateTime.Today);
+
+			isDataLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Uložení zadaných informací o baterii do databáze
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Save()
+	{
+		try
+		{
+			await BatteryService.UpdateOnlyBattery(battery);
+
+			//Zavolání události v rodičovské komponentě
+			await Saved.InvokeAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Nastavení zbývajících dní do předpokládaného data životnosti
+	/// </summary>
+	private BatteryStatus SetRemainingDaysToExpectedLife()
+	{
+		if (battery.InsertionDate is not null && battery.ExpectedLifespan is not null)
+		{
+			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Zavření této komponety s formulářem bez uložení zadaných dat
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task Close()
+	{
+		//Zavolání události v rodičovské komponentě
+		await Cancel.InvokeAsync();
+	}
+}
