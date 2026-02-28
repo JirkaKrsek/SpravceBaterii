@@ -49,6 +49,24 @@
         }
 
         /// <summary>
+        /// Při zavření komponenty se odstraní daná komponenta ze seznamu
+        /// Přidání komponenty k zobrazení
+        /// </summary>
+        /// <param name="componentType">Typ komponenty</param>
+        /// <param name="id">ID vybrané položky, která má být zobrazena v komponentě / null, pokud žádná položka není vybraná</param>
+        public void CloseAndOpen(Type componentType, int? id)
+        {
+            if (history.Count > 0)
+            {
+                history.RemoveAt(history.Count - 1);
+            }
+
+            history.Add(new ModalNavigationEntry(componentType, id));
+
+            ModalChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Nastavení reloadList hodnoty na true
         /// </summary>
         public void MarkForReload()
