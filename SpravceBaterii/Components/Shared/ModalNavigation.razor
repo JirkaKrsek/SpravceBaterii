@@ -1,0 +1,96 @@
+﻿@using SpravceBaterii.Services
+
+@inject ModalNavigationService ModalNavigationService
+
+@implements IDisposable
+
+@if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryDetail))
+{
+	<div class="overlay">
+		<div class="overlay-content">
+			<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryForm))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(DeviceDetail))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<DeviceDetail DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(DeviceForm))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<DeviceForm DeviceToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationDetail))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<LocationDetail LocationId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationForm))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<LocationForm LocationToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(SetLocation))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<SetLocation DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(InsertBatteryToDevice))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<InsertBatteryToDevice DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+		</div>
+	</div>
+}
+else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(ChargeBattery))
+{
+		<div class="overlay">
+			<div class="overlay-content">
+			<ChargeBattery BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+		</div>
+	</div>
+}
+
+@code {
+	/// <summary>
+	/// Přihlášení ke sledování události změny v ModalNavigationService
+	/// </summary>
+	protected override void OnInitialized()
+	{
+		ModalNavigationService.ModalChanged += StateHasChanged;
+	}
+
+	/// <summary>
+	/// Odhlášení od sledování události změny v ModalNavigationService
+	/// </summary>
+	public void Dispose()
+	{
+		ModalNavigationService.ModalChanged -= StateHasChanged;
+	}
+}
