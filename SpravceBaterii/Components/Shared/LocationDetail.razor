@@ -64,8 +64,9 @@ else
 					<th>Popis zařízení</th>
 					<th>Výrobce</th>
 					<th>Počet baterií (vloženo / max)</th>
-					<th>Nejbližší datum expirace vložených baterií</th>
+					<th>Datum expirace vložených baterií</th>
 					<th>Do konce expirace zbývá dní</th>
+					<th>Zbývající předpokládaná životnost</th>
 			
 				</tr>
 			</thead>
@@ -94,6 +95,9 @@ else
 
 							BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
 							<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
+
+							BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(device);
+							<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
 						}
 					</tr>
 				}
@@ -205,6 +209,13 @@ else
 					.Where(b => b.DisposableBattery?.ExpirationDate != null)
 					.Min(b => b.DisposableBattery?.ExpirationDate);
 	}
+	private Battery? GetBatteryWithMinExpectedLife(Device device)
+	{
+		return device.Batteries?
+			.Where(b => b.ExpectedLifespan != null)
+			.OrderBy(b => b.ExpectedLifespan)
+			.FirstOrDefault();
+	}
 
 	/// <summary>
 	/// Získání stavu baterie podle zbývajících dní do konce expirace
@@ -218,6 +229,21 @@ else
 		{
 			BatteryStatus status = batteryStatusEvaluator.RemainingDaysToExpirate(date.Value);
 			return status;
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Získání stavu baterie podle zbývajících dní do předpokládaného data životnosti
+	/// </summary>
+	/// <param name="device">Zařízení</param>
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpectedLife(Device device)
+	{
+		Battery? battery = GetBatteryWithMinExpectedLife(device);
+		if (battery is not null && battery.ExpectedLifespan is not null && battery.InsertionDate is not null)
+		{
+			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
 		return new BatteryStatus();
 	}

@@ -42,24 +42,25 @@
 else
 {
 	<div class="table-container">
-	<table class="selectable">
-		<thead>
-			<tr>
-				<th>Název zařízení</th>
-				<th>Popis zařízení</th>
-				<th>Počet baterií (vloženo / max)</th>
-				<th>Nejbližší datum expirace vložených baterií</th>
-				<th>Do konce expirace zbývá dní</th>
-				<th>Výrobce</th>
-				<th>Umístění</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (Device device in DeviceList)
-			{
-				<tr @onclick="() => ModalNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
-					<td>@device.Name</td>
-					<td><textarea disabled>@device.Description</textarea></td>
+		<table class="selectable">
+			<thead>
+				<tr>
+					<th>Název zařízení</th>
+					<th>Popis zařízení</th>
+					<th>Počet baterií (vloženo / max)</th>
+					<th>Datum expirace vložených baterií</th>
+					<th>Do konce expirace zbývá dní</th>
+					<th>Zbývající předpokládaná životnost</th>
+					<th>Výrobce</th>
+					<th>Umístění</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (Device device in DeviceList)
+				{
+					<tr @onclick="() => ModalNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
+						<td>@device.Name</td>
+						<td><textarea disabled>@device.Description</textarea></td>
 
 						@{
 							int insertedCount = device.Batteries?.Sum(b => b.Count) ?? 0;
@@ -75,20 +76,23 @@ else
 						}
 
 
-					@{
-						DateOnly? date = GetExpirationDate(device);
-						<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
+						@{
+							DateOnly? date = GetExpirationDate(device);
+							<td>@(date.HasValue? date.Value.ToShortDateString() : "")</td>
 
-						BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
-						<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
-					}
+							BatteryStatus StatusExpirationDate = SetRemainingDaysToExpirate(device);
+							<td class="@(StatusExpirationDate?.CssClass ?? "")">@(StatusExpirationDate?.Days?.ToString() ?? "")</td>
 
-					<td>@device.Manufacturer</td>
-					<td>@device.Location?.Name</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+							BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(device);
+							<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
+						}
+
+						<td>@device.Manufacturer</td>
+						<td>@device.Location?.Name</td>
+					</tr>
+				}
+			</tbody>
+		</table>
 	</div>
 }
 
@@ -160,6 +164,13 @@ else
 					.Where(b => b.DisposableBattery?.ExpirationDate != null)
 					.Min(b => b.DisposableBattery?.ExpirationDate);
 	}
+	private Battery? GetBatteryWithMinExpectedLife(Device device)
+	{
+		return device.Batteries?
+			.Where(b => b.ExpectedLifespan != null)
+			.OrderBy(b => b.ExpectedLifespan)
+			.FirstOrDefault();
+	}
 
 	/// <summary>
 	/// Získání stavu baterie podle zbývajících dní do konce expirace
@@ -173,6 +184,21 @@ else
 		{
 			BatteryStatus status = batteryStatusEvaluator.RemainingDaysToExpirate(date.Value);
 			return status;
+		}
+		return new BatteryStatus();
+	}
+
+	/// <summary>
+	/// Získání stavu baterie podle zbývajících dní do předpokládaného data životnosti
+	/// </summary>
+	/// <param name="device">Zařízení</param>
+	/// <returns>Status baterie</returns>
+	private BatteryStatus SetRemainingDaysToExpectedLife(Device device)
+	{
+		Battery? battery = GetBatteryWithMinExpectedLife(device);
+		if (battery is not null && battery.ExpectedLifespan is not null && battery.InsertionDate is not null)
+		{
+			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
 		return new BatteryStatus();
 	}
