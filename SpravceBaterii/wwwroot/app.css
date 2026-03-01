@@ -239,7 +239,7 @@ input#checkbox-show-password-requirements:checked ~ label:after {
 
 /* Tabulka */
 .table-container {
-    overflow-x: auto;
+    overflow: auto;
 }
 table.selectable {
     border-collapse: collapse;
@@ -330,6 +330,7 @@ form {
     margin: 0;
     padding: 0;
     background-color: white;
+    overflow: auto;
 }
 form.account {
     margin: auto;
