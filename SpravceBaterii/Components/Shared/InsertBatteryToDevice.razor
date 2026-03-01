@@ -19,58 +19,58 @@
 	<h2>Dostupné baterie pro vložení do zařízení</h2>
 </div>
 
-	@if (Batteries.Count < 1)
-	{
-		<h3>Nejsou dostupné žádné volné baterie</h3>
-	}
-	else
-	{
+@if (Batteries.Count < 1)
+{
+	<h3>Nejsou dostupné žádné volné baterie</h3>
+}
+else
+{
 	<p>Kliknutím na řádek vyberete baterii.</p>
 
-		<div class="table-container">
-			<table class="selectable">
-				<thead>
-					<tr>
-						<th>Počet</th>
-						<th>Chemické složení</th>
-						<th>Popis</th>
-						<th>Typ</th>
-						<th>Datum expirace</th>
-						<th>Do konce expirace zbývá dní</th>
-						<th>Byla použita v zařízení</th>
+	<div class="table-container">
+		<table class="selectable">
+			<thead>
+				<tr>
+					<th>Počet</th>
+					<th>Chemické složení</th>
+					<th>Popis</th>
+					<th>Typ</th>
+					<th>Datum expirace</th>
+					<th>Do konce expirace zbývá dní</th>
+					<th>Byla použita v zařízení</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (Battery battery in Batteries)
+				{
+					<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")" title="Vybrat">
+						<td>@battery.Count</td>
+						<td>@battery.ChemicalComposition?.Name</td>
+						<td><textarea disabled>@battery.Description</textarea></td>
+						@if (battery.IsRechargeable)
+						{
+							<td>Nabíjecí</td>
+							<td></td>
+							<td></td>
+						}
+						else
+						{
+							<td>Jednorázová</td>
+							<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+							BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+							<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+						}
+						<td><textarea disabled>@battery.UsageHistory</textarea></td>
 					</tr>
-				</thead>
-				<tbody>
-					@foreach (Battery battery in Batteries)
-					{
-						<tr @onclick="@(async () => { Input.selectedBatteryId = battery.Id; await SelectBatteryAndSetInsertLimit(); })" class="@(Input.selectedBatteryId == battery.Id ? "selected" : "")" title="Vybrat">
-							<td>@battery.Count</td>
-							<td>@battery.ChemicalComposition?.Name</td>
-							<td><textarea readonly>@battery.Description</textarea></td>
-							@if (battery.IsRechargeable)
-							{
-								<td>Nabíjecí</td>
-								<td></td>
-								<td></td>
-							}
-							else
-							{
-								<td>Jednorázová</td>
-								<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-								BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-								<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-							}
-							<td><textarea readonly>@battery.UsageHistory</textarea></td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</div>
+				}
+			</tbody>
+		</table>
+	</div>
 }
 
 @if (Input.selectedBatteryId is not null)
 {
-		<hr>
+	<hr>
 
 	<EditForm Model="@Input" OnValidSubmit="Save" FormName="InsertBatteryToDevice" class="add-update">
 		<DataAnnotationsValidator />
@@ -83,23 +83,23 @@
 		<InputDate id="input-InsertionDate" @bind-Value="Input.InsertionDate" required></InputDate>
 
 		<label for="input-Count">Počet baterií v rozmezí 1 - @maxCount: </label>
-			<InputNumber id="input-Count" @bind-Value="Input.batteryCountToInsert" min="1" max="@maxCount" required></InputNumber>
+		<InputNumber id="input-Count" @bind-Value="Input.batteryCountToInsert" min="1" max="@maxCount" required></InputNumber>
 
-			<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
-			<InputNumber id="input-ExpectedLifespan" @bind-Value="Input.ExpectedLifespan"></InputNumber>
+		<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
+		<InputNumber id="input-ExpectedLifespan" @bind-Value="Input.ExpectedLifespan"></InputNumber>
 
-			@if (Input.ExpectedLifespan is not null)
-			{
-				BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife();
-				<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@(batteryStatusExpectedLifeSpan.Days?.ToString() ?? "")</strong> dní</span>
-			}
+		@if (Input.ExpectedLifespan is not null)
+		{
+			BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife();
+			<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@(batteryStatusExpectedLifeSpan.Days?.ToString() ?? "")</strong> dní</span>
+		}
 
 		<hr>
 
-			<button type="submit">Vložit</button>
+		<button type="submit">Vložit</button>
 		<button @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), Input.selectedBatteryId)">Detail vybrané baterie</button>
 	</EditForm>
-	}
+}
 
 @code {
 	/// <summary>

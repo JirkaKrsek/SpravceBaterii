@@ -101,7 +101,7 @@ else
 					<tr @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
 						<td>@battery.Count</td>
 						<td>@battery.BatteryType.Name</td>
-						<td><textarea readonly>@battery.Description</textarea></td>
+						<td><textarea disabled>@battery.Description</textarea></td>
 						@if (battery.IsRechargeable)
 						{
 							<td>Nabíjecí</td>

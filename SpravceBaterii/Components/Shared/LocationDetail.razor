@@ -75,7 +75,7 @@ else
 				{
 					<tr @onclick="() => ModalNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
 						<td>@device.Name</td>
-						<td><textarea readonly>@device.Description</textarea></td>
+						<td><textarea disabled>@device.Description</textarea></td>
 						<td>@device.Manufacturer</td>
 						@{
 							int insertedCount = device.Batteries?.Sum(b => b.Count) ?? 0;
