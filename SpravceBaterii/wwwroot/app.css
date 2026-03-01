@@ -400,6 +400,22 @@ p.required-info span {
     border: 2px solid red;
 }
 
+/* Upozornění při nedostatečném počtu vložených baterií v zařízení */
+td.warning-info {
+    position: relative;
+    background-color: #fff7e6;
+    padding-left: 40px;
+}
+td.warning-info::before {
+    content: "⚠";
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: orange;
+    font-size: 24px;
+}
+
 /* Chybová zpráva */
 .error-message {
     color: red;

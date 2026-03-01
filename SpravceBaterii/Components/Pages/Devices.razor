@@ -60,7 +60,20 @@ else
 				<tr @onclick="() => ModalNavigationService.Open(typeof(DeviceDetail), device.Id)" title="Zobrazit detail">
 					<td>@device.Name</td>
 					<td><textarea disabled>@device.Description</textarea></td>
-					<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
+
+						@{
+							int insertedCount = device.Batteries?.Sum(b => b.Count) ?? 0;
+
+							if (insertedCount > 0 && insertedCount < device.BatteryCount)
+							{
+								<td class="warning-info" title="Zařízení aktuálně neobsahuje dostatek baterií">@insertedCount / @device.BatteryCount</td>
+							}
+							else
+							{
+								<td>@insertedCount / @device.BatteryCount</td>
+							}
+						}
+
 
 					@{
 						DateOnly? date = GetExpirationDate(device);

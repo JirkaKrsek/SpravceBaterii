@@ -120,8 +120,19 @@ else
 			<td><textarea readonly>@device.Description</textarea></td>
 		</tr>
 		<tr>
-			<td>Počet vložených baterií: </td>
-			<td>@(device.Batteries?.Sum(b => b.Count) ?? 0) / @device.BatteryCount</td>
+			<td>Počet baterií (vloženo / max)</td>
+			@{
+				int insertedCount = device.Batteries?.Sum(b => b.Count) ?? 0;
+
+				if (insertedCount > 0 && insertedCount < device.BatteryCount)
+				{
+					<td class="warning-info" title="Zařízení aktuálně neobsahuje dostatek baterií">@insertedCount / @device.BatteryCount</td>
+				}
+				else
+				{
+					<td>@insertedCount / @device.BatteryCount</td>
+				}
+			}
 		</tr>
 		<tr>
 			<td>Výrobce: </td>
