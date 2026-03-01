@@ -327,13 +327,16 @@ button.close:hover {
 
 /* Formuláře */
 form {
-    margin: auto;
-    padding: 30px;
+    margin: 0;
+    padding: 0;
     background-color: white;
-    box-shadow: 0 5px 20px black;
-    border-radius: 20px;
 }
 form.account {
+    margin: auto;
+    padding: 30px;
+    box-shadow: 0 5px 20px black;
+    border-radius: 20px;
+
     display: flex;
     flex-direction: column;
     gap: 10px;
