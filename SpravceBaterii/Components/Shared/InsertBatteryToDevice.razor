@@ -17,8 +17,6 @@
 
 <div class="component-header">
 	<h2>Vložení baterií do zařízení</h2>
-
-	<button type="button" class="close" @onclick="Close">Zavřít</button>
 </div>
 
 <EditForm Model="@Input" OnValidSubmit="Save" FormName="InsertBatteryToDevice">
@@ -273,15 +271,6 @@
 			return batteryStatusEvaluator.RemainingDaysToExpectedLife(Input.InsertionDate, Input.ExpectedLifespan.Value);
 		}
 		return new BatteryStatus();
-	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		ModalNavigationService.Close();
 	}
 
 	/// <summary>

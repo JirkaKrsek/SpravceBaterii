@@ -22,8 +22,6 @@
 			@(": " + battery.Manufacturer)
 		}
 	</h2>
-
-	<button type="button" class="close" @onclick="Close">Zavřít</button>
 </div>
 
 <EditForm Model="@battery" OnValidSubmit="Save" FormName="ChargeBattery" class="add-update">
@@ -119,14 +117,5 @@
 			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
 		return new BatteryStatus();
-	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		ModalNavigationService.Close();
 	}
 }

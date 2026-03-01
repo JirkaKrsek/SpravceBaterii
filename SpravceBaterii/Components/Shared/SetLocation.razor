@@ -17,8 +17,6 @@
 
 <div class="component-header">
     <h2>Výběr umístění</h2>
-
-    <button type="button" class="close" @onclick="Close">Zavřít</button>
 </div>
 
 <EditForm Model="@Input" OnValidSubmit="Save" FormName="SetLocation">
@@ -107,16 +105,6 @@
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
 	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-        ModalNavigationService.Close();
-	}
-
 
     /// <summary>
     /// Model pro vstupní data z formuláře

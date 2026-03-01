@@ -16,8 +16,6 @@
 
 <div class="component-header">
 	<h2>Detail baterie</h2>
-
-	<button type="button" class="close" @onclick="Close">Zavřít</button>
 </div>
 
 @if (isDataLoaded)
@@ -316,14 +314,5 @@ else
 			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
 		return new BatteryStatus();
-	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		ModalNavigationService.Close();
 	}
 }

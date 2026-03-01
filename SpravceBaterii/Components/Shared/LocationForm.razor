@@ -23,8 +23,6 @@
 	{
 		<h2>Formulář pro úpravu umístění</h2>
 	}
-
-	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
 </div>
 
 <EditForm Model="@location" OnValidSubmit="SaveLocation" FormName="LocationForm" class="add-update">
@@ -164,14 +162,5 @@
 		{
 			showConfirm = false;
 		}
-	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		ModalNavigationService.Close();
 	}
 }

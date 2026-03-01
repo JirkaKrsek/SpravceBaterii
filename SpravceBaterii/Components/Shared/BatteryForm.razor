@@ -27,8 +27,6 @@
 	{
 		<h2>Formulář pro úpravu baterie</h2>
 	}
-
-	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
 </div>
 
 <EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm" class="add-update">
@@ -317,14 +315,5 @@
 		{
 			batteryStatusExpectedLifeSpan = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
-	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		ModalNavigationService.Close();
 	}
 }
