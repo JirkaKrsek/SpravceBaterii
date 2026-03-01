@@ -29,6 +29,7 @@ namespace SpravceBaterii.Services
             string userId = await userService.GetUserIdAsync();
 
             return await applicationDbContext.Locations
+                .Include(l => l.Devices)
                 .AsNoTracking()
                 .Where(l => l.UserId == userId).ToListAsync();
         }
