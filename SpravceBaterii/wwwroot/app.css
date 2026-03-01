@@ -49,6 +49,7 @@ body {
     font-size: 16px;
     /*background-color: #f3f6fb;*/
     background-color: #0f172a;
+    color: black;
     margin: 0;
     padding: 0;
     display: flex;
@@ -224,17 +225,44 @@ input#checkbox-show-password-requirements:checked ~ label:after {
 }
 
 /* Vyhodnocený stav baterie */
+/* Upozornění při nedostatečném počtu vložených baterií v zařízení */
+td.status-default, td.count-warning {
+    position: relative;
+    padding-left: 40px;
+}
+td.status-default::before, td.count-warning::before {
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+}
 .status-ok {
-    color: white;
-    background-color: green;
+    background-color: #bcff96;
 }
 .status-warning {
-    color: black;
-    background-color: yellow;
+    background-color: #fffc7c;
 }
 .status-expired {
-    color: white;
-    background-color: red;
+    background-color: #ffadad;
+}
+td.count-warning {
+    background-color: #ffeeca;
+}
+td.status-ok::before {
+    /* Unicode ✔ - HEAVY CHECK MARK */
+    content: "\2714";
+    color: green;
+}
+td.status-warning::before, td.count-warning::before {
+    /* Unicode ⚠ - WARNING SIGN */
+    content: "\26A0";
+    color: darkorange;
+}
+td.status-expired::before {
+    /* Unicode ✖ - HEAVY MULTIPLICATION */
+    content: "\2716";
+    color: red;
 }
 
 /* Tabulka */
@@ -399,22 +427,6 @@ p.required-info span {
 }
 :required:invalid, .invalid, select[required]:has(option[value="0"]:checked) {
     border: 2px solid red;
-}
-
-/* Upozornění při nedostatečném počtu vložených baterií v zařízení */
-td.warning-info {
-    position: relative;
-    background-color: #fff7e6;
-    padding-left: 40px;
-}
-td.warning-info::before {
-    content: "⚠";
-    position: absolute;
-    left: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: orange;
-    font-size: 24px;
 }
 
 /* Chybová zpráva */
