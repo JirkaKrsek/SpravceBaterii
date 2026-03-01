@@ -296,30 +296,7 @@ namespace SpravceBaterii.Services
             stringBuilder.Append(" => ");
             stringBuilder.AppendLine(deviceName);
 
-            // Sestavení omezené historie využití baterie v zařízeních
-            string allText = (battery.UsageHistory ?? "") + stringBuilder.ToString();
-            string[] lines = allText.Split("\n");
-            int maxLength = 200;
-            List<string> history = [];
-            int length = 0;
-
-            if (allText.Length > maxLength)
-            {
-                length = 4;
-            }
-            for (int i = lines.Length - 1; i >= 0; i--)
-            {
-                int lineLength = lines[i].Length + (history.Count > 0 ? 1 : 0);
-                if (length + lineLength > maxLength)
-                {
-                    history.Insert(0, "...");
-                    break;
-                }
-                history.Insert(0, lines[i]);
-                length += lineLength;
-            }
-
-            battery.UsageHistory = string.Join("\n", history);
+            battery.UsageHistory += stringBuilder.ToString();
 
             battery.DeviceId = null;
             battery.InsertionDate = null;
