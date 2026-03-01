@@ -5,6 +5,8 @@
 @using SpravceBaterii.Services
 @using SpravceBaterii.Services.Tools
 
+@implements IDisposable
+
 @inject LocationService LocationService
 @inject ExceptionHandlerService ExceptionHandlerService
 @inject ModalNavigationService ModalNavigationService
@@ -21,33 +23,11 @@
 
 @if (isDataLoaded)
 {
-	@if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationDetail))
+	@if (ModalNavigationService.GetCurrentComponent() is not null)
 	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<LocationDetail LocationId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
-								EditLocation="@(locationId => ModalNavigationService.Open(typeof(LocationForm), locationId))"
-								Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload();})"
-								Cancel="@(async (dataChanged) => { ModalNavigationService.Close(); if (dataChanged) {ModalNavigationService.MarkForReload();} })"></LocationDetail>
-			</div>
-		</div>
+		<ModalNavigation />
 	}
-	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationForm))
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<LocationForm LocationToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId"
-							  LocationSavedShowLocationDetail="@(async (locationId) => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); ModalNavigationService.Open(typeof(LocationDetail), locationId); })"
-							  LocationSaved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
-							  Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload();})"
-							  Cancel="@(async () => ModalNavigationService.Close())"></LocationForm>
-			</div>
-		</div>
-	}
-	else
-	{
-		<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
-	}
+	<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
 }
 
 <hr>
@@ -97,6 +77,32 @@ else
 		ModalNavigationService.Reset();
 
 		await LoadLocationList();
+
+		//Přihlášení k události pro změnu navigace, aby se načetla data po návratu z modální komponenty
+		ModalNavigationService.ModalChanged += NavigationChanged;
+	}
+
+	/// <summary>
+	/// Při zavření modální komponenty se odhlásí odběr události
+	/// </summary>
+	public void Dispose()
+	{
+		ModalNavigationService.ModalChanged -= NavigationChanged;
+	}
+
+	/// <summary>
+	/// Po změně modální navigace se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	private async void NavigationChanged()
+	{
+		if (ModalNavigationService.ShouldReload())
+		{
+			await LoadLocationList();
+			ModalNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
+		}
 	}
 
 	/// <summary>

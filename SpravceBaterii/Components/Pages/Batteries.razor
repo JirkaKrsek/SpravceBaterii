@@ -5,6 +5,8 @@
 @using SpravceBaterii.Services
 @using SpravceBaterii.Services.Tools
 
+@implements IDisposable
+
 @inject BatteryService BatteryService
 @inject ExceptionHandlerService ExceptionHandlerService
 @inject ModalNavigationService ModalNavigationService
@@ -20,45 +22,13 @@
 }
 
 @if (isDataLoaded)
-{
-	@if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryDetail))
+{	
+	@if (ModalNavigationService.GetCurrentComponent() is not null)
 	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
-							   EditBattery="@(batteryId => ModalNavigationService.Open(typeof(BatteryForm), batteryId))"
-							   ChargeBattery="@(batteryId => ModalNavigationService.Open(typeof(ChargeBattery), batteryId))"
-							   Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
-							   Cancel="@(async (dataChanged) => { ModalNavigationService.Close(); if (dataChanged) {ModalNavigationService.MarkForReload();} })"></BatteryDetail>
-			</div>
-		</div>
+		<ModalNavigation />
 	}
-	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryForm))
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId"
-							 BatterySavedShowBatteryDetail="@(async (batteryId) => { ModalNavigationService.Close(); ModalNavigationService.MarkForReload(); ModalNavigationService.Open(typeof(BatteryDetail), batteryId); })"
-							 BatterySaved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
-							 Deleted="@(async () => { ModalNavigationService.CloseAll(); ModalNavigationService.MarkForReload(); })"
-							 Cancel="@(async () => ModalNavigationService.Close())"></BatteryForm>
-			</div>
-		</div>
-	}
-	else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(ChargeBattery))
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<ChargeBattery BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value"
-							 Saved="@(async () => {ModalNavigationService.Close(); ModalNavigationService.MarkForReload();})"
-							 Cancel="@(async () => ModalNavigationService.Close())"></ChargeBattery>
-			</div>
-		</div>
-	}
-	else
-	{
-		<button @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
-	}
+
+	<button @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
 }
 
 <hr>
@@ -72,52 +42,52 @@
 else
 {
 	<div class="table-container">
-	<table class="selectable">
-		<thead>
-			<tr>
-				<th>Název zařízení</th>
-				<th>Počet</th>
-				<th>Označení</th>
-				<th>Popis</th>
-				<th>Typ</th>
-				<th>Datum expirace</th>
-				<th>Do konce expirace zbývá dní</th>
-				<th>Datum vložení</th>
-				<th>Předpokládaná doba výdrže (ve dnech)</th>
-				<th>Zbývající předpokládaná životnost</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (Battery battery in BatteryList)
-			{
-					<tr @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
-					<td>@(battery.Device?.Name ?? "")</td>
-					<td>@battery.Count</td>
-					<td>@battery.BatteryType.Name</td>
-					<td><textarea disabled>@battery.Description</textarea></td>
-					@if (battery.IsRechargeable)
-					{
-						<td>Nabíjecí</td>
-						<td></td>
-						<td></td>
-					}
-					else
-					{
-						<td>Jednorázová</td>
-						<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-						BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-						<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-					}
-					<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-					<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-					@{
-						BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-						<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
-					}
+		<table class="selectable">
+			<thead>
+				<tr>
+					<th>Název zařízení</th>
+					<th>Počet</th>
+					<th>Označení</th>
+					<th>Popis</th>
+					<th>Typ</th>
+					<th>Datum expirace</th>
+					<th>Do konce expirace zbývá dní</th>
+					<th>Datum vložení</th>
+					<th>Předpokládaná doba výdrže (ve dnech)</th>
+					<th>Zbývající předpokládaná životnost</th>
 				</tr>
-			}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				@foreach (Battery battery in BatteryList)
+				{
+					<tr @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
+						<td>@(battery.Device?.Name ?? "")</td>
+						<td>@battery.Count</td>
+						<td>@battery.BatteryType.Name</td>
+						<td><textarea disabled>@battery.Description</textarea></td>
+						@if (battery.IsRechargeable)
+						{
+							<td>Nabíjecí</td>
+							<td></td>
+							<td></td>
+						}
+						else
+						{
+							<td>Jednorázová</td>
+							<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+							BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+							<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+						}
+						<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+						<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
+						@{
+							BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
+							<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
 	</div>
 }
 
@@ -136,14 +106,23 @@ else
 		ModalNavigationService.Reset();
 
 		await LoadBatteryList();
+
+		//Přihlášení k události pro změnu navigace, aby se načetla data po návratu z modální komponenty
+		ModalNavigationService.ModalChanged += NavigationChanged;
 	}
 
 	/// <summary>
-	/// Po vykreslení stránky se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// Při zavření modální komponenty se odhlásí odběr události
 	/// </summary>
-	/// <param name="firstRender">bool, zda se stránka vykresluje poprvé</param>
-	/// <returns>Asynchronní operace</returns>
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	public void Dispose()
+	{
+		ModalNavigationService.ModalChanged -= NavigationChanged;
+	}
+
+	/// <summary>
+	/// Po změně modální navigace se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	private async void NavigationChanged()
 	{
 		if (ModalNavigationService.ShouldReload())
 		{
