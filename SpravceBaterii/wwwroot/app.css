@@ -106,7 +106,7 @@ nav {
     display: flex;
     justify-content: center;
     align-items: stretch;
-    height: 50px;
+    flex-wrap: wrap;
 }
 nav a {
     flex: 1;
@@ -121,7 +121,7 @@ nav a {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    height: 50px;
 }
 nav a:first-child {
     border-left: none;
@@ -134,7 +134,6 @@ nav a.logo {
     background-color: #e2e9ff;
     color: black;
     gap: 12px;
-    font-size: 18px;
 }
 nav a.logo img {
     max-height: calc(100% - 16px);
