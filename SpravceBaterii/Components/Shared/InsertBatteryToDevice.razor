@@ -98,6 +98,7 @@
 		<hr>
 
 			<button type="submit">Vložit</button>
+		<button @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), Input.selectedBatteryId)">Detail vybrané baterie</button>
 	</EditForm>
 	}
 
