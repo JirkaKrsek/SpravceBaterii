@@ -17,8 +17,8 @@
 	parameter["ItemId"] = entry.SelectedId;
 }
 
-<div class="overlay">
-	<div class="overlay-content">
+<div class="overlay" @onmousedown="ModalNavigationService.Close">
+	<div class="overlay-content" @onmousedown:stopPropagation="true">
 		<button type="button" class="close" @onclick="ModalNavigationService.Close">X</button>
 		<DynamicComponent Type="componentType" Parameters="parameter" />
 	</div>
