@@ -210,7 +210,7 @@ else
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
-	public int DeviceId { get; set; }
+	public int ItemId { get; set; }
 
 
 	private string errorMessage = "";
@@ -244,7 +244,7 @@ else
 	{
 		try
 		{
-			device = await DeviceService.GetUserDeviceByIdWithDetails(DeviceId);
+			device = await DeviceService.GetUserDeviceByIdWithDetails(ItemId);
 			Batteries = await BatteryService.GetUserBatteriesByDeviceId(device.Id);
 
 			isDataLoaded = true;
@@ -277,7 +277,7 @@ else
 
 			showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
 
-			await DeviceService.DeleteDeviceById(DeviceId);
+			await DeviceService.DeleteDeviceById(ItemId);
 
 			ModalNavigationService.MarkForReload();
 			ModalNavigationService.CloseAll();

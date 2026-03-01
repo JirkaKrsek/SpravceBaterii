@@ -60,7 +60,7 @@
     /// Vstupní parametr - ID položky pro její načtení
     /// </summary>
     [Parameter]
-    public int DeviceId { get; set; }
+    public int ItemId { get; set; }
 
 
     private string errorMessage = "";
@@ -78,7 +78,7 @@
     {
         try
         {
-            device = await DeviceService.GetUserDeviceById(DeviceId);
+            device = await DeviceService.GetUserDeviceById(ItemId);
             Input.selectedLocationId = device.LocationId;
             Locations = await LocationService.GetLocations();
         }

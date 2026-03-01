@@ -8,7 +8,7 @@
 {
 	<div class="overlay">
 		<div class="overlay-content">
-			<BatteryDetail BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+			<BatteryDetail ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
 		</div>
 	</div>
 }
@@ -16,7 +16,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(B
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<BatteryForm BatteryToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
+			<BatteryForm ItemId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
 		</div>
 	</div>
 }
@@ -24,7 +24,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(D
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<DeviceDetail DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+			<DeviceDetail ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
 		</div>
 	</div>
 }
@@ -32,7 +32,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(D
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<DeviceForm DeviceToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
+			<DeviceForm ItemId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
 		</div>
 	</div>
 }
@@ -40,7 +40,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(L
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<LocationDetail LocationId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+			<LocationDetail ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
 		</div>
 	</div>
 }
@@ -48,7 +48,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(L
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<LocationForm LocationToUpdateId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
+			<LocationForm ItemId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
 		</div>
 	</div>
 }
@@ -56,7 +56,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(S
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<SetLocation DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+			<SetLocation ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
 		</div>
 	</div>
 }
@@ -64,7 +64,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(I
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<InsertBatteryToDevice DeviceId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+			<InsertBatteryToDevice ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
 		</div>
 	</div>
 }
@@ -72,7 +72,7 @@ else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(C
 {
 		<div class="overlay">
 			<div class="overlay-content">
-			<ChargeBattery BatteryId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
+			<ChargeBattery ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
 		</div>
 	</div>
 }

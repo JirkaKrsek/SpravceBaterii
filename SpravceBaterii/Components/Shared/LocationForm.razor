@@ -15,7 +15,7 @@
 }
 
 <div class="component-header">
-	@if (LocationToUpdateId is null)
+	@if (ItemId is null)
 	{
 		<h2>Formulář pro zadání nového umístění</h2>
 	}
@@ -46,7 +46,7 @@
 
 	<button type="submit">Uložit</button>
 
-	@if (LocationToUpdateId is not null)
+	@if (ItemId is not null)
 	{
 		<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
 	}
@@ -74,7 +74,7 @@
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
-	public int? LocationToUpdateId { get; set; }
+	public int? ItemId { get; set; }
 
 
 	private string errorMessage = "";
@@ -92,9 +92,9 @@
 	{
 		try
 		{
-			if (LocationToUpdateId is not null)
+			if (ItemId is not null)
 			{
-				location = await LocationService.GetUserLocationById(LocationToUpdateId.Value);
+				location = await LocationService.GetUserLocationById(ItemId.Value);
 				anyDevicesInLocation = await DeviceService.AnyDevicesInLocationById(location.Id);
 			}
 			else
@@ -116,7 +116,7 @@
 	{
 		try
 		{
-			if (LocationToUpdateId is null)
+			if (ItemId is null)
 			{
 				await LocationService.AddLocation(location);
 

@@ -61,7 +61,7 @@
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
-	public int BatteryId { get; set; }
+	public int ItemId { get; set; }
 
 
 	private string errorMessage = "";
@@ -79,7 +79,7 @@
 	{
 		try
 		{
-			battery = await BatteryService.GetUserBatteryById(BatteryId);
+			battery = await BatteryService.GetUserBatteryById(ItemId);
 			battery.InsertionDate = DateOnly.FromDateTime(DateTime.Today);
 
 			isDataLoaded = true;

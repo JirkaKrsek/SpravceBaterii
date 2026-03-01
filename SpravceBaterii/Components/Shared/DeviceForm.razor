@@ -16,7 +16,7 @@
 }
 
 <div class="component-header">
-	@if (DeviceToUpdateId is null)
+	@if (ItemId is null)
 	{
 		<h2>Formulář pro zadání nového zařízení</h2>
 	}
@@ -73,7 +73,7 @@
 
 	<button type="submit">Uložit</button>
 
-	@if(DeviceToUpdateId is not null)
+	@if(ItemId is not null)
 	{
 		<button type="button" @onclick="() => showConfirm = true">Smazat toto zařízení</button>
 	}
@@ -97,7 +97,7 @@
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
-	public int? DeviceToUpdateId { get; set; }
+	public int? ItemId { get; set; }
 
 
 	private string errorMessage = "";
@@ -119,9 +119,9 @@
 	{
 		try
 		{
-			if (DeviceToUpdateId is not null)
+			if (ItemId is not null)
 			{
-				device = await DeviceService.GetUserDeviceByIdWithBatteries(DeviceToUpdateId.Value);
+				device = await DeviceService.GetUserDeviceByIdWithBatteries(ItemId.Value);
 
 				if (device.Batteries?.Count > 0)
 				{
@@ -158,7 +158,7 @@
 				errorMessage = "Maximální počet baterií musí být alespoň: " + minBatteryCount + ", protože zařízení již obsahuje tento počet baterií.";
 				return;
 			}
-			if (DeviceToUpdateId is null)
+			if (ItemId is null)
 			{
 				await DeviceService.AddDevice(device);
 

@@ -186,7 +186,7 @@ else
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
-	public int BatteryId { get; set; }
+	public int ItemId { get; set; }
 
 
 	private string errorMessage = "";
@@ -220,7 +220,7 @@ else
 	{
 		try
 		{
-			battery = await BatteryService.GetUserBatteryByIdWithDetails(BatteryId);
+			battery = await BatteryService.GetUserBatteryByIdWithDetails(ItemId);
 
 			if (battery.DeviceId is not null)
 			{

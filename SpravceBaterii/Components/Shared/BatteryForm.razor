@@ -19,7 +19,7 @@
 }
 
 <div class="component-header">
-	@if (BatteryToUpdateId is null)
+	@if (ItemId is null)
 	{
 		<h2>Formulář pro zadání nové baterie</h2>
 	}
@@ -64,7 +64,7 @@
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="battery.Manufacturer"></InputText>
 
-	@if (BatteryToUpdateId is not null)
+	@if (ItemId is not null)
 	{
 	<label for="input-UsageHistory">Byla použita v zařízení: </label>
 	<InputTextArea id="input-UsageHistory" @bind-Value="battery.UsageHistory"></InputTextArea>
@@ -124,7 +124,7 @@
 
 	<button type="submit">Uložit</button>
 
-	@if (BatteryToUpdateId is not null)
+	@if (ItemId is not null)
 	{
 		<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
 	}
@@ -148,7 +148,7 @@
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
-	public int? BatteryToUpdateId { get; set; }
+	public int? ItemId { get; set; }
 
 
 	private string errorMessage = "";
@@ -175,9 +175,9 @@
 	{
 		try
 		{
-			if (BatteryToUpdateId is not null)
+			if (ItemId is not null)
 			{
-				battery = await BatteryService.GetUserBatteryById(BatteryToUpdateId.Value);
+				battery = await BatteryService.GetUserBatteryById(ItemId.Value);
 
 				if (battery.DeviceId is not null)
 				{
@@ -243,7 +243,7 @@
 			battery.RechargeableBattery = rechargeableBattery;
 			battery.DisposableBattery = disposableBattery;
 
-			if (BatteryToUpdateId is null)
+			if (ItemId is null)
 			{
 				await BatteryService.AddBattery(battery);
 

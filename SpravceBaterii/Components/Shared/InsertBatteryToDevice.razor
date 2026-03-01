@@ -118,7 +118,7 @@
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
-	public int DeviceId { get; set; }
+	public int ItemId { get; set; }
 
 
 	private string errorMessage = "";
@@ -140,7 +140,7 @@
 	{
 		try
 		{
-			device = await DeviceService.GetUserDeviceByIdWithBatteries(DeviceId);
+			device = await DeviceService.GetUserDeviceByIdWithBatteries(ItemId);
 			Batteries = await BatteryService.GetUnUsedBatteriesByTypeId(device.BatteryTypeId);
 		}
 		catch (Exception ex)
@@ -177,7 +177,7 @@
 
 					//Nová baterie pro vložení do zařízení s nastaveným počtem přiřazených baterií
 					Battery newBattery = await BatteryService.CreateBatteryCopy(selectedBattery.Id);
-					newBattery.DeviceId = DeviceId;
+					newBattery.DeviceId = ItemId;
 					newBattery.Count = Input.batteryCountToInsert;
 					newBattery.InsertionDate = Input.InsertionDate;
 					newBattery.ExpectedLifespan = Input.ExpectedLifespan;
@@ -186,7 +186,7 @@
 				else if (Input.batteryCountToInsert == selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
 				{
 					//Původní baterie pro vložení do zařízení se správným počtem
-					selectedBattery.DeviceId = DeviceId;
+					selectedBattery.DeviceId = ItemId;
 					selectedBattery.InsertionDate = Input.InsertionDate;
 					selectedBattery.ExpectedLifespan = Input.ExpectedLifespan;
 					await BatteryService.UpdateOnlyBattery(selectedBattery);
