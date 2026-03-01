@@ -4,78 +4,24 @@
 
 @implements IDisposable
 
-@if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryDetail))
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			<BatteryDetail ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
-		</div>
-	</div>
+@{
+	ModalNavigationEntry? entry = ModalNavigationService.GetCurrentComponent();
+	if (entry is null)
+	{
+		return;
+	}
+
+	Type componentType = entry.ComponentType;
+
+	Dictionary<string, object?> parameter = new();
+	parameter["ItemId"] = entry.SelectedId;
 }
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(BatteryForm))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<BatteryForm ItemId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
-		</div>
+
+<div class="overlay">
+	<div class="overlay-content">
+		<DynamicComponent Type="componentType" Parameters="parameter" />
 	</div>
-}
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(DeviceDetail))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<DeviceDetail ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
-		</div>
-	</div>
-}
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(DeviceForm))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<DeviceForm ItemId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
-		</div>
-	</div>
-}
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationDetail))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<LocationDetail ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
-		</div>
-	</div>
-}
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(LocationForm))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<LocationForm ItemId="@ModalNavigationService.GetCurrentComponent()?.SelectedId" />
-		</div>
-	</div>
-}
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(SetLocation))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<SetLocation ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
-		</div>
-	</div>
-}
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(InsertBatteryToDevice))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<InsertBatteryToDevice ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
-		</div>
-	</div>
-}
-else if (ModalNavigationService.GetCurrentComponent()?.ComponentType == typeof(ChargeBattery))
-{
-		<div class="overlay">
-			<div class="overlay-content">
-			<ChargeBattery ItemId="@ModalNavigationService.GetCurrentComponent()!.SelectedId!.Value" />
-		</div>
-	</div>
-}
+</div>
 
 @code {
 	/// <summary>
