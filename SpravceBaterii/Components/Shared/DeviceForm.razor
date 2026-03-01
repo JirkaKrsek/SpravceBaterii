@@ -7,6 +7,7 @@
 @inject LocationService LocationService
 @inject BatteryTypeService BatteryTypeService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -92,22 +93,15 @@
 </EditForm>
 
 @code {
-	private string errorMessage = "";
-	private bool showConfirm = false;
-
 	/// <summary>
-	/// Callback události z rodičovské komponenty
+	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
 	public int? DeviceToUpdateId { get; set; }
-	[Parameter]
-	public EventCallback DeviceSaved { get; set; }
-	[Parameter]
-	public EventCallback Deleted { get; set; }
-	[Parameter]
-	public EventCallback Cancel { get; set; }
-	[Parameter]
-	public EventCallback<int> DeviceSavedShowDeviceDetail { get; set; }
+
+
+	private string errorMessage = "";
+	private bool showConfirm = false;
 
 	private Device device = new();
 	private List<Location> Locations = new();
@@ -115,6 +109,7 @@
 	private int minBatteryCount = 1;
 	private int usedSlots = 0;
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -167,15 +162,15 @@
 			{
 				await DeviceService.AddDevice(device);
 
-				//Zavolání události v rodičovské komponentě
-				await DeviceSavedShowDeviceDetail.InvokeAsync(device.Id);
+				ModalNavigationService.MarkForReload();			
+				ModalNavigationService.CloseAndOpen(typeof(DeviceDetail), device.Id);
 			}
 			else
 			{
 				await DeviceService.UpdateDevice(device);
 
-				//Zavolání události v rodičovské komponentě
-				await DeviceSaved.InvokeAsync();
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.Close();
 			}
 		}
 		catch (Exception ex)
@@ -195,8 +190,8 @@
 		{
 			await DeviceService.DeleteDeviceById(deviceId);
 
-			//Zavolání události v rodičovské komponentě
-			await Deleted.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
@@ -242,7 +237,6 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+		ModalNavigationService.Close();
 	}
 }

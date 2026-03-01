@@ -7,6 +7,7 @@
 @inject LocationService LocationService
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -55,20 +56,15 @@
 </EditForm>
 
 @code {
-    private string errorMessage = "";
-    private InputModel Input = new();
-
     /// <summary>
-    /// Callback události z rodičovské komponenty
+    /// Vstupní parametr - ID položky pro její načtení
     /// </summary>
     [Parameter]
     public int DeviceId { get; set; }
-    [Parameter]
-    public EventCallback Saved { get; set; }
-    [Parameter]
-    public EventCallback Cancel { get; set; }
-    [Parameter]
-    public EventCallback<int> EditLocation { get; set; }
+
+
+    private string errorMessage = "";
+    private InputModel Input = new();
 
     private Device device = new();
     private List<Location> Locations = new();
@@ -103,8 +99,8 @@
             device.LocationId = Input.selectedLocationId;
             await DeviceService.UpdateDevice(device);
 
-            //Zavolání události v rodičovské komponentě
-            await Saved.InvokeAsync();
+            ModalNavigationService.MarkForReload();
+            ModalNavigationService.Close();
 		}
 		catch (Exception ex)
 		{
@@ -118,8 +114,7 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+        ModalNavigationService.Close();
 	}
 
 

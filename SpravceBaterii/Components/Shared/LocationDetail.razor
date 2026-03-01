@@ -6,6 +6,7 @@
 @inject LocationService LocationService
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -96,7 +97,7 @@ else
 <hr>
 
 <div class="action-buttons">
-	<button @onclick="() => EditLocation.InvokeAsync(location.Id)">Upravit umístění</button>
+	<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), location.Id)">Upravit umístění</button>
 	<button type="button" @onclick="() => showConfirmDeleteLocation = true">Odstranit toto umístění</button>
 </div>
 
@@ -118,27 +119,21 @@ else
 }
 
 @code {
+	/// <summary>
+	/// Vstupní parametr - ID položky pro její načtení
+	/// </summary>
+	[Parameter]
+	public int LocationId { get; set; }
+
+
 	private string errorMessage = "";
 	private bool showConfirmDeleteLocation = false;
 	private bool isDataLoaded = false;
-	private bool dataUpdated = false;
 
 	private Location location = new();
 	private List<Device> DeviceList = new();
 
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
-
-	/// <summary>
-	/// Callback události z rodičovské komponenty
-	/// </summary>
-	[Parameter]
-	public int LocationId { get; set; }
-	[Parameter]
-	public EventCallback Deleted { get; set; }
-	[Parameter]
-	public EventCallback<bool> Cancel { get; set; }
-	[Parameter]
-	public EventCallback<int> EditLocation { get; set; }
 
 
 	/// <summary>
@@ -183,8 +178,8 @@ else
 			}
 			await LocationService.DeleteLocationById(location.Id);
 
-			//Zavolání události v rodičovské komponentě
-			await Deleted.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
@@ -225,7 +220,6 @@ else
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync(dataUpdated);
+		ModalNavigationService.Close();
 	}
 }

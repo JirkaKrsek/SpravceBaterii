@@ -6,6 +6,7 @@
 @inject LocationService LocationService
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -69,25 +70,19 @@
 </EditForm>
 
 @code {
-	private string errorMessage = "";
-	private bool showConfirm = false;
-
 	/// <summary>
-	/// Callback události z rodičovské komponenty
+	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
 	public int? LocationToUpdateId { get; set; }
-	[Parameter]
-	public EventCallback LocationSaved { get; set; }
-	[Parameter]
-	public EventCallback Deleted { get; set; }
-	[Parameter]
-	public EventCallback Cancel { get; set; }
-	[Parameter]
-	public EventCallback<int> LocationSavedShowLocationDetail { get; set; }
+
+
+	private string errorMessage = "";
+	private bool showConfirm = false;
 
 	private Location location = new();
 	private bool anyDevicesInLocation;
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -125,15 +120,15 @@
 			{
 				await LocationService.AddLocation(location);
 
-				//Zavolání události v rodičovské komponentě
-				await LocationSavedShowLocationDetail.InvokeAsync(location.Id);
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAndOpen(typeof(LocationDetail), location.Id);
 			}
 			else
 			{
 				await LocationService.UpdateLocation(location);
 
-				//Zavolání události v rodičovské komponentě
-				await LocationSaved.InvokeAsync();
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.Close();
 			}
 		}
 		catch (Exception ex)
@@ -158,8 +153,8 @@
 
 			await LocationService.DeleteLocationById(locationId);
 
-			//Zavolání události v rodičovské komponentě
-			await Deleted.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
@@ -177,7 +172,6 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+		ModalNavigationService.Close();
 	}
 }

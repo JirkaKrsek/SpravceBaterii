@@ -6,6 +6,7 @@
 
 @inject BatteryService BatteryService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -56,21 +57,19 @@
 </EditForm>
 
 @code {
-	private string errorMessage = "";
-
 	/// <summary>
-	/// Callback události z rodičovské komponenty
+	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
 	public int BatteryId { get; set; }
-	[Parameter]
-	public EventCallback Saved { get; set; }
-	[Parameter]
-	public EventCallback Cancel { get; set; }
+
+
+	private string errorMessage = "";
 
 	private Battery battery = new();
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 	private bool isDataLoaded = false;
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -101,8 +100,8 @@
 		{
 			await BatteryService.UpdateOnlyBattery(battery);
 
-			//Zavolání události v rodičovské komponentě
-			await Saved.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.Close();
 		}
 		catch (Exception ex)
 		{
@@ -128,7 +127,6 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+		ModalNavigationService.Close();
 	}
 }

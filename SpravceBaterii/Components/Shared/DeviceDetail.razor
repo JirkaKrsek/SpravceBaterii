@@ -6,6 +6,7 @@
 @inject BatteryService BatteryService
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -92,7 +93,7 @@ else
 			<tbody>
 				@foreach (Battery battery in Batteries)
 				{
-					<tr @onclick="() => BatteryDetail.InvokeAsync(battery.Id)" title="Zobrazit detail">
+					<tr @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
 						<td>@battery.Count</td>
 						<td>@battery.BatteryType.Name</td>
 						<td><textarea readonly>@battery.Description</textarea></td>
@@ -129,19 +130,19 @@ else
 <hr>
 
 <div class="action-buttons">
-	<button @onclick="() => EditDevice.InvokeAsync(device.Id)">Upravit zařízení</button>
+	<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), device.Id)">Upravit zařízení</button>
 	@if ((device.Batteries?.Sum(b => b.Count) ?? 0) < device.BatteryCount)
 	{
-		<button @onclick="() => InsertBattery.InvokeAsync(device.Id)">Vložit baterii</button>
+		<button @onclick="() => ModalNavigationService.Open(typeof(InsertBatteryToDevice), device.Id)">Vložit baterii</button>
 	}
 
 	@if (device.LocationId is null)
 	{
-		<button @onclick="() => SetLocation.InvokeAsync(device.Id)">Nastavit umístění</button>
+		<button @onclick="() => ModalNavigationService.Open(typeof(SetLocation), device.Id)">Nastavit umístění</button>
 	}
 	else
 	{
-		<button @onclick="() => SetLocation.InvokeAsync(device.Id)">Změnit umístění</button>
+		<button @onclick="() => ModalNavigationService.Open(typeof(SetLocation), device.Id)">Změnit umístění</button>
 	}
 
 	@if (device.Batteries?.Count > 0)
@@ -205,6 +206,13 @@ else
 }
 
 @code {
+	/// <summary>
+	/// Vstupní parametr - ID položky pro její načtení
+	/// </summary>
+	[Parameter]
+	public int DeviceId { get; set; }
+
+
 	private string errorMessage = "";
 	private int? selectedBatteryId = null;
 	private bool showConfirmDeleteDevice = false;
@@ -212,30 +220,12 @@ else
 	private bool showConfirmEjectOrDeleteSelectedBattery = false;
 	private bool showConfirmEjectOrDeleteAllBatteries = false;
 	private bool isDataLoaded = false;
-	private bool dataUpdated = false;
-
-	/// <summary>
-	/// Callback události z rodičovské komponenty
-	/// </summary>
-	[Parameter]
-	public int DeviceId { get; set; }
-	[Parameter]
-	public EventCallback Deleted { get; set; }
-	[Parameter]
-	public EventCallback<bool> Cancel { get; set; }
-	[Parameter]
-	public EventCallback<int> BatteryDetail { get; set; }
-	[Parameter]
-	public EventCallback<int> EditDevice { get; set; }
-	[Parameter]
-	public EventCallback<int> InsertBattery { get; set; }
-	[Parameter]
-	public EventCallback<int> SetLocation { get; set; }
 
 	private Device device = new();
 	private List<Battery> Batteries = new();
 
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -289,8 +279,8 @@ else
 
 			await DeviceService.DeleteDeviceById(DeviceId);
 
-			//Zavolání události v rodičovské komponentě
-			await Deleted.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
@@ -329,7 +319,8 @@ else
 					}
 				}
 
-				dataUpdated = true;
+				ModalNavigationService.MarkForReload();
+
 				await LoadDeviceList();
 			}
 		}
@@ -368,7 +359,8 @@ else
 				await BatteryService.EjectBatteryFromDevice(selectedBatteryId!.Value, device.Name);
 			}
 
-			dataUpdated = true;
+			ModalNavigationService.MarkForReload();
+
 			await LoadDeviceList();
 		}
 		catch (Exception ex)
@@ -416,7 +408,6 @@ else
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync(dataUpdated);
+		ModalNavigationService.Close();
 	}
 }

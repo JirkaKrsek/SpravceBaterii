@@ -7,9 +7,10 @@
 @inject DeviceService DeviceService
 @inject BatteryTypeService BatteryTypeService
 @inject ChemicalCompositionService ChemicalCompositionService
-@inject ExceptionHandlerService ExceptionHandlerService
 @inject DisposableBatteryService DisposableBatteryService
 @inject RechargeableBatteryService RechargeableBatteryService
+@inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -143,22 +144,15 @@
 </EditForm>
 
 	@code {
-	private string errorMessage = "";
-	private bool showConfirm = false;
-
 	/// <summary>
-	/// Callback události z rodičovské komponenty
+	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
 	public int? BatteryToUpdateId { get; set; }
-	[Parameter]
-	public EventCallback BatterySaved { get; set; }
-	[Parameter]
-	public EventCallback Deleted { get; set; }
-	[Parameter]
-	public EventCallback Cancel { get; set; }
-	[Parameter]
-	public EventCallback<int> BatterySavedShowBatteryDetail { get; set; }
+
+
+	private string errorMessage = "";
+	private bool showConfirm = false;
 
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
@@ -171,6 +165,7 @@
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 	private BatteryStatus batteryStatusExpirationDate = new();
 	private BatteryStatus batteryStatusExpectedLifeSpan = new();
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -252,8 +247,8 @@
 			{
 				await BatteryService.AddBattery(battery);
 
-				//Zavolání události v rodičovské komponentě
-				await BatterySavedShowBatteryDetail.InvokeAsync(battery.Id);
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAndOpen(typeof(BatteryDetail), battery.Id);
 			}
 			else
 			{
@@ -268,8 +263,8 @@
 
 				await BatteryService.UpdateBattery(battery);
 
-				//Zavolání události v rodičovské komponentě
-				await BatterySaved.InvokeAsync();
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.Close();
 			}
 		}
 		catch (Exception ex)
@@ -289,8 +284,8 @@
 		{
 			await BatteryService.DeleteBatteryById(batteryId);
 
-			//Zavolání události v rodičovské komponentě
-			await Deleted.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
@@ -330,7 +325,6 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+		ModalNavigationService.Close();
 	}
 }

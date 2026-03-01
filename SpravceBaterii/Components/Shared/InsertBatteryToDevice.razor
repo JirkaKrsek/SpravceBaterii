@@ -7,6 +7,7 @@
 @inject BatteryService BatteryService
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -74,7 +75,7 @@
 							<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
 							<td><textarea readonly>@battery.UsageHistory</textarea></td>
 
-							<td><button @onclick="() => EditBattery.InvokeAsync(battery.Id)">Upravit tuto baterii</button></td>
+							<td><button @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), battery.Id)">Upravit tuto baterii</button></td>
 						</tr>
 					}
 				</tbody>
@@ -113,19 +114,14 @@
 </EditForm>
 
 @code {
-	private string errorMessage = "";
-
 	/// <summary>
-	/// Callback události z rodičovské komponenty
+	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
 	[Parameter]
 	public int DeviceId { get; set; }
-	[Parameter]
-	public EventCallback Saved { get; set; }
-	[Parameter]
-	public EventCallback Cancel { get; set; }
-	[Parameter]
-	public EventCallback<int> EditBattery { get; set; }
+
+
+	private string errorMessage = "";
 
 	private Device device = new();
 	private List<Battery> Batteries = new();
@@ -134,6 +130,7 @@
 	private int maxCount = 1;
 
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -200,8 +197,8 @@
 					return;
 				}
 
-				//Zavolání události v rodičovské komponentě
-				await Saved.InvokeAsync();
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.Close();
 			}
 			else
 			{
@@ -284,8 +281,7 @@
 	/// <returns>Asynchronní operace</returns>
 	private async Task Close()
 	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+		ModalNavigationService.Close();
 	}
 
 	/// <summary>
