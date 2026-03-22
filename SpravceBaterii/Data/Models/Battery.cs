@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpravceBaterii.Data.Models
 {
@@ -8,8 +7,6 @@ namespace SpravceBaterii.Data.Models
     /// </summary>
     public class Battery
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Počet baterií je min. 1")]
