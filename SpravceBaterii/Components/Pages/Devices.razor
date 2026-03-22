@@ -21,15 +21,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-@if (isDataLoaded)
-{
-	@if (ModalNavigationService.GetCurrentComponent() is not null)
-	{
-		<ModalNavigation />
-	}
-
 	<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
-}
 
 <hr>
 
@@ -98,7 +90,6 @@ else
 
 @code {
 	private string errorMessage = "";
-	private bool isDataLoaded = false;
 	private List<Device> DeviceList = new();
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 
@@ -149,8 +140,6 @@ else
 		{
 			DeviceList = await DeviceService.GetDevices();
 			DeviceList = DeviceList.OrderBy(d => d.Name).ToList();
-
-			isDataLoaded = true;
 		}
 		catch (Exception ex)
 		{

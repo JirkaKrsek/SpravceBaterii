@@ -21,14 +21,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-@if (isDataLoaded)
-{
-	@if (ModalNavigationService.GetCurrentComponent() is not null)
-	{
-		<ModalNavigation />
-	}
 	<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
-}
 
 <hr>
 
@@ -67,7 +60,6 @@ else
 
 @code {
 	private string errorMessage = "";
-	private bool isDataLoaded = false;
 	private List<Location> LocationList = new();
 
 	/// <summary>
@@ -117,8 +109,6 @@ else
 		{
 			LocationList = await LocationService.GetLocations();
 			LocationList = LocationList.OrderBy(l => l.Name).ToList();
-
-			isDataLoaded = true;
 		}
 		catch (Exception ex)
 		{
