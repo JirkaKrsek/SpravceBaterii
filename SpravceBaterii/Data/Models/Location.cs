@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpravceBaterii.Data.Models
 {
@@ -8,8 +7,6 @@ namespace SpravceBaterii.Data.Models
     /// </summary>
     public class Location
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Vyplňte název")]

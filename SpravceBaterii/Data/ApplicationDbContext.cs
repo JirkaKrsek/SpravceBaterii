@@ -16,7 +16,7 @@ namespace SpravceBaterii.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-        
+
         /// <summary>
         /// Připojení modelových tříd
         /// </summary>
@@ -27,6 +27,5 @@ namespace SpravceBaterii.Data
         public DbSet<ChemicalComposition> ChemicalCompositions { get; set; }
         public DbSet<DisposableBattery> DisposableBatteries { get; set; }
         public DbSet<RechargeableBattery> RechargeableBatteries { get; set; }
-        public DbSet<ChargingHistory> ChargingHistories { get; set; }
     }
 }

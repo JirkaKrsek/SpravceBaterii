@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpravceBaterii.Data.Models
 {
@@ -8,8 +7,6 @@ namespace SpravceBaterii.Data.Models
     /// </summary>
     public class Battery
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Počet baterií je min. 1")]
@@ -22,7 +19,6 @@ namespace SpravceBaterii.Data.Models
         [StringLength(100, ErrorMessage = "Výrobce může mít max. 100 znaků")]
         public string? Manufacturer { get; set; }
 
-        [StringLength(200, ErrorMessage = "Historie použití může mít max. 200 znaků")]
         public string? UsageHistory { get; set; }
 
         [StringLength(200, ErrorMessage = "Popis může mít max. 200 znaků")]

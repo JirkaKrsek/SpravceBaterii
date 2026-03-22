@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SpravceBaterii.Data;
 
@@ -11,9 +12,11 @@ using SpravceBaterii.Data;
 namespace SpravceBaterii.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260322110301_RemoveUsageHistoryLengthLimit")]
+    partial class RemoveUsageHistoryLengthLimit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,6 +237,30 @@ namespace SpravceBaterii.Migrations
                     b.ToTable("BatteryTypes");
                 });
 
+            modelBuilder.Entity("SpravceBaterii.Data.Models.ChargingHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CapacityAfterCharge")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("ChargeDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("RechargeableBatteryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RechargeableBatteryId");
+
+                    b.ToTable("ChargingHistories");
+                });
+
             modelBuilder.Entity("SpravceBaterii.Data.Models.ChemicalComposition", b =>
                 {
                     b.Property<int>("Id")
@@ -434,6 +461,17 @@ namespace SpravceBaterii.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SpravceBaterii.Data.Models.ChargingHistory", b =>
+                {
+                    b.HasOne("SpravceBaterii.Data.Models.RechargeableBattery", "RechargeableBattery")
+                        .WithMany("ChargingHistories")
+                        .HasForeignKey("RechargeableBatteryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RechargeableBattery");
+                });
+
             modelBuilder.Entity("SpravceBaterii.Data.Models.Device", b =>
                 {
                     b.HasOne("SpravceBaterii.Data.Models.BatteryType", "BatteryType")
@@ -528,6 +566,11 @@ namespace SpravceBaterii.Migrations
             modelBuilder.Entity("SpravceBaterii.Data.Models.Location", b =>
                 {
                     b.Navigation("Devices");
+                });
+
+            modelBuilder.Entity("SpravceBaterii.Data.Models.RechargeableBattery", b =>
+                {
+                    b.Navigation("ChargingHistories");
                 });
 #pragma warning restore 612, 618
         }
