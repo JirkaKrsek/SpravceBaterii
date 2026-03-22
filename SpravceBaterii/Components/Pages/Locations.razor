@@ -1,4 +1,7 @@
 ﻿@page "/umisteni"
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using SpravceBaterii.Components.Shared
 @using SpravceBaterii.Data.Models
@@ -21,7 +24,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-	<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
+<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
 
 <hr>
 
