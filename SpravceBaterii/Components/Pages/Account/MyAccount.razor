@@ -1,0 +1,344 @@
+﻿@page "/mujucet"
+@attribute [Authorize]
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationUserService UserService
+@inject NavigationManager Navigation
+@inject ExceptionHandlerService ExceptionHandlerService
+@inject Microsoft.Extensions.Options.IOptions<IdentityOptions> IdentityOptions
+
+<PageTitle>Správce baterií - Můj účet</PageTitle>
+
+<h1>Můj účet</h1>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="error-message">@errorMessage</p>
+}
+
+<p>Zde můžete změnit přihlašovací údaje, odstranit svá data nebo celý účet.</p>
+
+<div class="account-update">
+	<!--Změna e-mailu-->
+	<div>
+		<h2>Změna e‑mailu</h2>
+
+		<EditForm Model="@InputEmail" OnValidSubmit="ChangeEmail" FormName="ChangeEmail">
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+
+			<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
+
+			<label for="input-email">Nový e-mail: </label>
+			<InputText id="input-email" @bind-Value="InputEmail.NewEmail" type="email" placeholder="Zadejte nový e-mail" required></InputText>
+	
+			<label for="input-password">Heslo pro potvrzení: </label>
+			<InputText id="input-password" @bind-Value="InputEmail.CurrentPassword" type="password" placeholder="Zadejte heslo" required></InputText>
+	
+			<button type="submit">Uložit</button>
+		</EditForm>
+	</div>
+
+	<!--Změna hesla-->
+	<div>
+		<h2>Změna hesla</h2>
+
+		<EditForm Model="@InputPassword" OnValidSubmit="ChangePassword" FormName="ChangePassword">
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+
+			<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
+
+			<label for="input-password">Současné heslo: </label>
+			<InputText id="input-password" @bind-Value="InputPassword.CurrentPassword" type="password" placeholder="Zadejte heslo" required></InputText>
+	
+			<label for="input-confirm-password">Nové heslo: </label>
+			<InputText id="input-confirm-password" @bind-Value="InputPassword.NewPassword" type="password" placeholder="Zadejte nové heslo" required></InputText>
+	
+			<label for="input-confirm-password">Potvrzení nového hesla: </label>
+			<InputText id="input-confirm-password" @bind-Value="InputPassword.ConfirmNewPassword" type="password" placeholder="Zadejte nové heslo znovu" required></InputText>
+	
+			<button type="submit">Uložit</button>
+
+			<div id="show-password-requirements">
+				<input type="checkbox" id="checkbox-show-password-requirements" />
+				<label for="checkbox-show-password-requirements">Požadavky na heslo</label>
+
+				<div id="password-requirements">
+					<ul id="requirements">
+						@foreach (string requirement in passwordRequirements)
+						{
+							<li>@requirement</li>
+						}
+					</ul>
+				</div>
+			</div>
+		</EditForm>
+	</div>
+
+</div>
+
+<!--Smazání dat-->
+<h2>Smazání všech dat</h2>
+
+<button type="button" @onclick="() => showConfirmDeleteData = true" class="delete">Smazat všechna moje data - (baterie, zařízení, umístění)</button>
+
+@if (showConfirmDeleteData)
+{
+	<div class="overlay">
+		<div class="overlay-content">
+			<button type="button" class="close" @onclick="() => showConfirmDeleteData = false">X</button>
+			<p>Opravdu chcete navždy odstranit všechna svoje data - (baterie, zařízení, umístění)?</p>
+			<p>Váš účet v této aplikaci zůstane zachován.</p>
+			<div class="action-buttons">
+				<button type="button" @onclick="DeleteAllUserData">Ano</button>
+				<button type="button" @onclick="() => showConfirmDeleteData = false">Ne</button>
+			</div>
+		</div>
+	</div>
+}
+
+<!--Smazání účtu-->
+<h2>Smazání účtu</h2>
+
+<button type="button" @onclick="() => showConfirmDeleteAccount = true">Smazat navždy můj účet</button>
+
+@if (showConfirmDeleteAccount)
+{
+	<div class="overlay">
+		<div class="overlay-content">
+			<button type="button" class="close" @onclick="() => showConfirmDeleteAccount = false">X</button>
+			<p>Opravdu chcete navždy odstranit svůj účet?</p>
+			<p>S tím budou odstraněna všechna vaše data.</p>
+			<div class="action-buttons">
+				<button type="button" @onclick="DeleteAccount">Ano</button>
+				<button type="button" @onclick="() => showConfirmDeleteAccount = false">Ne</button>
+			</div>
+		</div>
+	</div>
+}
+
+<!--Zobrazení úspěšné hlášky-->
+@if (!string.IsNullOrEmpty(successInfo))
+{
+	<div class="overlay">
+		<div class="overlay-content">
+			<button type="button" class="close" @onclick="() => successInfo = string.Empty">X</button>
+			<p>@successInfo</p>
+			<div class="action-buttons">
+				<button type="button" @onclick="() => successInfo = string.Empty">Zavřít</button>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	private InputModelEmail InputEmail { get; set; } = new InputModelEmail();
+	private InputModelPassword InputPassword { get; set; } = new InputModelPassword();
+
+	private List<string> passwordRequirements = new();
+
+	private string errorMessage = "";
+	private string successInfo = "";
+	private bool showConfirmDeleteAccount = false;
+	private bool showConfirmDeleteData = false;
+
+
+	/// <summary>
+	/// Po načtení této stránky proběhne načtení požadavků na heslo pro jeho případnou změnu
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			passwordRequirements.Add("Minimální délka: " + IdentityOptions.Value.Password.RequiredLength + " znaků");
+			if (IdentityOptions.Value.Password.RequireDigit)
+			{
+				passwordRequirements.Add("Musí obsahovat číslici");
+			}
+			if (IdentityOptions.Value.Password.RequireLowercase)
+			{
+				passwordRequirements.Add("Musí obsahovat malé písmeno");
+			}
+			if (IdentityOptions.Value.Password.RequireUppercase)
+			{
+				passwordRequirements.Add("Musí obsahovat velké písmeno");
+			}
+			if (IdentityOptions.Value.Password.RequireNonAlphanumeric)
+			{
+				passwordRequirements.Add("Musí obsahovat speciální znak");
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Změna e-mailu
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task ChangeEmail()
+	{
+		errorMessage = "";
+		try
+		{
+			ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+			if (user != null)
+			{
+				IdentityResult result = await UserManager.ChangeEmailAsync(user, InputEmail.NewEmail, InputEmail.CurrentPassword);
+
+				if (result.Succeeded)
+				{
+					successInfo = "E-mail byl úspěšně změněn.";
+					InputEmail.NewEmail = "";
+					InputEmail.CurrentPassword = "";
+				}
+				else
+				{
+					errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+					return;
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Změna hesla
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task ChangePassword()
+	{
+		errorMessage = "";
+		try
+		{
+			if (InputPassword.NewPassword != InputPassword.ConfirmNewPassword)
+			{
+				errorMessage = "Zadaná hesla se neshodují.";
+				return;
+			}
+
+			ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+			if (user != null)
+			{
+				IdentityResult result = await UserManager.ChangePasswordAsync(user, InputPassword.CurrentPassword, InputPassword.NewPassword);
+
+				if (result.Succeeded)
+				{
+					successInfo = "Heslo bylo úspěšně změněno.";
+					InputPassword.CurrentPassword = "";
+					InputPassword.NewPassword = "";
+					InputPassword.ConfirmNewPassword = "";
+				}
+				else
+				{
+					errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+					return;
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Smazání všech evidovaných dat aktuálně přihlášeného uživatele z databáze - baterie, zařízení, umístění
+	/// Účet zůstane zachován a funkční
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task DeleteAllUserData()
+	{
+		errorMessage = "";
+		try
+		{
+			await UserService.DeleteAllUserData();
+			successInfo = "Všechna vaše uložená data byla úspěšně smazána.";
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			showConfirmDeleteData = false;
+		}
+	}
+
+	/// <summary>
+	/// Smazání celého účtu aktuálně přihlášeného uživatele z databáze i se všemi uloženými daty
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task DeleteAccount()
+	{
+		errorMessage = "";
+		try
+		{
+			ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+			if (user != null)
+			{
+				IdentityResult result = await UserManager.DeleteAsync(user);
+
+				if (result.Succeeded)
+				{
+					Navigation.NavigateTo("/odhlaseni", true);
+				}
+				else
+				{
+					errorMessage = string.Join("<br>", result.Errors.Select(e => e.Description));
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			showConfirmDeleteAccount = false;
+		}
+	}
+
+
+	/// <summary>
+	/// Model pro vstupní data z formuláře pro změnu hesla
+	/// </summary>
+	private class InputModelPassword
+	{
+		[Required(ErrorMessage = "Zadejte současné heslo.")]
+		public string CurrentPassword { get; set; } = "";
+
+		[Required(ErrorMessage = "Zadejte nové heslo.")]
+		public string NewPassword { get; set; } = "";
+
+		[Required(ErrorMessage = "Zadejte znovu nové heslo.")]
+		public string ConfirmNewPassword { get; set; } = "";
+	}
+
+	/// <summary>
+	/// Model pro vstupní data z formuláře pro změnu e-mailu
+	/// </summary>
+	private class InputModelEmail
+	{
+		[Required(ErrorMessage = "Zadejte email.")]
+		[EmailAddress(ErrorMessage = "Zadaný email není správný.")]
+		public string NewEmail { get; set; } = "";
+
+		[Required(ErrorMessage = "Zadejte současné heslo.")]
+		public string CurrentPassword { get; set; } = "";
+	}
+}
