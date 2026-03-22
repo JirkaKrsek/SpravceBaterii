@@ -22,7 +22,6 @@ namespace SpravceBaterii.Data.Models
         [StringLength(100, ErrorMessage = "Výrobce může mít max. 100 znaků")]
         public string? Manufacturer { get; set; }
 
-        [StringLength(200, ErrorMessage = "Historie použití může mít max. 200 znaků")]
         public string? UsageHistory { get; set; }
 
         [StringLength(200, ErrorMessage = "Popis může mít max. 200 znaků")]
