@@ -361,12 +361,30 @@ form {
     background-color: white;
     overflow: auto;
 }
+div.account-update {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+div.account-update>div {
+    flex: 1;
+    padding: 30px;
+    box-shadow: 0 5px 20px black;
+    border-radius: 20px;
+}
+div.account-update>div form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+form.account label, div.account-update label {
+    margin-bottom: -10px;
+}
 form.account {
     margin: auto;
     padding: 30px;
     box-shadow: 0 5px 20px black;
     border-radius: 20px;
-
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -386,7 +404,6 @@ form.add-update span, form .validation-errors {
     grid-column: 1 / -1;
 }
 form label {
-    margin-bottom: 5px;
     font-weight: bold;
 }
 form input, form select, textarea {
