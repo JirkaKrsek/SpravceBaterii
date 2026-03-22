@@ -5,6 +5,7 @@ using SpravceBaterii.Components;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
 using SpravceBaterii.Services;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,12 @@ builder.Services.AddRazorComponents()
 
 
 // Název systémové promìnné pro pøístup k databázi
-string systemVariableName = "SpravceBateriiDatabaze";
+string? systemVariableName = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(systemVariableName))
+{
+    throw new InvalidOperationException("The connection string name in appsettings.json is missing or empty.");
+}
 
 // Naètení connection stringu ze systémové promìnné
 var connectionString = Environment.GetEnvironmentVariable(systemVariableName);
@@ -39,12 +45,11 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     options.User.RequireUniqueEmail = true;
 
     // Nastavení požadavkù hesla
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 0;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
@@ -73,6 +78,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/ucet/odhlaseni";
 });
 
+// Nastavení výchozí kultury na èeštinu
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("cs-CZ");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("cs-CZ");
+
 // Registrace služeb
 builder.Services.AddScoped<ApplicationUserService>();
 builder.Services.AddScoped<BatteryService>();
@@ -83,7 +92,7 @@ builder.Services.AddScoped<ChemicalCompositionService>();
 builder.Services.AddScoped<DisposableBatteryService>();
 builder.Services.AddScoped<RechargeableBatteryService>();
 builder.Services.AddScoped<ExceptionHandlerService>();
-builder.Services.AddScoped<FormNavigationService>();
+builder.Services.AddScoped<ModalNavigationService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,43 @@
+﻿@using SpravceBaterii.Services
+
+@inject ModalNavigationService ModalNavigationService
+
+@implements IDisposable
+
+@{
+	ModalNavigationEntry? entry = ModalNavigationService.GetCurrentComponent();
+	if (entry is null)
+	{
+		return;
+	}
+
+	Type componentType = entry.ComponentType;
+
+	Dictionary<string, object?> parameter = new();
+	parameter["ItemId"] = entry.SelectedId;
+}
+
+<div class="overlay" @onmousedown="ModalNavigationService.Close">
+	<div class="overlay-content" @onmousedown:stopPropagation="true">
+		<button type="button" class="close" @onclick="ModalNavigationService.Close">X</button>
+		<DynamicComponent Type="componentType" Parameters="parameter" />
+	</div>
+</div>
+
+@code {
+	/// <summary>
+	/// Přihlášení ke sledování události změny v ModalNavigationService
+	/// </summary>
+	protected override void OnInitialized()
+	{
+		ModalNavigationService.ModalChanged += StateHasChanged;
+	}
+
+	/// <summary>
+	/// Odhlášení od sledování události změny v ModalNavigationService
+	/// </summary>
+	public void Dispose()
+	{
+		ModalNavigationService.ModalChanged -= StateHasChanged;
+	}
+}

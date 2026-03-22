@@ -12,7 +12,7 @@
 @inject ApplicationUserService UserService
 @inject ExceptionHandlerService ExceptionHandlerService
 
-<PageTitle>Přihlášení</PageTitle>
+<PageTitle>Správce baterií - Přihlášení</PageTitle>
 
 <h1>Přihlášení</h1>
 
@@ -27,11 +27,13 @@
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-    <label for="input-email">Email: </label>
-    <InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Email@email.com" required></InputText>
+    <p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
+
+    <label for="input-email">E-mail: </label>
+    <InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Zadejte e-mail" required></InputText>
 
 	<label for="input-password">Heslo: </label>
-	<InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="TajneHeslo" required></InputText>
+    <InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="Zadejte heslo" required></InputText>
 
     <div>
         <InputCheckbox id="input-checkbox" @bind-Value="Input.RememberMe"></InputCheckbox>

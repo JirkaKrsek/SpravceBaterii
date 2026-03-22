@@ -71,6 +71,8 @@ namespace SpravceBaterii.Services
             string userId = await userService.GetUserIdAsync();
 
             return await applicationDbContext.Batteries
+                .Include(b => b.BatteryType)
+                .Include(b => b.ChemicalComposition)
                 .Include(b => b.DisposableBattery)
                 .Include(b => b.RechargeableBattery)
                 .AsNoTracking()
@@ -106,7 +108,7 @@ namespace SpravceBaterii.Services
 
             return await applicationDbContext.Batteries
                 .Where(b => b.UserId == userId && b.DeviceId == null && b.BatteryTypeId == typeId)
-                .Include(b => b.BatteryType)
+                .Include(b => b.ChemicalComposition)
                 .Include(b => b.DisposableBattery)
                 .AsNoTracking()
                 .ToListAsync();
@@ -128,8 +130,8 @@ namespace SpravceBaterii.Services
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
 
-                //Odpojení od slednování EF Core
-                applicationDbContext.Entry(battery).State = EntityState.Detached;
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {
@@ -183,9 +185,6 @@ namespace SpravceBaterii.Services
                     }
                     //Uložení
                     await applicationDbContext.SaveChangesAsync();
-
-                    //Odpojení od slednování EF Core
-                    applicationDbContext.Entry(rechargeableBattery).State = EntityState.Detached;
                 }
                 else if (!battery.IsRechargeable && disposableBattery is not null)
                 {
@@ -206,25 +205,19 @@ namespace SpravceBaterii.Services
                     }
                     //Uložení
                     await applicationDbContext.SaveChangesAsync();
-
-                    //Odpojení od slednování EF Core
-                    applicationDbContext.Entry(disposableBattery).State = EntityState.Detached;
                 }
                 else
                 {
-                    //Odpojení od slednování EF Core
-                    applicationDbContext.Entry(battery).State = EntityState.Detached;
-
                     throw new InvalidOperationException();
                 }
-
-                //Odpojení od slednování EF Core
-                applicationDbContext.Entry(battery).State = EntityState.Detached;
             }
             else
             {
                 throw new UnauthorizedAccessException();
             }
+
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
@@ -255,8 +248,8 @@ namespace SpravceBaterii.Services
             //Uložení
             await applicationDbContext.SaveChangesAsync();
 
-            //Odpojení od slednování EF Core
-            applicationDbContext.Entry(battery).State = EntityState.Detached;
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
@@ -275,6 +268,9 @@ namespace SpravceBaterii.Services
                 applicationDbContext.Remove(battery);
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {
@@ -297,12 +293,14 @@ namespace SpravceBaterii.Services
             stringBuilder.Append(battery.InsertionDate?.ToString() ?? "Datum vložení nebyl zadán");
             stringBuilder.Append(" - ");
             stringBuilder.Append(DateOnly.FromDateTime(DateTime.Today).ToShortDateString());
-            stringBuilder.Append(" byla použita v ");
+            stringBuilder.Append(" => ");
             stringBuilder.AppendLine(deviceName);
 
             battery.UsageHistory += stringBuilder.ToString();
+
             battery.DeviceId = null;
             battery.InsertionDate = null;
+            battery.ExpectedLifespan = null;
 
             await UpdateOnlyBattery(battery);
         }

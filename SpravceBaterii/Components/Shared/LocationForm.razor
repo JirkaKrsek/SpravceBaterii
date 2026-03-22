@@ -4,9 +4,9 @@
 @using SpravceBaterii.Services.Tools
 
 @inject LocationService LocationService
+@inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
-
-<h2>Formulář pro zadání nové baterie</h2>
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -14,9 +14,22 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<div class="component-header">
+	@if (ItemId is null)
+	{
+		<h2>Formulář pro zadání nového umístění</h2>
+	}
+	else
+	{
+		<h2>Formulář pro úpravu umístění</h2>
+	}
+</div>
+
 <EditForm Model="@location" OnValidSubmit="SaveLocation" FormName="LocationForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
+
+	<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
 
 	<label for="input-Name">Název: </label>
 	<InputText id="input-Name" @bind-Value="location.Name"></InputText>
@@ -30,34 +43,44 @@
 	<hr>
 
 	<button type="submit">Uložit</button>
-	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
-	<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
+
+	@if (ItemId is not null)
+	{
+		<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
+	}
 
 	@if (showConfirm)
 	{
-		<div>
-			<p>Opravdu chcete odstranit toto umístění?</p>
-			<button type="button" @onclick="() => DeleteLocation(location.Id)">Ano</button>
-			<button type="button" @onclick="() => showConfirm = false">Ne</button>
+		<div class="overlay">
+			<div class="overlay-content">
+				@if (anyDevicesInLocation)
+				{
+					<p>Zařízení zůstanou zachována.</p>
+				}
+				<p>Opravdu chcete odstranit toto umístění?</p>
+				<div class="action-buttons">
+					<button type="button" @onclick="() => DeleteLocation(location.Id)">Ano</button>
+					<button type="button" @onclick="() => showConfirm = false">Ne</button>
+				</div>
+			</div>
 		</div>
 	}
 </EditForm>
 
 @code {
+	/// <summary>
+	/// Vstupní parametr - ID položky pro její načtení
+	/// </summary>
+	[Parameter]
+	public int? ItemId { get; set; }
+
+
 	private string errorMessage = "";
 	private bool showConfirm = false;
 
-	/// <summary>
-	/// Callback události z rodičovské komponenty
-	/// </summary>
-	[Parameter]
-	public int? LocationToUpdateId { get; set; }
-	[Parameter]
-	public EventCallback LocationSaved { get; set; }
-	[Parameter]
-	public EventCallback Cancel { get; set; }
-
 	private Location location = new();
+	private bool anyDevicesInLocation;
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -67,9 +90,10 @@
 	{
 		try
 		{
-			if (LocationToUpdateId is not null)
+			if (ItemId is not null)
 			{
-				location = await LocationService.GetUserLocationById(LocationToUpdateId.Value);
+				location = await LocationService.GetUserLocationById(ItemId.Value);
+				anyDevicesInLocation = await DeviceService.AnyDevicesInLocationById(location.Id);
 			}
 			else
 			{
@@ -90,17 +114,20 @@
 	{
 		try
 		{
-			if (LocationToUpdateId is null)
+			if (ItemId is null)
 			{
 				await LocationService.AddLocation(location);
+
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAndOpen(typeof(LocationDetail), location.Id);
 			}
 			else
 			{
 				await LocationService.UpdateLocation(location);
-			}
 
-			//Zavolání události v rodičovské komponentě
-			await LocationSaved.InvokeAsync();
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.Close();
+			}
 		}
 		catch (Exception ex)
 		{
@@ -117,24 +144,23 @@
 	{
 		try
 		{
+			if (anyDevicesInLocation)
+			{
+				await DeviceService.UnassignDevicesInLocationById(location.Id);
+			}
+
 			await LocationService.DeleteLocationById(locationId);
 
-			//Zavolání události v rodičovské komponentě
-			await LocationSaved.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
-	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
+		finally
+		{
+			showConfirm = false;
+		}
 	}
 }

@@ -5,11 +5,13 @@
 @using SpravceBaterii.Services
 @using SpravceBaterii.Services.Tools
 
+@implements IDisposable
+
 @inject BatteryService BatteryService
 @inject ExceptionHandlerService ExceptionHandlerService
-@inject FormNavigationService FormNavigationService
+@inject ModalNavigationService ModalNavigationService
 
-<PageTitle>Seznam baterií</PageTitle>
+<PageTitle>Správce baterií - Baterie</PageTitle>
 
 <h1>Baterie</h1>
 
@@ -19,34 +21,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-@if (isDataLoaded)
-{
-	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryDetail))
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<BatteryDetail BatteryId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-							   EditBattery="@(batteryId => FormNavigationService.Open(typeof(BatteryForm), batteryId))"
-							   Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-							   Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></BatteryDetail>
-			</div>
-		</div>
-	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(BatteryForm))
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<BatteryForm BatteryToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-							 BatterySaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
-							 Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></BatteryForm>
-			</div>
-		</div>
-	}
-	else
-	{
-		<button @onclick="() => FormNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
-	}
-}
+	<button @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
 
 <hr>
 
@@ -58,59 +33,59 @@
 }
 else
 {
-	<table class="selectable">
-		<thead>
-			<tr>
-				<th>Název zařízení</th>
-				<th>Počet</th>
-				<th>Označení</th>
-				<th>Popis</th>
-				<th>Typ</th>
-				<th>Datum expirace</th>
-				<th>Do konce expirace zbývá dní</th>
-				<th>Datum vložení</th>
-				<th>Předpokládaná doba výdrže (ve dnech)</th>
-				<th>Zbývající předpokládaná životnost</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (Battery battery in BatteryList)
-			{
-				<tr @onclick="() => FormNavigationService.Open(typeof(BatteryDetail), battery.Id)">
-					<td>@(battery.Device?.Name ?? "")</td>
-					<td>@battery.Count</td>
-					<td>@battery.BatteryType.Name</td>
-					<td><textarea readonly>@battery.Description</textarea></td>
-					@if (battery.IsRechargeable)
-					{
-						<td>Nabíjecí</td>
-						<td></td>
-						<td></td>
-					}
-					else
-					{
-						<td>Jednorázová</td>
-						<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
-						BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
-						<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
-					}
-					<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
-					<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
-					@{
-						BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
-						<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
-					}
+	<div class="table-container">
+		<table class="selectable">
+			<thead>
+				<tr>
+					<th>Název zařízení</th>
+					<th>Počet</th>
+					<th>Označení</th>
+					<th>Popis</th>
+					<th>Typ</th>
+					<th>Datum expirace</th>
+					<th>Do konce expirace zbývá dní</th>
+					<th>Datum vložení</th>
+					<th>Předpokládaná doba výdrže (ve dnech)</th>
+					<th>Zbývající předpokládaná životnost</th>
 				</tr>
-			}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				@foreach (Battery battery in BatteryList)
+				{
+					<tr @onclick="() => ModalNavigationService.Open(typeof(BatteryDetail), battery.Id)" title="Zobrazit detail">
+						<td>@(battery.Device?.Name ?? "")</td>
+						<td>@battery.Count</td>
+						<td>@battery.BatteryType.Name</td>
+						<td><textarea disabled>@battery.Description</textarea></td>
+						@if (battery.IsRechargeable)
+						{
+							<td>Nabíjecí</td>
+							<td></td>
+							<td></td>
+						}
+						else
+						{
+							<td>Jednorázová</td>
+							<td>@(battery.DisposableBattery?.ExpirationDate.ToShortDateString() ?? "")</td>
+							BatteryStatus batteryStatusExpirationDate = SetRemainingDaysToExpirate(battery);
+							<td class="@(batteryStatusExpirationDate?.CssClass ?? "")">@(batteryStatusExpirationDate?.Days?.ToString() ?? "")</td>
+						}
+						<td>@(battery.InsertionDate?.ToShortDateString() ?? "")</td>
+						<td>@(battery.ExpectedLifespan?.ToString() ?? "")</td>
+						@{
+							BatteryStatus batteryStatusExpectedLifeSpan = SetRemainingDaysToExpectedLife(battery);
+							<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 }
 
 @code {
 	private string errorMessage = "";
-	private bool isDataLoaded = false;
 	private List<Battery> BatteryList = new();
-	private int? selectedBatteryId;
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 
 	/// <summary>
@@ -119,9 +94,35 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
-		FormNavigationService.Reset();
+		ModalNavigationService.Reset();
 
 		await LoadBatteryList();
+
+		//Přihlášení k události pro změnu navigace, aby se načetla data po návratu z modální komponenty
+		ModalNavigationService.ModalChanged += NavigationChanged;
+	}
+
+	/// <summary>
+	/// Při zavření modální komponenty se odhlásí odběr události
+	/// </summary>
+	public void Dispose()
+	{
+		ModalNavigationService.ModalChanged -= NavigationChanged;
+	}
+
+	/// <summary>
+	/// Po změně modální navigace se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	private async void NavigationChanged()
+	{
+		if (ModalNavigationService.ShouldReload())
+		{
+			await LoadBatteryList();
+			ModalNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
+		}
 	}
 
 	/// <summary>
@@ -134,8 +135,6 @@ else
 		{
 			BatteryList = await BatteryService.GetUserBatteries();
 			BatteryList = BatteryList.OrderBy(b => b.Device?.Name == null).ThenBy(b => b.Device?.Name).ToList();
-
-			isDataLoaded = true;
 		}
 		catch (Exception ex)
 		{
@@ -169,20 +168,5 @@ else
 			return batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
 		return new BatteryStatus();
-	}
-
-	/// <summary>
-	/// Pokud je v FormNavigationService reloadList = true
-	/// Znovu se načtou data
-	/// FormNavigationService se nastaví na výchozí hodnoty
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task TryReloadList()
-	{
-		if (FormNavigationService.ShouldReload())
-		{
-			await LoadBatteryList();
-			FormNavigationService.Reset();
-		}
 	}
 }

@@ -7,6 +7,7 @@
 @inject LocationService LocationService
 @inject DeviceService DeviceService
 @inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -14,53 +15,56 @@
     <p class="error-message">@errorMessage</p>
 }
 
+<div class="component-header">
+    <h2>Výběr umístění</h2>
+</div>
+
+<p>Kliknutím na řádek vyberete umístění.</p>
+
 <EditForm Model="@Input" OnValidSubmit="Save" FormName="SetLocation">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-    <table class="selectable">
-        <thead>
-            <tr>
-                <th>Název</th>
-                <th>Podlaží</th>
-                <th>Popis</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Location location in Locations)
-            {
-                <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")">
-                    <td>@location.Name</td>
-                    <td>@location.Floor</td>
-                    <td><textarea readonly>@location.Description</textarea></td>
+    <div class="table-container">
+        <table class="selectable">
+            <thead>
+                <tr>
+                    <th>Název</th>
+                    <th>Podlaží</th>
+                    <th>Popis</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (Location location in Locations)
+                {
+                    <tr @onclick="@(() => Input.selectedLocationId = location.Id)" class="@(Input.selectedLocationId == location.Id ? "selected" : "")" title="Vybrat">
+                        <td>@location.Name</td>
+                        <td>@location.Floor</td>
+                        <td><textarea disabled>@location.Description</textarea></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+	</div>
 
 	<hr>
 
-	<button type="submit">Uložit</button>
-    <button type="reset" @onclick="@(() => Input.selectedLocationId = null)">Žádné umístění</button>
-    <button type="button" class="close" @onclick="Close">Zavřít</button>
+    <div class="action-buttons">
+	    <button type="submit">Uložit</button>
+        <button type="reset" @onclick="@(() => Input.selectedLocationId = null)">Žádné umístění</button>
+    </div>
 </EditForm>
 
 @code {
-    private string errorMessage = "";
-    private bool showConfirm = false;
-    private InputModel Input = new();
-
     /// <summary>
-    /// Callback události z rodičovské komponenty
+    /// Vstupní parametr - ID položky pro její načtení
     /// </summary>
     [Parameter]
-    public int DeviceId { get; set; }
-    [Parameter]
-    public EventCallback Saved { get; set; }
-    [Parameter]
-    public EventCallback Cancel { get; set; }
-    [Parameter]
-    public EventCallback<int> EditLocation { get; set; }
+    public int ItemId { get; set; }
+
+
+    private string errorMessage = "";
+    private InputModel Input = new();
 
     private Device device = new();
     private List<Location> Locations = new();
@@ -74,7 +78,7 @@
     {
         try
         {
-            device = await DeviceService.GetUserDeviceById(DeviceId);
+            device = await DeviceService.GetUserDeviceById(ItemId);
             Input.selectedLocationId = device.LocationId;
             Locations = await LocationService.GetLocations();
         }
@@ -95,25 +99,14 @@
             device.LocationId = Input.selectedLocationId;
             await DeviceService.UpdateDevice(device);
 
-            //Zavolání události v rodičovské komponentě
-            await Saved.InvokeAsync();
+            ModalNavigationService.MarkForReload();
+            ModalNavigationService.Close();
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
 	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
-	}
-
 
     /// <summary>
     /// Model pro vstupní data z formuláře

@@ -7,11 +7,10 @@
 @inject DeviceService DeviceService
 @inject BatteryTypeService BatteryTypeService
 @inject ChemicalCompositionService ChemicalCompositionService
-@inject ExceptionHandlerService ExceptionHandlerService
 @inject DisposableBatteryService DisposableBatteryService
 @inject RechargeableBatteryService RechargeableBatteryService
-
-<h2>Formulář pro zadání nové baterie</h2>
+@inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -19,26 +18,27 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<div class="component-header">
+	@if (ItemId is null)
+	{
+		<h2>Formulář pro zadání nové baterie</h2>
+	}
+	else
+	{
+		<h2>Formulář pro úpravu baterie</h2>
+	}
+</div>
+
 <EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-	<label for="input-Device">Zařízení (ve kterém je umístěna): </label>
-	<InputSelect id="input-Device" @bind-Value="battery.DeviceId" @bind-Value:after="SetDeviceLocation">
-		<option value="">- Vyberte typ -</option>
-		@foreach (Device device in Devices)
-		{
-			<option value="@device.Id">@device.Name</option>
-		}
-	</InputSelect>
-
-	<span>Poloha vybraného zařízení: @selectedDeviceLocation</span>
+	<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
 
 	@if (battery.DeviceId is not null)
 	{
 		<label for="input-InsertionDate">Datum vložení: </label>
 		<InputDate id="input-InsertionDate" @bind-Value="battery.InsertionDate" @bind-Value:after="SetRemainingDaysToExpectedLife"></InputDate>
-	}
 
 	<label for="input-ExpectedLifespan">Očekávaná doba životnosti (ve dnech): </label>
 	<InputNumber id="input-ExpectedLifespan" @bind-Value="battery.ExpectedLifespan" @bind-Value:after="SetRemainingDaysToExpectedLife"></InputNumber>
@@ -47,9 +47,14 @@
 	{
 		<span>Podle očekávané životnosti zbývá do vybití <strong class="@batteryStatusExpectedLifeSpan.CssClass">@(batteryStatusExpectedLifeSpan.Days?.ToString() ?? "")</strong> dní</span>
 	}
+	}
 
 	<label for="input-Count">Počet: </label>
-	<InputNumber id="input-Count" @bind-Value="battery.Count" min="1" required></InputNumber>
+	<InputNumber id="input-Count" @bind-Value="battery.Count" min="1" max="@maxBatteryCount" required></InputNumber>
+	@if (maxBatteryCount is not null)
+	{
+		<span>Počet dostupných slotů v zařízení pro tuto baterii: @maxBatteryCount</span>
+	}
 
 	<label for="input-Description">Popis: </label>
 	<InputTextArea id="input-Description" @bind-Value="battery.Description"></InputTextArea>
@@ -57,8 +62,11 @@
 	<label for="input-Manufacturer">Výrobce: </label>
 	<InputText id="input-Manufacturer" @bind-Value="battery.Manufacturer"></InputText>
 
+	@if (ItemId is not null)
+	{
 	<label for="input-UsageHistory">Byla použita v zařízení: </label>
 	<InputTextArea id="input-UsageHistory" @bind-Value="battery.UsageHistory"></InputTextArea>
+	}
 
 	<label for="input-BatteryType">Typ: </label>
 	<InputSelect id="input-BatteryType" @bind-Value="battery.BatteryTypeId" required>
@@ -78,19 +86,18 @@
 		}
 	</InputSelect>
 
-	<label for="input-IsRechargeable">Nabíjecí/jednorázová: </label>
+	<label for="input-IsRechargeable">Jednorázová/nabíjecí: </label>
 	<div id="input-IsRechargeable">
 		<InputRadioGroup @bind-Value="battery.IsRechargeable" required>
 			<div>
-		<InputRadio Value="true" id="input-IsRechargeable-true">Nabíjecí</InputRadio>
-		<label for="input-IsRechargeable-true">Nabíjecí</label>
+				<InputRadio Value="false" id="input-IsRechargeable-false">Jednorázová</InputRadio>
+				<label for="input-IsRechargeable-false">Jednorázová</label>
 			</div>
 			<div>
-		<InputRadio Value="false" id="input-IsRechargeable-false">Jednorázová</InputRadio>
-		<label for="input-IsRechargeable-false">Jednorázová</label>
+				<InputRadio Value="true" id="input-IsRechargeable-true">Nabíjecí</InputRadio>
+				<label for="input-IsRechargeable-true">Nabíjecí</label>
 			</div>
-			
-	</InputRadioGroup>
+		</InputRadioGroup>
 	</div>
 
 	@if (battery.IsRechargeable)
@@ -114,44 +121,49 @@
 	<hr>
 
 	<button type="submit">Uložit</button>
-	<button type="button" class="close" @onclick="Close">Zavřít bez uložení</button>
-	<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
+
+	@if (ItemId is not null)
+	{
+		<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
+	}
 
 	@if (showConfirm)
 	{
-		<div>
+		<div class="overlay">
+			<div class="overlay-content">
 			<p>Opravdu chcete odstranit tuto baterii?</p>
+				<div class="action-buttons">
 			<button type="button" @onclick="() => DeleteBattery(battery.Id)">Ano</button>
 			<button type="button" @onclick="() => showConfirm = false">Ne</button>
+		</div>
+		</div>
 		</div>
 	}
 </EditForm>
 
-@code {
+	@code {
+	/// <summary>
+	/// Vstupní parametr - ID položky pro její načtení
+	/// </summary>
+	[Parameter]
+	public int? ItemId { get; set; }
+
+
 	private string errorMessage = "";
 	private bool showConfirm = false;
 
-	/// <summary>
-	/// Callback události z rodičovské komponenty
-	/// </summary>
-	[Parameter]
-	public int? BatteryToUpdateId { get; set; }
-	[Parameter]
-	public EventCallback BatterySaved { get; set; }
-	[Parameter]
-	public EventCallback Cancel { get; set; }
-
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
-	private List<Device> Devices = new();
 	private Battery battery = new();
+	private Device? device = null;
+	private int? maxBatteryCount = null;
 	private RechargeableBattery rechargeableBattery = new();
 	private DisposableBattery disposableBattery = new();
 
-	private string selectedDeviceLocation = "";
 	private BatteryStatusEvaluator batteryStatusEvaluator = new();
 	private BatteryStatus batteryStatusExpirationDate = new();
 	private BatteryStatus batteryStatusExpectedLifeSpan = new();
+
 
 	/// <summary>
 	/// Načtení potřebných dat při zobrazení komponenty
@@ -161,10 +173,21 @@
 	{
 		try
 		{
-			if (BatteryToUpdateId is not null)
+			if (ItemId is not null)
 			{
-				battery = await BatteryService.GetUserBatteryById(BatteryToUpdateId.Value);
+				battery = await BatteryService.GetUserBatteryById(ItemId.Value);
 
+				if (battery.DeviceId is not null)
+				{
+					device = await DeviceService.GetUserDeviceByIdWithBatteries(battery.DeviceId.Value);
+				}
+				if (device is not null)
+				{
+					int usedSlots = device.Batteries?.Sum(b => b.Count) ?? 0;
+					int freeSlots = device.BatteryCount - usedSlots;
+					maxBatteryCount = battery.Count + freeSlots;
+				}
+				
 				if (!battery.IsRechargeable)
 				{
 					disposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id) ?? new()
@@ -197,11 +220,9 @@
 
 			BatteryTypes = await BatteryTypeService.GetBatteryTypes();
 			ChemicalCompositions = await ChemicalCompositionService.GetChemicalCompositions();
-			Devices = await DeviceService.GetDevices();
 
 			SetRemainingDaysToExpirate();
 			SetRemainingDaysToExpectedLife();
-			SetDeviceLocation();
 		}
 		catch (Exception ex)
 		{
@@ -220,17 +241,29 @@
 			battery.RechargeableBattery = rechargeableBattery;
 			battery.DisposableBattery = disposableBattery;
 
-			if (BatteryToUpdateId is null)
+			if (ItemId is null)
 			{
 				await BatteryService.AddBattery(battery);
+
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAndOpen(typeof(BatteryDetail), battery.Id);
 			}
 			else
 			{
-				await BatteryService.UpdateBattery(battery);
-			}
+				if (maxBatteryCount is not null)
+				{
+					if (battery.Count > maxBatteryCount)
+					{
+						errorMessage = "Počet baterií může být maximálně: " + maxBatteryCount + ", protože v zařízení již není dostupné místo.";
+						return;
+					}
+				}
 
-			//Zavolání události v rodičovské komponentě
-			await BatterySaved.InvokeAsync();
+				await BatteryService.UpdateBattery(battery);
+
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.Close();
+			}
 		}
 		catch (Exception ex)
 		{
@@ -249,12 +282,16 @@
 		{
 			await BatteryService.DeleteBatteryById(batteryId);
 
-			//Zavolání události v rodičovské komponentě
-			await BatterySaved.InvokeAsync();
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			showConfirm = false;
 		}
 	}
 
@@ -278,23 +315,5 @@
 		{
 			batteryStatusExpectedLifeSpan = batteryStatusEvaluator.RemainingDaysToExpectedLife(battery.InsertionDate.Value, battery.ExpectedLifespan.Value);
 		}
-	}
-
-	/// <summary>
-	/// Nastavení názvu umístění aktuálně vybraného zařízení
-	/// </summary>
-	private void SetDeviceLocation()
-	{
-		selectedDeviceLocation = Devices.FirstOrDefault(d => d.Id == battery.DeviceId)?.Location?.Name ?? "-";
-	}
-
-	/// <summary>
-	/// Zavření této komponety s formulářem bez uložení zadaných dat
-	/// </summary>
-	/// <returns>Asynchronní operace</returns>
-	private async Task Close()
-	{
-		//Zavolání události v rodičovské komponentě
-		await Cancel.InvokeAsync();
 	}
 }

@@ -5,11 +5,13 @@
 @using SpravceBaterii.Services
 @using SpravceBaterii.Services.Tools
 
+@implements IDisposable
+
 @inject LocationService LocationService
 @inject ExceptionHandlerService ExceptionHandlerService
-@inject FormNavigationService FormNavigationService
+@inject ModalNavigationService ModalNavigationService
 
-<PageTitle>Seznam umístění</PageTitle>
+<PageTitle>Správce baterií - Umístění</PageTitle>
 
 <h1>Umístění</h1>
 
@@ -19,34 +21,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-@if (isDataLoaded)
-{
-	@if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(LocationDetail))
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<LocationDetail LocationId="@FormNavigationService.GetCurrentForm()!.SelectedId!.Value"
-								EditLocation="@(locationId => FormNavigationService.Open(typeof(LocationForm), locationId))"
-								Deleted="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload();})"
-								Cancel="@(async (dataChanged) => { FormNavigationService.Close(); if (dataChanged) {FormNavigationService.MarkForReload();} })"></LocationDetail>
-			</div>
-		</div>
-	}
-	else if (FormNavigationService.GetCurrentForm()?.ComponentType == typeof(LocationForm))
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<LocationForm LocationToUpdateId="@FormNavigationService.GetCurrentForm()?.SelectedId"
-							  LocationSaved="@(async () => {FormNavigationService.Close(); FormNavigationService.MarkForReload(); await TryReloadList();})"
-							  Cancel="@(async () => {FormNavigationService.Close(); await TryReloadList();})"></LocationForm>
-			</div>
-		</div>
-	}
-	else
-	{
-		<button @onclick="() => FormNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
-	}
-}
+	<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
 
 <hr>
 
@@ -58,30 +33,33 @@
 }
 else
 {
-	<table class="selectable">
-		<thead>
-			<tr>
-				<th>Název umístění</th>
-				<th>Podlaží</th>
-				<th>Popis</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (Location location in LocationList)
-			{
-				<tr @onclick="() => FormNavigationService.Open(typeof(LocationDetail), location.Id)">
-					<td>@location.Name</td>
-					<td>@(location.Floor ?? "")</td>
-					<td><textarea readonly>@location.Description</textarea></td>
+	<div class="table-container">
+		<table class="selectable">
+			<thead>
+				<tr>
+					<th>Název umístění</th>
+					<th>Podlaží</th>
+					<th>Popis</th>
+					<th>Počet zařízení</th>
 				</tr>
-			}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				@foreach (Location location in LocationList)
+				{
+					<tr @onclick="() => ModalNavigationService.Open(typeof(LocationDetail), location.Id)" title="Zobrazit detail">
+						<td>@location.Name</td>
+						<td>@(location.Floor ?? "")</td>
+						<td><textarea disabled>@location.Description</textarea></td>
+						<td>@location.Devices?.Count()</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 }
 
 @code {
 	private string errorMessage = "";
-	private bool isDataLoaded = false;
 	private List<Location> LocationList = new();
 
 	/// <summary>
@@ -90,9 +68,35 @@ else
 	/// <returns>Asynchronní operace</returns>
 	protected override async Task OnInitializedAsync()
 	{
-		FormNavigationService.Reset();
+		ModalNavigationService.Reset();
 
 		await LoadLocationList();
+
+		//Přihlášení k události pro změnu navigace, aby se načetla data po návratu z modální komponenty
+		ModalNavigationService.ModalChanged += NavigationChanged;
+	}
+
+	/// <summary>
+	/// Při zavření modální komponenty se odhlásí odběr události
+	/// </summary>
+	public void Dispose()
+	{
+		ModalNavigationService.ModalChanged -= NavigationChanged;
+	}
+
+	/// <summary>
+	/// Po změně modální navigace se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	private async void NavigationChanged()
+	{
+		if (ModalNavigationService.ShouldReload())
+		{
+			await LoadLocationList();
+			ModalNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
+		}
 	}
 
 	/// <summary>
@@ -105,8 +109,6 @@ else
 		{
 			LocationList = await LocationService.GetLocations();
 			LocationList = LocationList.OrderBy(l => l.Name).ToList();
-
-			isDataLoaded = true;
 		}
 		catch (Exception ex)
 		{
@@ -115,17 +117,19 @@ else
 	}
 
 	/// <summary>
-	/// Pokud je v FormNavigationService reloadList = true
-	/// Znovu se načtou data
-	/// FormNavigationService se nastaví na výchozí hodnoty
+	/// Po vykreslení stránky se zkontroluje, zda nejsou potřeba znovunačíst data
 	/// </summary>
+	/// <param name="firstRender">bool, zda se stránka vykresluje poprvé</param>
 	/// <returns>Asynchronní operace</returns>
-	private async Task TryReloadList()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		if (FormNavigationService.ShouldReload())
+		if (ModalNavigationService.ShouldReload())
 		{
 			await LoadLocationList();
-			FormNavigationService.Reset();
+			ModalNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
 		}
 	}
 }

@@ -29,6 +29,7 @@ namespace SpravceBaterii.Services
             string userId = await userService.GetUserIdAsync();
 
             return await applicationDbContext.Locations
+                .Include(l => l.Devices)
                 .AsNoTracking()
                 .Where(l => l.UserId == userId).ToListAsync();
         }
@@ -62,8 +63,8 @@ namespace SpravceBaterii.Services
             applicationDbContext.Locations.Add(location);
             await applicationDbContext.SaveChangesAsync();
 
-            //Odpojení od slednování EF Core
-            applicationDbContext.Entry(location).State = EntityState.Detached;
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
@@ -83,8 +84,8 @@ namespace SpravceBaterii.Services
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
 
-                //Odpojení od slednování EF Core
-                applicationDbContext.Entry(location).State = EntityState.Detached;
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {
@@ -108,6 +109,9 @@ namespace SpravceBaterii.Services
                 applicationDbContext.Remove(location);
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {

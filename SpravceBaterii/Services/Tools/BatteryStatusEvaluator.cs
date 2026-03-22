@@ -2,6 +2,8 @@
 {
     public class BatteryStatusEvaluator
     {
+        private readonly string DefaultStatus = "status-default ";
+
         /// <summary>
         /// Výpočet zbývajících dní do konce expirace baterie
         /// </summary>
@@ -10,7 +12,7 @@
         public BatteryStatus RemainingDaysToExpirate(DateOnly expirationDate)
         {
             int remainingDays = (expirationDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
-            string cssClass = GetCssClass(remainingDays);
+            string cssClass = DefaultStatus + GetCssClass(remainingDays);
 
             return new BatteryStatus(remainingDays, cssClass);
         }
@@ -24,7 +26,7 @@
         public BatteryStatus RemainingDaysToExpectedLife(DateOnly insertionDate, int expectedLifespan)
         {
             int remainingDays = (insertionDate.AddDays(expectedLifespan).ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
-            string cssClass = GetCssClass(remainingDays);
+            string cssClass = DefaultStatus + GetCssClass(remainingDays);
 
             return new BatteryStatus(remainingDays, cssClass);
         }

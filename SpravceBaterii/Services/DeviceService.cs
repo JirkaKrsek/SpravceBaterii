@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpravceBaterii.Data;
 using SpravceBaterii.Data.Models;
-using System;
 
 namespace SpravceBaterii.Services
 {
@@ -41,6 +40,7 @@ namespace SpravceBaterii.Services
         /// <summary>
         /// Načtení zařízení podle ID umístění
         /// </summary>
+        /// <param name="locationId">ID umístění</param>
         /// <returns>List zařízení</returns>
         public async Task<List<Device>> GetUserDevicesByLocationId(int locationId)
         {
@@ -48,14 +48,29 @@ namespace SpravceBaterii.Services
 
             return await applicationDbContext.Devices
                 .Where(d => d.UserId == userId && d.LocationId == locationId)
+                .Include(d => d.Batteries!)
+                    .ThenInclude(b => b.DisposableBattery)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
         /// <summary>
+        /// Zjištění, zda umístění obsahuje zařízení
+        /// </summary>
+        /// <param name="locationId">ID umístění</param>
+        /// <returns>bool</returns>
+        public async Task<bool> AnyDevicesInLocationById(int locationId)
+        {
+            string userId = await userService.GetUserIdAsync();
+
+            return await applicationDbContext.Devices
+                .AnyAsync(d => d.UserId == userId && d.LocationId == locationId);
+        }
+
+        /// <summary>
         /// Získání zařízení podle ID
         /// </summary>
-        /// <param name="batteryId">ID hledaného zařízení</param>
+        /// <param name="deviceId">ID hledaného zařízení</param>
         /// <returns>Nalezené zařízení</returns>
         /// <exception cref="KeyNotFoundException">Zařízení nenalezeno</exception>
         public async Task<Device> GetUserDeviceById(int deviceId)
@@ -117,14 +132,14 @@ namespace SpravceBaterii.Services
             applicationDbContext.Devices.Add(device);
             await applicationDbContext.SaveChangesAsync();
 
-            //Odpojení od slednování EF Core
-            applicationDbContext.Entry(device).State = EntityState.Detached;
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
         }
 
         /// <summary>
         /// Aktualizace zařízení v databázi
         /// </summary>
-        /// <param name="battery">Upravené zařízení</param>
+        /// <param name="device">Upravené zařízení</param>
         /// <returns>Asynchronní operace</returns>
         /// <exception cref="InvalidOperationException">Neplatná data</exception>
         /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
@@ -138,8 +153,8 @@ namespace SpravceBaterii.Services
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
 
-                //Odpojení od slednování EF Core
-                applicationDbContext.Entry(device).State = EntityState.Detached;
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {
@@ -148,9 +163,31 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Odpojení všech zařízení z daného umístění
+        /// </summary>
+        /// <param name="locationId">ID umístění</param>
+        /// <returns>Asynchronní operace</returns>
+        public async Task UnassignDevicesInLocationById(int locationId)
+        {
+            List<Device> devices = await GetUserDevicesByLocationId(locationId);
+
+            foreach (Device device in devices)
+            {
+                device.LocationId = null;
+            }
+
+            applicationDbContext.UpdateRange(devices);
+            //Uložení
+            await applicationDbContext.SaveChangesAsync();
+
+            //Odpojení všech entit od slednování v EF Core
+            applicationDbContext.ChangeTracker.Clear();
+        }
+
+        /// <summary>
         /// Odstranění zařízení z databáze
         /// </summary>
-        /// <param name="batteryId">ID zařízení</param>
+        /// <param name="deviceId">ID zařízení</param>
         /// <returns>Asynchronní operace</returns>
         /// <exception cref="UnauthorizedAccessException">Uživatel nemá oprávnění</exception>
         public async Task DeleteDeviceById(int deviceId)
@@ -163,6 +200,9 @@ namespace SpravceBaterii.Services
                 applicationDbContext.Remove(device);
                 //Uložení
                 await applicationDbContext.SaveChangesAsync();
+
+                //Odpojení všech entit od slednování v EF Core
+                applicationDbContext.ChangeTracker.Clear();
             }
             else
             {
