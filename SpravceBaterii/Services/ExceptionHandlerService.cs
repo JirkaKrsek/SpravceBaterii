@@ -27,7 +27,7 @@ namespace SpravceBaterii.Services
         {
             if (exception is UnauthorizedAccessException)
             {
-                navigation.NavigateTo("/ucet/prihlaseni", true);
+                navigation.NavigateTo("/prihlaseni", true);
             }
             else if (exception is DbUpdateException or SqlException or TimeoutException)
             {

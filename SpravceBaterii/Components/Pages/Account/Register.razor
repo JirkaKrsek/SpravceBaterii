@@ -1,4 +1,4 @@
-﻿@page "/ucet/registrace"
+﻿@page "/registrace"
 @attribute [ExcludeFromInteractiveRouting]
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -57,7 +57,7 @@
 
 </EditForm>
 
-<p class="switch-account-page">Již máte účet? <a href="/ucet/prihlaseni">Přihlásit se</a></p>
+<p class="switch-account-page">Již máte účet? <a href="/prihlaseni">Přihlásit se</a></p>
 
 @code {
 	[SupplyParameterFromForm]
@@ -75,6 +75,7 @@
 		if (await UserService.IsUserAuthenticatedAsync())
 		{
 			Navigation.NavigateTo("/", true);
+			return;
 		}
 
 		passwordRequirements.Add("Minimální délka: " + IdentityOptions.Value.Password.RequiredLength + " znaků");

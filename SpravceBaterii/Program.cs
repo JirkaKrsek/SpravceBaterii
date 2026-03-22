@@ -74,8 +74,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Strict;
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
     options.SlidingExpiration = true;
-    options.LoginPath = "/ucet/prihlaseni";
-    options.LogoutPath = "/ucet/odhlaseni";
+    options.LoginPath = "/prihlaseni";
+    options.LogoutPath = "/odhlaseni";
 });
 
 // Nastavení výchozí kultury na èeštinu

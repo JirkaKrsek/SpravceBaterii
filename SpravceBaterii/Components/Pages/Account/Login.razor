@@ -1,4 +1,4 @@
-﻿@page "/ucet/prihlaseni"
+﻿@page "/prihlaseni"
 @attribute [ExcludeFromInteractiveRouting]
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -43,7 +43,7 @@
 	<button type="submit">Přihlásit se</button>
 </EditForm>
 
-<p class="switch-account-page">Ještě nemáte účet? <a href="/ucet/registrace">Zaregistrovat se</a></p>
+<p class="switch-account-page">Ještě nemáte účet? <a href="/registrace">Zaregistrovat se</a></p>
 
 @code {
     [SupplyParameterFromForm]
@@ -61,6 +61,7 @@
         if (await UserService.IsUserAuthenticatedAsync())
         {
             Navigation.NavigateTo("/", true);
+            return;
         }
     }
 
