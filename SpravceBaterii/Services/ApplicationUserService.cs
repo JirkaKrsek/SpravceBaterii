@@ -67,6 +67,41 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
+        /// Výpočet všech uložených záznamů přihlášeného uživatele
+        /// </summary>
+        /// <returns>UserStatisticsDto</returns>
+        public async Task<UserStatisticsDto> GetUserStatistics()
+        {
+            string userId = await GetUserIdAsync();
+
+            int disposableBatteries = await applicationDbContext.Batteries
+                .CountAsync(b => b.UserId == userId && !b.IsRechargeable);
+
+            int rechargeableBatteries = await applicationDbContext.Batteries
+                .CountAsync(b => b.UserId == userId && b.IsRechargeable);
+
+            int batteries = disposableBatteries + rechargeableBatteries;
+
+            int devices = await applicationDbContext.Devices
+                .CountAsync(d => d.UserId == userId);
+
+            int locations = await applicationDbContext.Locations
+                .CountAsync(l => l.UserId == userId);
+
+            int totalCount = disposableBatteries + rechargeableBatteries + devices + locations;
+
+            return new UserStatisticsDto(
+                totalCount,
+                batteries,
+                disposableBatteries,
+                rechargeableBatteries,
+                devices,
+                locations
+            );
+        }
+
+
+        /// <summary>
         /// Smazání všech uložených dat aktuálně přihlášeného uživatele
         /// </summary>
         /// <returns>Asynchronní operace</returns>
@@ -99,4 +134,6 @@ namespace SpravceBaterii.Services
             applicationDbContext.ChangeTracker.Clear();
         }
     }
+
+    public record UserStatisticsDto(int TotalCount, int Batteries, int DisposableBatteries, int RechargeableBatteries, int Devices, int Locations);
 }
