@@ -51,6 +51,20 @@ namespace SpravceBaterii.Services
             return false;
         }
 
+        /// <summary>
+        /// Získání informací aktuálně přihlášeného uživatele
+        /// </summary>
+        /// <returns>Nalezený uživatel</returns>
+        /// <exception cref="KeyNotFoundException">Uživatel nenalezen</exception>
+        public async Task<ApplicationUser> GetUserInformations()
+        {
+            string userId = await GetUserIdAsync();
+
+            return await applicationDbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.Id == userId)
+            ?? throw new KeyNotFoundException();
+        }
 
         /// <summary>
         /// Smazání všech uložených dat aktuálně přihlášeného uživatele
