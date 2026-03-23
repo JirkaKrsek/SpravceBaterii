@@ -25,6 +25,16 @@
 
 <p>Zde můžete změnit přihlašovací údaje, odstranit svá data nebo celý účet.</p>
 
+<!--Uložené informace-->
+<div class="user-info">
+	<h2>Uložené informace</h2>
+	<ul>
+		<li>Váš registrovaný e-mail: @user?.Email</li>
+		<li>Poslední přihlášení: @user?.LastLoginDate.ToLocalTime()</li>
+		<li>Registrace proběhla: @user?.RegistrationDate.ToLocalTime()</li>
+	</ul>
+</div>
+
 <div class="account-update">
 	<!--Změna e-mailu-->
 	<div>
@@ -143,6 +153,7 @@
 	private InputModelEmail InputEmail { get; set; } = new InputModelEmail();
 	private InputModelPassword InputPassword { get; set; } = new InputModelPassword();
 
+	private ApplicationUser user = default!;
 	private List<string> passwordRequirements = new();
 
 	private string errorMessage = "";
@@ -159,6 +170,8 @@
 	{
 		try
 		{
+			user = await UserService.GetUserInformations();
+
 			passwordRequirements.Add("Minimální délka: " + IdentityOptions.Value.Password.RequiredLength + " znaků");
 			if (IdentityOptions.Value.Password.RequireDigit)
 			{
