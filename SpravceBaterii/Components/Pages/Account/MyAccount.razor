@@ -23,7 +23,7 @@
     <p class="error-message">@errorMessage</p>
 }
 
-<p>Zde můžete změnit přihlašovací údaje, odstranit svá data nebo celý účet.</p>
+<p>Zde můžete vidět své statistiky, změnit přihlašovací údaje, odstranit svá data nebo celý účet.</p>
 
 <!--Uložené informace-->
 <div class="user-info">
@@ -32,6 +32,21 @@
 		<li>Váš registrovaný e-mail: @user?.Email</li>
 		<li>Poslední přihlášení: @user?.LastLoginDate.ToLocalTime()</li>
 		<li>Registrace proběhla: @user?.RegistrationDate.ToLocalTime()</li>
+	</ul>
+</div>
+
+<!--Počet evidovaných záznamů-->
+<div class="user-info">
+	<h2>Počet evidovaných záznamů = @userStatistics?.TotalCount</h2>
+	<ul>
+		<li>Baterií = @userStatistics?.Batteries
+			<ul>
+				<li>Jednorázových = @userStatistics?.DisposableBatteries</li>
+				<li>Nabíjecích = @userStatistics?.RechargeableBatteries</li>
+			</ul>
+		</li>
+		<li>Zařízení = @userStatistics?.Devices</li>
+		<li>Umístění = @userStatistics?.Locations</li>
 	</ul>
 </div>
 
@@ -155,6 +170,7 @@
 
 	private ApplicationUser user = default!;
 	private List<string> passwordRequirements = new();
+	private UserStatisticsDto? userStatistics;
 
 	private string errorMessage = "";
 	private string successInfo = "";
@@ -163,7 +179,7 @@
 
 
 	/// <summary>
-	/// Po načtení této stránky proběhne načtení požadavků na heslo pro jeho případnou změnu
+	/// Po načtení této stránky proběhne načtení aktuálně přihlášeného uživatele, jeho statistiky a požadavky na heslo pro jeho případnou změnu
 	/// </summary>
 	/// <returns>Asynchronní metoda</returns>
 	protected override async Task OnInitializedAsync()
@@ -171,6 +187,8 @@
 		try
 		{
 			user = await UserService.GetUserInformations();
+
+			userStatistics = await UserService.GetUserStatistics();
 
 			passwordRequirements.Add("Minimální délka: " + IdentityOptions.Value.Password.RequiredLength + " znaků");
 			if (IdentityOptions.Value.Password.RequireDigit)
