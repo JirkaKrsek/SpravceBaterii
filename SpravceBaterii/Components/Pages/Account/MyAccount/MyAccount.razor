@@ -37,12 +37,12 @@
 
 <!--Počet evidovaných záznamů-->
 <div class="user-info">
-	<h2>Počet evidovaných záznamů = @userStatistics?.TotalCount</h2>
+	<h2>Celkový počet evidovaných záznamů = @userStatistics?.TotalCount</h2>
 	<ul>
 		<li>Baterií = @userStatistics?.Batteries
 			<ul>
-				<li>Jednorázových = @userStatistics?.DisposableBatteries</li>
-				<li>Nabíjecích = @userStatistics?.RechargeableBatteries</li>
+				<li>z toho jednorázových = @userStatistics?.DisposableBatteries</li>
+				<li>z toho nabíjecích = @userStatistics?.RechargeableBatteries</li>
 			</ul>
 		</li>
 		<li>Zařízení = @userStatistics?.Devices</li>
