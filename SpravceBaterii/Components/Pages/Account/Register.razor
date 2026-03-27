@@ -17,14 +17,14 @@
 
 <h1>Registrace</h1>
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-	<p class="error-message">@((MarkupString)errorMessage)</p>
-}
-
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm" class="account">
+	<!--Zobrazení chybové hlášky pokud je vyplněna-->
+	@if (!string.IsNullOrEmpty(errorMessage))
+	{
+		<p class="error-message">@((MarkupString)errorMessage)</p>
+	}
+
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -126,17 +126,17 @@
 
 				if (resultConfirmEmail.Succeeded)
 				{
-				await SignInManager.SignInAsync(newUser, false);
+					await SignInManager.SignInAsync(newUser, false);
 
-				newUser.LastLoginDate = DateTime.UtcNow;
-				await UserManager.UpdateAsync(newUser);
+					newUser.LastLoginDate = DateTime.UtcNow;
+					await UserManager.UpdateAsync(newUser);
+				}
+				else
+				{
+					errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+					return;
+				}
 			}
-			else
-			{
-				errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
-				return;
-			}
-		}
 			else
 			{
 				errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));

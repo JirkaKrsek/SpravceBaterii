@@ -16,14 +16,14 @@
 
 <h1>Přihlášení</h1>
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <p class="error-message">@errorMessage</p>
-}
-
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm" class="account">
+    <!--Zobrazení chybové hlášky pokud je vyplněna-->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="error-message">@errorMessage</p>
+    }
+
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
