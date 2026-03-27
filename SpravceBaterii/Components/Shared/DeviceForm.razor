@@ -9,12 +9,6 @@
 @inject ExceptionHandlerService ExceptionHandlerService
 @inject ModalNavigationService ModalNavigationService
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-	<p class="error-message">@errorMessage</p>
-}
-
 <div class="component-header">
 	@if (ItemId is null)
 	{
@@ -25,6 +19,12 @@
 		<h2>Formulář pro úpravu zařízení</h2>
 	}
 </div>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p class="error-message">@errorMessage</p>
+}
 
 <EditForm Model="@device" OnValidSubmit="SaveDevice" FormName="DeviceForm" class="add-update">
 	<DataAnnotationsValidator />

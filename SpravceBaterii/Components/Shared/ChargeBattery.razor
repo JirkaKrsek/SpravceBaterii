@@ -8,12 +8,6 @@
 @inject ExceptionHandlerService ExceptionHandlerService
 @inject ModalNavigationService ModalNavigationService
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-	<p class="error-message">@errorMessage</p>
-}
-
 <div class="component-header">
 	<h2>
 		Nabití baterie
@@ -23,6 +17,12 @@
 		}
 	</h2>
 </div>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p class="error-message">@errorMessage</p>
+}
 
 <EditForm Model="@battery" OnValidSubmit="Save" FormName="ChargeBattery" class="add-update">
 	<DataAnnotationsValidator />

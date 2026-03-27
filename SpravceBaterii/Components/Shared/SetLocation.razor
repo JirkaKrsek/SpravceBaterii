@@ -9,15 +9,15 @@
 @inject ExceptionHandlerService ExceptionHandlerService
 @inject ModalNavigationService ModalNavigationService
 
+<div class="component-header">
+    <h2>Výběr umístění</h2>
+</div>
+
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
     <p class="error-message">@errorMessage</p>
 }
-
-<div class="component-header">
-    <h2>Výběr umístění</h2>
-</div>
 
 <p>Kliknutím na řádek vyberete umístění.</p>
 
