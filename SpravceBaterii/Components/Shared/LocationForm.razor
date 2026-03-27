@@ -42,12 +42,14 @@
 
 	<hr>
 
-	<button type="submit">Uložit</button>
+	<div class="action-buttons">
+		<button type="submit">Uložit</button>
 
-	@if (ItemId is not null)
-	{
-		<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
-	}
+		@if (ItemId is not null)
+		{
+			<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
+		}
+	</div>
 
 	@if (showConfirm)
 	{
