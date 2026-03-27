@@ -429,12 +429,12 @@ label:has(+ input[required])::after, label:has(+ select[required])::after {
     vertical-align: middle;
 }
 p.required-info {
-    color: red;
     font-weight: bold;
     grid-column: 1 / -1;
     margin: 0;
 }
 p.required-info span {
+    color: red;
     font-size: x-large;
     vertical-align: middle;
 }
