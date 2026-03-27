@@ -432,7 +432,7 @@ p.required-info {
     color: red;
     font-weight: bold;
     grid-column: 1 / -1;
-    margin-bottom: 0;
+    margin: 0;
 }
 p.required-info span {
     font-size: x-large;
