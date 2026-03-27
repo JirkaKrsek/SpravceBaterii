@@ -85,7 +85,7 @@ namespace SpravceBaterii
             return new IdentityError
             {
                 Code = nameof(PasswordMismatch),
-                Description = "Zadaná hesla se neshodují."
+                Description = "Zadané současné heslo není správné."
             };
         }
 
