@@ -118,21 +118,4 @@ else
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
 	}
-
-	/// <summary>
-	/// Po vykreslení stránky se zkontroluje, zda nejsou potřeba znovunačíst data
-	/// </summary>
-	/// <param name="firstRender">bool, zda se stránka vykresluje poprvé</param>
-	/// <returns>Asynchronní operace</returns>
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (ModalNavigationService.ShouldReload())
-		{
-			await LoadLocationList();
-			ModalNavigationService.Reset();
-
-			//Aktualizace UI
-			StateHasChanged();
-		}
-	}
 }
