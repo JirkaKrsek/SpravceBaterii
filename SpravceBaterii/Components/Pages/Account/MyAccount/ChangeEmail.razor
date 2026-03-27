@@ -1,0 +1,154 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using System.ComponentModel.DataAnnotations
+
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationUserService UserService
+@inject NavigationManager Navigation
+@inject ModalNavigationService ModalNavigationService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<h2>Změna e‑mailu</h2>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p class="error-message">@errorMessage</p>
+}
+
+<EditForm Model="@InputEmail" OnValidSubmit="Change" FormName="Change" class="account-update">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
+
+	<label for="input-email">Nový e-mail: </label>
+	<InputText id="input-email" @bind-Value="InputEmail.NewEmail" type="email" placeholder="Zadejte nový e-mail" required></InputText>
+	
+	<label for="input-password">Heslo pro potvrzení: </label>
+	<InputText id="input-password" @bind-Value="InputEmail.CurrentPassword" type="password" placeholder="Zadejte heslo" required></InputText>
+	
+	<div class="action-buttons">
+		<button type="submit">Uložit</button>
+	</div>
+</EditForm>
+
+<!--Zobrazení úspěšné hlášky-->
+@if (showSuccessInfo)
+{
+	<div class="overlay">
+		<div class="overlay-content">
+			<button type="button" class="close" @onclick="CloseSuccessInfo">X</button>
+			<p>E-mail byl úspěšně změněn.</p>
+			<div class="action-buttons">
+				<button type="button" @onclick="CloseSuccessInfo">Zavřít</button>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	/// <summary>
+	/// Vstupní parametr - ID položky pro její načtení
+	/// </summary>
+	[Parameter]
+	public int? ItemId { get; set; }
+
+	private InputModelEmail InputEmail { get; set; } = new InputModelEmail();
+
+	private string errorMessage = "";
+	private bool showSuccessInfo = false;
+	private bool needUpdateCookie = false;
+
+	/// <summary>
+	/// Nastavení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			InputEmail.NewEmail = "";
+			InputEmail.CurrentPassword = "";
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Změna e-mailu
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task Change()
+	{
+		errorMessage = "";
+		try
+		{
+			ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+			if (user != null)
+			{
+				if (await UserManager.CheckPasswordAsync(user, InputEmail.CurrentPassword))
+				{
+					string token = await UserManager.GenerateChangeEmailTokenAsync(user, InputEmail.NewEmail);
+					IdentityResult result = await UserManager.ChangeEmailAsync(user, InputEmail.NewEmail, token);
+
+					if (result.Succeeded)
+					{
+						user.UserName = InputEmail.NewEmail;
+						await UserManager.UpdateAsync(user);
+
+						needUpdateCookie = true;
+						showSuccessInfo = true;
+					}
+					else
+					{
+						errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+						return;
+					}
+				}
+				else
+				{
+					errorMessage = "Zadali jste nesprávné heslo";
+					return;
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Po zavření hlášky o úspěšném procesu se komponenta zavře a proběhne aktualizace Cookie
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task CloseSuccessInfo()
+	{
+		showSuccessInfo = false;
+
+		if (needUpdateCookie)
+		{
+			needUpdateCookie = false;
+			ModalNavigationService.MarkForReload();
+			ModalNavigationService.Close();
+			Navigation.NavigateTo("/aktualizace-cookie", true);
+		}
+	}
+
+	/// <summary>
+	/// Model pro vstupní data z formuláře pro změnu e-mailu
+	/// </summary>
+	private class InputModelEmail
+	{
+		[Required(ErrorMessage = "Zadejte email.")]
+		[EmailAddress(ErrorMessage = "Zadaný email není správný.")]
+		public string NewEmail { get; set; } = "";
+
+		[Required(ErrorMessage = "Zadejte současné heslo.")]
+		public string CurrentPassword { get; set; } = "";
+	}
+}

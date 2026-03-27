@@ -1,0 +1,128 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+@using System.ComponentModel.DataAnnotations
+
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationUserService UserService
+@inject NavigationManager Navigation
+@inject ModalNavigationService ModalNavigationService
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<h2>Smazání účtu</h2>
+
+<p>Opravdu chcete navždy odstranit svůj účet?</p>
+<p>S tím budou odstraněna všechna vaše data.</p>
+
+<h2>Potvrzení hesla</h2>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p class="error-message ">@errorMessage</p>
+}
+
+<EditForm Model="@InputCurrentPassword" OnValidSubmit="Delete" FormName="Delete" class="account-update">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
+
+	<label for="input-password">Heslo pro potvrzení: </label>
+	<InputText id="input-password" @bind-Value="InputCurrentPassword.CurrentPassword" type="password" placeholder="Zadejte heslo" required></InputText>
+	
+	<div class="action-buttons">
+		<button type="submit">Potvrdit</button>
+	</div>
+</EditForm>
+
+@code {
+	/// <summary>
+	/// Vstupní parametr - ID položky pro její načtení
+	/// </summary>
+	[Parameter]
+	public int? ItemId { get; set; }
+
+	private InputModelCurrentPassword InputCurrentPassword { get; set; } = new InputModelCurrentPassword();
+
+	private string errorMessage = "";
+
+	/// <summary>
+	/// Načtení potřebných dat při zobrazení komponenty
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			InputCurrentPassword.CurrentPassword = "";
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Smazání celého účtu aktuálně přihlášeného uživatele z databáze i se všemi uloženými daty
+	/// Po úspěšném smazání proběhne odhlášení uživatele z aplikace
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task Delete()
+	{
+		errorMessage = "";
+		try
+		{
+			if (await CheckCurrentPassword())
+			{
+				ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+				if (user != null)
+				{
+					IdentityResult result = await UserManager.DeleteAsync(user);
+
+					if (result.Succeeded)
+					{
+						ModalNavigationService.Reset();
+						Navigation.NavigateTo("/odhlaseni", true);
+					}
+					else
+					{
+						errorMessage = string.Join("<br>", result.Errors.Select(e => e.Description));
+					}
+				}
+			}
+			else
+			{
+				errorMessage = "Zadali jste nesprávné heslo";
+				return;
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Kontrola zadanáho současného hesla uživatele
+	/// </summary>
+	/// <returns>bool, zda se heslo shoduje s uloženým heslem v databázi</returns>
+	private async Task<bool> CheckCurrentPassword()
+	{
+		ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+		if (user != null)
+		{
+			return await UserManager.CheckPasswordAsync(user, InputCurrentPassword.CurrentPassword);
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Model pro vstupní data z formuláře pro potvrzení hesla
+	/// </summary>
+	private class InputModelCurrentPassword
+	{
+		[Required(ErrorMessage = "Zadejte současné heslo.")]
+		public string CurrentPassword { get; set; } = "";
+	}
+}
