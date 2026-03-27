@@ -36,7 +36,7 @@
     /// </returns>
     private IComponentRenderMode? GetRenderMode()
     {
-        string path = HttpContext.Request.Path.Value!.ToLowerInvariant();
+        string path = HttpContext.Request.Path.Value!;
 
         string[] staticPages =
         {
@@ -45,7 +45,7 @@
             "/odhlaseni"
         };
         
-        if (staticPages.Contains(path))
+        if (staticPages.Contains(path, StringComparer.OrdinalIgnoreCase))
         {
             return null;
         }
