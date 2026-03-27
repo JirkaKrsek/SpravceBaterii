@@ -121,11 +121,22 @@
 
 			if (result.Succeeded)
 			{
+				string token = await UserManager.GenerateEmailConfirmationTokenAsync(newUser);
+				IdentityResult resultConfirmEmail = await UserManager.ConfirmEmailAsync(newUser, token);
+
+				if (resultConfirmEmail.Succeeded)
+				{
 				await SignInManager.SignInAsync(newUser, false);
 
 				newUser.LastLoginDate = DateTime.UtcNow;
 				await UserManager.UpdateAsync(newUser);
 			}
+			else
+			{
+				errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+				return;
+			}
+		}
 			else
 			{
 				errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
