@@ -66,7 +66,7 @@
     }
 
     /// <summary>
-    /// Přihlášení existujícího uživatele pomocí emailu a hesla
+    /// Přihlášení existujícího uživatele pomocí e-mailu a hesla
     /// </summary>
     /// <returns>Asynchronní metoda</returns>
     private async Task LoginUser()
@@ -95,7 +95,7 @@
             }
             else
             {
-                errorMessage = "Zadali jste nesprávný email nebo heslo.";
+                errorMessage = "Zadali jste nesprávný e-mail nebo heslo.";
                 return;
             }
         }
@@ -113,8 +113,8 @@
 	/// </summary>
 	private class InputModel
 	{
-		[Required(ErrorMessage = "Zadejte email.")]
-		[EmailAddress(ErrorMessage = "Zadaný email není správný.")]
+		[Required(ErrorMessage = "Zadejte e-mail.")]
+		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný.")]
 		public string Email { get; set; } = "";
 
 		[Required(ErrorMessage = "Zadejte heslo.")]

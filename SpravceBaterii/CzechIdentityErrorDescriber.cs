@@ -19,7 +19,7 @@ namespace SpravceBaterii
             return new IdentityError
             {
                 Code = nameof(DuplicateEmail),
-                Description = "Zadaný email je již zaregistrovaný."
+                Description = "Zadaný e-mail je již zaregistrovaný."
             };
         }
 
@@ -52,7 +52,7 @@ namespace SpravceBaterii
             return new IdentityError
             {
                 Code = nameof(InvalidEmail),
-                Description = "Zadaný email není správný."
+                Description = "Zadaný e-mail není správný."
             };
         }
 
@@ -71,7 +71,7 @@ namespace SpravceBaterii
             return new IdentityError
             {
                 Code = nameof(InvalidUserName),
-                Description = "Zadaný email není správný."
+                Description = "Zadaný e-mail není správný."
             };
         }
 

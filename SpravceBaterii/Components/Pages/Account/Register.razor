@@ -98,7 +98,7 @@
 	}
 
 	/// <summary>
-	/// Registrace nového uživatele pomocí emailu a hesla
+	/// Registrace nového uživatele pomocí e-mailu a hesla
 	/// Pokud registrace proběhne úspěšně, vytvořený uživatel je automaticky přihlášen
 	/// </summary>
 	/// <returns>Asynchronní metoda</returns>
@@ -157,8 +157,8 @@
 	/// </summary>
 	private class InputModel
 	{
-		[Required(ErrorMessage = "Zadejte email.")]
-		[EmailAddress(ErrorMessage = "Zadaný email není správný.")]
+		[Required(ErrorMessage = "Zadejte e-mail.")]
+		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný.")]
 		public string Email { get; set; } = "";
 
 		[Required(ErrorMessage = "Zadejte heslo.")]

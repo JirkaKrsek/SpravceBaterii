@@ -38,10 +38,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Nastavení Identity uživatele
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
 {
-    // Pøihlášení bez nutnosti ovìøeného emailu
+    // Pøihlášení bez nutnosti ovìøeného e-mailu
     options.SignIn.RequireConfirmedAccount = false;
 
-    // Každý email musí být v databázi jedineèný
+    // Každý e-mail musí být v databázi jedineèný
     options.User.RequireUniqueEmail = true;
 
     // Nastavení požadavkù hesla
