@@ -1,0 +1,48 @@
+﻿@page "/aktualizaceCookie"
+@attribute [ExcludeFromInteractiveRouting]
+@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationUserService UserService
+@inject NavigationManager Navigation
+@inject ExceptionHandlerService ExceptionHandlerService
+
+<PageTitle>Správce baterií - Aktualizace Cookie</PageTitle>
+
+<h1>Aktualizace Cookie</h1>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="error-message">@errorMessage</p>
+}
+
+@code {
+    private string errorMessage = "";
+
+    /// <summary>
+    /// Po načtení této stránky proběhne automatická aktualizace Cookie v prohlížeči aktuálně přihlášeného uživatele a přesměruje na stránku Můj účet
+    /// </summary>
+    /// <returns>Asynchronní metoda</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+            if (user != null)
+            {
+                await SignInManager.RefreshSignInAsync(user);
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ExceptionHandlerService.HandleException(ex);
+            return;
+        }
+
+        Navigation.NavigateTo("/mujucet", true);
+    }
+}
