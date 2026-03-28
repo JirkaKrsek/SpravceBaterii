@@ -267,6 +267,12 @@ input#checkbox-show-password-requirements:checked ~ label:after {
     color: red;
 }
 
+ul.battery-status-legend li,
+ul.device-count-legend li {
+    padding: 10px 40px;
+    max-width: 240px;
+}
+
 /* Informace o aktuálně přihlášeném uživateli */
 div.user-info {
     font-weight: bolder;
