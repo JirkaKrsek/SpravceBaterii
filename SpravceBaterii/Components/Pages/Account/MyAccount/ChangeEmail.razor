@@ -144,11 +144,11 @@
 	/// </summary>
 	private class InputModelEmail
 	{
-		[Required(ErrorMessage = "Zadejte e-mail.")]
-		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný.")]
+		[Required(ErrorMessage = "Zadejte e-mail")]
+		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný")]
 		public string NewEmail { get; set; } = "";
 
-		[Required(ErrorMessage = "Zadejte současné heslo.")]
+		[Required(ErrorMessage = "Zadejte současné heslo")]
 		public string CurrentPassword { get; set; } = "";
 	}
 }

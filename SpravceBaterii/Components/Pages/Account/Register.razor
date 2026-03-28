@@ -108,7 +108,7 @@
 		{
 			if (Input.Password != Input.ConfirmPassword)
 			{
-				errorMessage = "Zadaná hesla se neshodují.";
+				errorMessage = "Zadaná hesla se neshodují";
 				return;
 			}
 
@@ -157,14 +157,14 @@
 	/// </summary>
 	private class InputModel
 	{
-		[Required(ErrorMessage = "Zadejte e-mail.")]
-		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný.")]
+		[Required(ErrorMessage = "Zadejte e-mail")]
+		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný")]
 		public string Email { get; set; } = "";
 
-		[Required(ErrorMessage = "Zadejte heslo.")]
+		[Required(ErrorMessage = "Zadejte heslo")]
 		public string Password { get; set; } = "";
 
-		[Required(ErrorMessage = "Zadejte znovu heslo.")]
+		[Required(ErrorMessage = "Zadejte znovu heslo")]
 		public string ConfirmPassword { get; set; } = "";
 	}
 }

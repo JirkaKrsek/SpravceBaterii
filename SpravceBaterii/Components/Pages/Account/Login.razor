@@ -85,17 +85,17 @@
             }
             else if (result.IsLockedOut)
             {
-                errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později.";
+                errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později";
                 return;
             }
             else if (result.IsNotAllowed)
             {
-                errorMessage = "Přihlášení bylo zamítnuto.";
+                errorMessage = "Přihlášení bylo zamítnuto";
                 return;
             }
             else
             {
-                errorMessage = "Zadali jste nesprávný e-mail nebo heslo.";
+                errorMessage = "Zadali jste nesprávný e-mail nebo heslo";
                 return;
             }
         }
@@ -113,11 +113,11 @@
 	/// </summary>
 	private class InputModel
 	{
-		[Required(ErrorMessage = "Zadejte e-mail.")]
-		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný.")]
+		[Required(ErrorMessage = "Zadejte e-mail")]
+		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný")]
 		public string Email { get; set; } = "";
 
-		[Required(ErrorMessage = "Zadejte heslo.")]
+		[Required(ErrorMessage = "Zadejte heslo")]
 		public string Password { get; set; } = "";
 
 		public bool RememberMe { get; set; } = false;
