@@ -228,11 +228,11 @@ input#checkbox-show-password-requirements:checked ~ label:after {
 
 /* Vyhodnocený stav baterie */
 /* Upozornění při nedostatečném počtu vložených baterií v zařízení */
-td.status-default, td.count-warning {
+.status-default, .count-warning {
     position: relative;
     padding-left: 40px;
 }
-td.status-default::before, td.count-warning::before {
+.status-default::before, .count-warning::before {
     position: absolute;
     left: 6px;
     top: 50%;
@@ -248,20 +248,20 @@ td.status-default::before, td.count-warning::before {
 .status-expired {
     background-color: #ffadad;
 }
-td.count-warning {
+.count-warning {
     background-color: #ffeeca;
 }
-td.status-ok::before {
+.status-ok::before {
     /* Unicode ✔ - HEAVY CHECK MARK */
     content: "\2714";
     color: green;
 }
-td.status-warning::before, td.count-warning::before {
+.status-warning::before, .count-warning::before {
     /* Unicode ⚠ - WARNING SIGN */
     content: "\26A0";
     color: darkorange;
 }
-td.status-expired::before {
+.status-expired::before {
     /* Unicode ✖ - HEAVY MULTIPLICATION */
     content: "\2716";
     color: red;
