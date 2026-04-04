@@ -8,12 +8,6 @@
 @inject ExceptionHandlerService ExceptionHandlerService
 @inject ModalNavigationService ModalNavigationService
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-	<p class="error-message">@errorMessage</p>
-}
-
 <div class="component-header">
 	@if (ItemId is null)
 	{
@@ -25,6 +19,12 @@
 	}
 </div>
 
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p class="error-message">@errorMessage</p>
+}
+
 <EditForm Model="@location" OnValidSubmit="SaveLocation" FormName="LocationForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
@@ -32,7 +32,7 @@
 	<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
 
 	<label for="input-Name">Název: </label>
-	<InputText id="input-Name" @bind-Value="location.Name"></InputText>
+	<InputText id="input-Name" @bind-Value="location.Name" required></InputText>
 
 	<label for="input-Floor">Podlaží: </label>
 	<InputText id="input-Floor" @bind-Value="location.Floor"></InputText>
@@ -42,12 +42,14 @@
 
 	<hr>
 
-	<button type="submit">Uložit</button>
+	<div class="action-buttons">
+		<button type="submit">Uložit</button>
 
-	@if (ItemId is not null)
-	{
-		<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
-	}
+		@if (ItemId is not null)
+		{
+			<button type="button" @onclick="() => showConfirm = true">Smazat toto umístění</button>
+		}
+	</div>
 
 	@if (showConfirm)
 	{

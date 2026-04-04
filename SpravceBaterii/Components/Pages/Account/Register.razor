@@ -1,4 +1,4 @@
-﻿@page "/ucet/registrace"
+﻿@page "/registrace"
 @attribute [ExcludeFromInteractiveRouting]
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -17,14 +17,14 @@
 
 <h1>Registrace</h1>
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-	<p class="error-message">@((MarkupString)errorMessage)</p>
-}
-
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="RegisterUser" FormName="RegisterForm" class="account">
+	<!--Zobrazení chybové hlášky pokud je vyplněna-->
+	@if (!string.IsNullOrEmpty(errorMessage))
+	{
+		<p class="error-message">@((MarkupString)errorMessage)</p>
+	}
+
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -57,7 +57,7 @@
 
 </EditForm>
 
-<p class="switch-account-page">Již máte účet? <a href="/ucet/prihlaseni">Přihlásit se</a></p>
+<p class="switch-account-page">Již máte účet? <a href="/prihlaseni">Přihlásit se</a></p>
 
 @code {
 	[SupplyParameterFromForm]
@@ -75,6 +75,7 @@
 		if (await UserService.IsUserAuthenticatedAsync())
 		{
 			Navigation.NavigateTo("/", true);
+			return;
 		}
 
 		passwordRequirements.Add("Minimální délka: " + IdentityOptions.Value.Password.RequiredLength + " znaků");
@@ -97,7 +98,7 @@
 	}
 
 	/// <summary>
-	/// Registrace nového uživatele pomocí emailu a hesla
+	/// Registrace nového uživatele pomocí e-mailu a hesla
 	/// Pokud registrace proběhne úspěšně, vytvořený uživatel je automaticky přihlášen
 	/// </summary>
 	/// <returns>Asynchronní metoda</returns>
@@ -107,7 +108,7 @@
 		{
 			if (Input.Password != Input.ConfirmPassword)
 			{
-				errorMessage = "Zadaná hesla se neshodují.";
+				errorMessage = "Zadaná hesla se neshodují";
 				return;
 			}
 
@@ -120,10 +121,21 @@
 
 			if (result.Succeeded)
 			{
-				await SignInManager.SignInAsync(newUser, false);
+				string token = await UserManager.GenerateEmailConfirmationTokenAsync(newUser);
+				IdentityResult resultConfirmEmail = await UserManager.ConfirmEmailAsync(newUser, token);
 
-				newUser.LastLoginDate = DateTime.UtcNow;
-				await UserManager.UpdateAsync(newUser);
+				if (resultConfirmEmail.Succeeded)
+				{
+					await SignInManager.SignInAsync(newUser, false);
+
+					newUser.LastLoginDate = DateTime.UtcNow;
+					await UserManager.UpdateAsync(newUser);
+				}
+				else
+				{
+					errorMessage = string.Join("<br>", result.Errors.Select(error => error.Description).Where(error => !string.IsNullOrEmpty(error)));
+					return;
+				}
 			}
 			else
 			{
@@ -137,7 +149,7 @@
 			return;
 		}
 
-		Navigation.NavigateTo("/", true);
+		Navigation.NavigateTo("/zarizeni", true);
 	}
 
 	/// <summary>
@@ -145,14 +157,14 @@
 	/// </summary>
 	private class InputModel
 	{
-		[Required(ErrorMessage = "Zadejte email.")]
-		[EmailAddress(ErrorMessage = "Zadaný email není správný.")]
+		[Required(ErrorMessage = "Zadejte e-mail")]
+		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný")]
 		public string Email { get; set; } = "";
 
-		[Required(ErrorMessage = "Zadejte heslo.")]
+		[Required(ErrorMessage = "Zadejte heslo")]
 		public string Password { get; set; } = "";
 
-		[Required(ErrorMessage = "Zadejte znovu heslo.")]
+		[Required(ErrorMessage = "Zadejte znovu heslo")]
 		public string ConfirmPassword { get; set; } = "";
 	}
 }

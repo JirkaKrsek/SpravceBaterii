@@ -1,4 +1,4 @@
-﻿@page "/ucet/prihlaseni"
+﻿@page "/prihlaseni"
 @attribute [ExcludeFromInteractiveRouting]
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -16,14 +16,14 @@
 
 <h1>Přihlášení</h1>
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <p class="error-message">@errorMessage</p>
-}
-
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm" class="account">
+    <!--Zobrazení chybové hlášky pokud je vyplněna-->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="error-message">@errorMessage</p>
+    }
+
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
@@ -43,7 +43,7 @@
 	<button type="submit">Přihlásit se</button>
 </EditForm>
 
-<p class="switch-account-page">Ještě nemáte účet? <a href="/ucet/registrace">Zaregistrovat se</a></p>
+<p class="switch-account-page">Ještě nemáte účet? <a href="/registrace">Zaregistrovat se</a></p>
 
 @code {
     [SupplyParameterFromForm]
@@ -61,11 +61,12 @@
         if (await UserService.IsUserAuthenticatedAsync())
         {
             Navigation.NavigateTo("/", true);
+            return;
         }
     }
 
     /// <summary>
-    /// Přihlášení existujícího uživatele pomocí emailu a hesla
+    /// Přihlášení existujícího uživatele pomocí e-mailu a hesla
     /// </summary>
     /// <returns>Asynchronní metoda</returns>
     private async Task LoginUser()
@@ -84,17 +85,17 @@
             }
             else if (result.IsLockedOut)
             {
-                errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později.";
+                errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později";
                 return;
             }
             else if (result.IsNotAllowed)
             {
-                errorMessage = "Přihlášení bylo zamítnuto.";
+                errorMessage = "Přihlášení bylo zamítnuto";
                 return;
             }
             else
             {
-                errorMessage = "Zadali jste nesprávný email nebo heslo.";
+                errorMessage = "Zadali jste nesprávný e-mail nebo heslo";
                 return;
             }
         }
@@ -104,7 +105,7 @@
             return;
 		}
 
-        Navigation.NavigateTo("/", true);
+        Navigation.NavigateTo("/zarizeni", true);
 	}
 
 	/// <summary>
@@ -112,11 +113,11 @@
 	/// </summary>
 	private class InputModel
 	{
-		[Required(ErrorMessage = "Zadejte email.")]
-		[EmailAddress(ErrorMessage = "Zadaný email není správný.")]
+		[Required(ErrorMessage = "Zadejte e-mail")]
+		[EmailAddress(ErrorMessage = "Zadaný e-mail není správný")]
 		public string Email { get; set; } = "";
 
-		[Required(ErrorMessage = "Zadejte heslo.")]
+		[Required(ErrorMessage = "Zadejte heslo")]
 		public string Password { get; set; } = "";
 
 		public bool RememberMe { get; set; } = false;

@@ -28,7 +28,7 @@
 
     /// <summary>
     /// Přepínání režimu renderování podle cesty URL
-    /// Cesta začínající na "/ucet" je vykreslena staticky (SSR), ostatní interaktivně
+    /// Požadované cesty jsou vykresleny staticky (SSR), ostatní interaktivně
     /// </summary>
     /// <returns>
     /// RenderMode.InteractiveServer - interaktivní režim
@@ -36,9 +36,17 @@
     /// </returns>
     private IComponentRenderMode? GetRenderMode()
     {
-        PathString path = HttpContext.Request.Path;
+        string path = HttpContext.Request.Path.Value!;
 
-        if (path.StartsWithSegments("/ucet", StringComparison.OrdinalIgnoreCase))
+        string[] staticPages =
+        {
+            "/registrace",
+            "/prihlaseni",
+            "/odhlaseni",
+            "/aktualizace-cookie"
+        };
+
+        if (staticPages.Contains(path, StringComparer.OrdinalIgnoreCase))
         {
             return null;
         }

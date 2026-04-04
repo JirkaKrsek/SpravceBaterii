@@ -38,10 +38,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Nastavení Identity uživatele
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
 {
-    // Pøihlášení bez nutnosti ovìøeného emailu
+    // Pøihlášení bez nutnosti ovìøeného e-mailu
     options.SignIn.RequireConfirmedAccount = false;
 
-    // Každý email musí být v databázi jedineèný
+    // Každý e-mail musí být v databázi jedineèný
     options.User.RequireUniqueEmail = true;
 
     // Nastavení požadavkù hesla
@@ -74,8 +74,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Strict;
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
     options.SlidingExpiration = true;
-    options.LoginPath = "/ucet/prihlaseni";
-    options.LogoutPath = "/ucet/odhlaseni";
+    options.LoginPath = "/prihlaseni";
+    options.LogoutPath = "/odhlaseni";
 });
 
 // Nastavení výchozí kultury na èeštinu
@@ -103,7 +103,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+app.UseStatusCodePagesWithReExecute("/nenalezeno", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
 // Pøidání autentizace a autorizace

@@ -10,11 +10,12 @@
             <NavLink href="/baterie">Baterie</NavLink>
             <NavLink href="/zarizeni">Zařízení</NavLink>
             <NavLink href="/umisteni">Umístění</NavLink>
-            <NavLink href="/ucet/odhlaseni" class="logout">Odhlásit se</NavLink>
+            <NavLink href="/mujucet">Můj účet</NavLink>
+            <NavLink href="/odhlaseni" class="logout">Odhlásit se</NavLink>
         </Authorized>
         <NotAuthorized>
-            <NavLink href="/ucet/registrace">Registrace</NavLink>
-            <NavLink href="/ucet/prihlaseni">Přihlásit se</NavLink>
+            <NavLink href="/registrace">Registrace</NavLink>
+            <NavLink href="/prihlaseni">Přihlásit se</NavLink>
         </NotAuthorized>
     </AuthorizeView>
 </nav>
@@ -24,8 +25,8 @@
 <main>@Body</main>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
+    Došlo k neočekávané chybě.
+    <a href="." class="reload">Obnovit stránku</a>
     <span class="dismiss">🗙</span>
 </div>
 

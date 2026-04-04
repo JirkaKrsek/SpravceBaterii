@@ -108,6 +108,7 @@ nav {
     justify-content: center;
     align-items: stretch;
     flex-wrap: wrap;
+    z-index: 999;
 }
 nav a {
     flex: 1;
@@ -165,7 +166,7 @@ nav a:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    z-index: 1000;
     overflow: auto;
 }
 .overlay-content {
@@ -174,7 +175,6 @@ nav a:hover {
     width: auto;
     height: auto;
     padding: 30px;
-    padding-top: 0;
     border-radius: 20px;
     border-top-right-radius: 12px;
     box-shadow: 0 5px 20px black;
@@ -188,6 +188,8 @@ nav a:hover {
     display: flex;
     gap: 10px;
     margin-top: 20px;
+    grid-column: 1 / -1;
+    flex: 1;
 }
 .action-buttons button {
     flex: 1;
@@ -226,11 +228,11 @@ input#checkbox-show-password-requirements:checked ~ label:after {
 
 /* Vyhodnocený stav baterie */
 /* Upozornění při nedostatečném počtu vložených baterií v zařízení */
-td.status-default, td.count-warning {
+.status-default, .count-warning {
     position: relative;
     padding-left: 40px;
 }
-td.status-default::before, td.count-warning::before {
+.status-default::before, .count-warning::before {
     position: absolute;
     left: 6px;
     top: 50%;
@@ -246,23 +248,35 @@ td.status-default::before, td.count-warning::before {
 .status-expired {
     background-color: #ffadad;
 }
-td.count-warning {
+.count-warning {
     background-color: #ffeeca;
 }
-td.status-ok::before {
+.status-ok::before {
     /* Unicode ✔ - HEAVY CHECK MARK */
     content: "\2714";
     color: green;
 }
-td.status-warning::before, td.count-warning::before {
+.status-warning::before, .count-warning::before {
     /* Unicode ⚠ - WARNING SIGN */
     content: "\26A0";
     color: darkorange;
 }
-td.status-expired::before {
+.status-expired::before {
     /* Unicode ✖ - HEAVY MULTIPLICATION */
     content: "\2716";
     color: red;
+}
+
+ul.battery-status-legend li,
+ul.device-count-legend li {
+    padding: 10px 40px;
+    max-width: 240px;
+}
+
+/* Informace o aktuálně přihlášeném uživateli */
+div.user-info {
+    font-weight: bolder;
+    margin: 30px 0px 40px 0px;
 }
 
 /* Tabulka */
@@ -361,12 +375,19 @@ form {
     background-color: white;
     overflow: auto;
 }
+form.account label, form.account-update label {
+    margin-bottom: -10px;
+}
+form.account-update {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 form.account {
     margin: auto;
     padding: 30px;
     box-shadow: 0 5px 20px black;
     border-radius: 20px;
-
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -386,7 +407,6 @@ form.add-update span, form .validation-errors {
     grid-column: 1 / -1;
 }
 form label {
-    margin-bottom: 5px;
     font-weight: bold;
 }
 form input, form select, textarea {
@@ -416,12 +436,12 @@ label:has(+ input[required])::after, label:has(+ select[required])::after {
     vertical-align: middle;
 }
 p.required-info {
-    color: red;
     font-weight: bold;
     grid-column: 1 / -1;
-    margin-bottom: 0;
+    margin: 0;
 }
 p.required-info span {
+    color: red;
     font-size: x-large;
     vertical-align: middle;
 }
@@ -433,5 +453,5 @@ p.required-info span {
 .error-message {
     color: red;
     font-weight: bold;
-    margin: 20px;
+    margin: 20px 0px;
 }

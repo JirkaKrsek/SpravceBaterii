@@ -12,12 +12,6 @@
 @inject ExceptionHandlerService ExceptionHandlerService
 @inject ModalNavigationService ModalNavigationService
 
-<!--Zobrazení chybové hlášky pokud je vyplněna-->
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-	<p class="error-message">@errorMessage</p>
-}
-
 <div class="component-header">
 	@if (ItemId is null)
 	{
@@ -28,6 +22,12 @@
 		<h2>Formulář pro úpravu baterie</h2>
 	}
 </div>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+	<p class="error-message">@errorMessage</p>
+}
 
 <EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm" class="add-update">
 	<DataAnnotationsValidator />
@@ -120,12 +120,14 @@
 
 	<hr>
 
-	<button type="submit">Uložit</button>
+	<div class="action-buttons">
+		<button type="submit">Uložit</button>
 
-	@if (ItemId is not null)
-	{
-		<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
-	}
+		@if (ItemId is not null)
+		{
+			<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
+		}
+	</div>
 
 	@if (showConfirm)
 	{
@@ -254,7 +256,7 @@
 				{
 					if (battery.Count > maxBatteryCount)
 					{
-						errorMessage = "Počet baterií může být maximálně: " + maxBatteryCount + ", protože v zařízení již není dostupné místo.";
+						errorMessage = "Počet baterií může být maximálně: " + maxBatteryCount + ", protože v zařízení již není dostupné místo";
 						return;
 					}
 				}

@@ -1,16 +1,18 @@
-﻿@page "/odhlaseni"
+﻿@page "/aktualizace-cookie"
 @attribute [ExcludeFromInteractiveRouting]
 @using Microsoft.AspNetCore.Identity
 @using SpravceBaterii.Data.Models
 @using SpravceBaterii.Services
 
+@inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationUserService UserService
 @inject NavigationManager Navigation
 @inject ExceptionHandlerService ExceptionHandlerService
 
-<PageTitle>Správce baterií - Odhlášení</PageTitle>
+<PageTitle>Správce baterií - Aktualizace Cookie</PageTitle>
 
-<h1>Odhlášení</h1>
+<h1>Aktualizace Cookie</h1>
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -22,20 +24,25 @@
     private string errorMessage = "";
 
     /// <summary>
-    /// Po načtení této stránky automaticky odhlásí aktuálně přihlášeného uživatele a přesměruje na domovskou stránku
+    /// Po načtení této stránky proběhne automatická aktualizace Cookie v prohlížeči aktuálně přihlášeného uživatele a přesměruje na stránku Můj účet
     /// </summary>
     /// <returns>Asynchronní metoda</returns>
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await SignInManager.SignOutAsync();
+            ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+            if (user != null)
+            {
+                await SignInManager.RefreshSignInAsync(user);
+            }
         }
         catch (Exception ex)
         {
             errorMessage = ExceptionHandlerService.HandleException(ex);
             return;
         }
-        Navigation.NavigateTo("/", true);
+
+        Navigation.NavigateTo("/mujucet", true);
     }
 }

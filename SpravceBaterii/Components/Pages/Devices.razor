@@ -1,4 +1,7 @@
 ﻿@page "/zarizeni"
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using SpravceBaterii.Components.Shared
 @using SpravceBaterii.Data.Models
@@ -21,7 +24,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-	<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
+<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
 
 <hr>
 

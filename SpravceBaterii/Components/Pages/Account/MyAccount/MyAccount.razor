@@ -1,0 +1,140 @@
+﻿@page "/mujucet"
+@attribute [Authorize]
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Data.Models
+@using SpravceBaterii.Services
+
+@implements IDisposable
+
+@inject ApplicationUserService UserService
+@inject ExceptionHandlerService ExceptionHandlerService
+@inject ModalNavigationService ModalNavigationService
+
+<PageTitle>Správce baterií - Můj účet</PageTitle>
+
+<h1>Můj účet</h1>
+
+<!--Zobrazení chybové hlášky pokud je vyplněna-->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="error-message">@errorMessage</p>
+}
+
+<p>Zde můžete vidět své statistiky, změnit přihlašovací údaje, odstranit svá data nebo celý účet.</p>
+
+<!--Uložené informace-->
+<div class="user-info">
+	<h2>Uložené informace</h2>
+	<ul>
+		<li>Váš registrovaný e-mail: @userInfo?.Email</li>
+		<li>Poslední přihlášení: @userInfo?.LastLoginDate.ToLocalTime()</li>
+		<li>Registrace proběhla: @userInfo?.RegistrationDate.ToLocalTime()</li>
+	</ul>
+</div>
+
+<!--Počet evidovaných záznamů-->
+<div class="user-info">
+	<h2>Celkový počet evidovaných záznamů = @userStatistics?.TotalCount</h2>
+	<ul>
+		<li>Baterií = @userStatistics?.Batteries
+			<ul>
+				<li>z toho jednorázových = @userStatistics?.DisposableBatteries</li>
+				<li>z toho nabíjecích = @userStatistics?.RechargeableBatteries</li>
+			</ul>
+		</li>
+		<li>Zařízení = @userStatistics?.Devices</li>
+		<li>Umístění = @userStatistics?.Locations</li>
+	</ul>
+</div>
+
+
+<h2>Změna e‑mailu</h2>
+
+<button type="button" @onclick="() => ModalNavigationService.Open(typeof(ChangeEmail), null)">Změnit e-mail</button>
+
+
+<h2>Změna hesla</h2>
+
+<button type="button" @onclick="() => ModalNavigationService.Open(typeof(ChangePassword), null)">Změnit heslo</button>
+
+
+<h2>Smazání všech dat</h2>
+
+<button type="button" @onclick="() => ModalNavigationService.Open(typeof(DeleteUserData), null)">Smazat všechna moje data - (baterie, zařízení, umístění)</button>
+
+
+<h2>Smazání účtu</h2>
+
+<button type="button" @onclick="() => ModalNavigationService.Open(typeof(DeleteAccount), null)">Smazat navždy můj účet</button>
+
+@code {
+	private ApplicationUser userInfo = default!;
+	private UserStatisticsDto? userStatistics;
+
+	private string errorMessage = "";
+
+
+	/// <summary>
+	/// Při načtení stránky se zavolá načtení dat
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			ModalNavigationService.Reset();
+
+			await LoadUserInfo();
+
+			//Přihlášení k události pro změnu navigace, aby se načetla data po návratu z modální komponenty
+			ModalNavigationService.ModalChanged += NavigationChanged;
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+
+	/// <summary>
+	/// Při zavření modální komponenty se odhlásí odběr události
+	/// </summary>
+	public void Dispose()
+	{
+		ModalNavigationService.ModalChanged -= NavigationChanged;
+	}
+
+	/// <summary>
+	/// Po změně modální navigace se zkontroluje, zda nejsou potřeba znovunačíst data
+	/// </summary>
+	private async void NavigationChanged()
+	{
+		if (ModalNavigationService.ShouldReload())
+		{
+			await LoadUserInfo();
+			ModalNavigationService.Reset();
+
+			//Aktualizace UI
+			StateHasChanged();
+		}
+	}
+
+	/// <summary>
+	/// Načtení informací o aktuálně přihlášeném uživateli z databáze a jeho statistik
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task LoadUserInfo()
+	{
+		try
+		{
+			userInfo = await UserService.GetUserInformations();
+			userStatistics = await UserService.GetUserStatistics();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+	}
+}
