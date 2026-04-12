@@ -1,24 +1,29 @@
 # Správce baterií
 
-Tato webová aplikace slouí ke správì spotøebních baterií - jednorázovıch i nabíjecích.
+Webová aplikace pro správu spotøebních baterií - jednorázovıch i nabíjecích.
+Umoòuje evidovat umístìní, zaøízení a jednotlivé baterie a poskytuje pøehled o jejich stavu.
 
-Poskytuje pøehled o jejich stavu.
-
-Aplikace umoòuje uivatelùm evidovat umístìní, zaøízení a baterie.
-
-
-## Technologie
+## Pouité technologie
 - **C#**
-- **.NET Blazor Server**
+- **.NET 10**
+- **Blazor Server**
 - **Microsoft SQL Server (MSSQL)**
 - **Entity Framework Core**
+- **ASP.NET Core Identity**
 - **CSS**
 
-## Nasazení
-Aplikace bude po dokonèení nasazena na webovı hosting pro veøejné pouití.
+## Dostupnost
+Aplikace je nasazena na pro veøejné pouití. Aktuální odkaz je uveden v popisu repozitáøe.
+
+## Lokální spuštìní projektu
+Podrobnı postup pro lokální spuštìní (instalace, konfigurace a vytvoøení databáze) je uveden v sekci **Issues -> Informace**.
+
+## Databázovı model
+Model databáze je dostupnı v sekci **Issues -> Model databáze**.
+
+## Dotazy, návrhy a hlášení chyb
+Pro dotazy, návrhy a hlášení chyb vytváøejte nová **Issues** v tomto repozitáøi.
 
 ## Autor
-**Jiøí Krsek** (https://github.com/JirkaKrsek)
-
-## Další informace
-V repozitáøi v **Issues** je dostupnı model databáze.
+**Jiøí Krsek**
+https://github.com/JirkaKrsek
