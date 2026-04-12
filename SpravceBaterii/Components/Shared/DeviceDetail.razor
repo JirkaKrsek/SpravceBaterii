@@ -24,6 +24,9 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<!--Zobrazení potvrzovacího dialogu-->
+<ConfirmDialog @ref="confirmDialog" />
+
 @if (isDataLoaded)
 {
 	<table>
@@ -123,7 +126,7 @@ else
 						}
 
 						<td>
-							<button @onclick:stopPropagation="true" @onclick="() => { selectedBatteryId = battery.Id; showConfirmEjectOrDeleteSelectedBattery = true; }" title="">Vysunout / odstranit</button>
+							<button @onclick:stopPropagation="true" @onclick="async () => { selectedBatteryId = battery.Id; await EjectBatteryFromDevice(); }" title="">Vysunout / odstranit</button>
 						</td>
 					</tr>
 				}
@@ -135,7 +138,8 @@ else
 <hr>
 
 <div class="action-buttons">
-	<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), device.Id)">Upravit zařízení</button>
+	<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), device.Id)">Upravit</button>
+
 	@if ((device.Batteries?.Sum(b => b.Count) ?? 0) < device.BatteryCount)
 	{
 		<button @onclick="() => ModalNavigationService.Open(typeof(InsertBatteryToDevice), device.Id)">Vložit baterii</button>
@@ -152,63 +156,11 @@ else
 
 	@if (device.Batteries?.Count > 0)
 	{
-		<button type="button" @onclick="() => showConfirmEjectOrDeleteAllBatteries = true">Vysunout / odstranit všechny baterie z tohoto zařízení</button>
+		<button type="button" @onclick="async () => await EjectBatteriesFromDevice()">Vysunout / odstranit všechny baterie</button>
 	}
 
-	<button type="button" @onclick="() => showConfirmDeleteDevice = true">Odstranit toto zařízení</button>
+	<button type="button" @onclick="async () => await DeleteDevice()">Odstranit</button>
 </div>
-
-@if (showConfirmDeleteDevice)
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			<p>Opravdu chcete odstranit toto zařízení?</p>
-			<p>Vložené baterie budou ponechány.</p>
-			<div class="action-buttons">
-				<button type="button" @onclick="async () => await DeleteDevice(false)">Ano</button>
-				<button type="button" @onclick="() => showConfirmDeleteDevice = false">Ne</button>
-			</div>
-		</div>
-	</div>
-}
-@if (showConfirmKeepOrDeleteBatteryFromDeletedDevice)
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			<p>Chcete baterie z odstraněného zařízení zachovat nebo také odstranit?</p>
-			<div class="action-buttons">
-				<button type="button" @onclick="() => DeleteDevice(false)">Zachovat</button>
-				<button type="button" @onclick="() => DeleteDevice(true)">Odstranit</button>
-			</div>
-		</div>
-	</div>
-}
-@if (selectedBatteryId is not null && showConfirmEjectOrDeleteSelectedBattery)
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			<p>Chcete tuto baterii jen vysunotou nebo vysunout a odstranit?</p>
-			<div class="action-buttons">
-				<button type="button" @onclick="async () => await EjectBatteryFromDevice(false)">Jen vysunout</button>
-				<button type="button" @onclick="async () => await EjectBatteryFromDevice(true)">Vysunout a odstranit</button>
-				<button type="button" @onclick="() => { showConfirmEjectOrDeleteSelectedBattery = false; selectedBatteryId = null; }">Zrušit akci</button>
-			</div>
-		</div>
-	</div>
-}
-@if (showConfirmEjectOrDeleteAllBatteries)
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			<p>Chcete všechny baterie z tohoto zařízení jen vysunotou nebo vysunout a odstranit?</p>
-			<div class="action-buttons">
-				<button @onclick="async () => await EjectBatteriesFromDevice(false)">Jen vysunout</button>
-				<button @onclick="async () => await EjectBatteriesFromDevice(true)">Vysunout a odstranit</button>
-				<button @onclick="() => showConfirmEjectOrDeleteAllBatteries = false">Zrušit tuto akci</button>
-			</div>
-		</div>
-	</div>
-}
 
 @code {
 	/// <summary>
@@ -219,11 +171,8 @@ else
 
 
 	private string errorMessage = "";
+	private ConfirmDialog confirmDialog = default!;
 	private int? selectedBatteryId = null;
-	private bool showConfirmDeleteDevice = false;
-	private bool showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
-	private bool showConfirmEjectOrDeleteSelectedBattery = false;
-	private bool showConfirmEjectOrDeleteAllBatteries = false;
 	private bool isDataLoaded = false;
 
 	private Device device = new();
@@ -263,66 +212,113 @@ else
 	/// <summary>
 	/// Odstranění vybraného zařízení z databáze
 	/// </summary>
-	/// <param name="deleteInsertedBatteries">bool, zachovat / odstranit baterie v zařízení</param>
 	/// <returns>Asynchronní operace</returns>
-	private async Task DeleteDevice(bool deleteInsertedBatteries)
+	private async Task DeleteDevice()
 	{
 		try
 		{
-			if (device.Batteries?.Count > 0)
+			if (await confirmDialog.Show("Opravdu chcete toto zařízení odstranit z evidence?", new() { "Odstranit", "Zrušit" }) == 1)
 			{
-				if (showConfirmKeepOrDeleteBatteryFromDeletedDevice == false)
+				if (device.Batteries?.Count > 0)
 				{
-					showConfirmKeepOrDeleteBatteryFromDeletedDevice = true;
-					return;
+					if (await confirmDialog.Show("Chcete baterie z tohoto zařízení ponechat v evidenci nebo je ihned odstranit?", new() { "Ponechat v evidenci", "Odstranit" }) == 1)
+					{
+						foreach (Battery battery in device.Batteries)
+						{
+							await BatteryService.EjectBatteryFromDevice(battery.Id, device.Name);
+						}
+					}
+					else
+					{
+						foreach (Battery battery in device.Batteries)
+						{
+							await BatteryService.DeleteBatteryById(battery.Id);
+						}
+					}
 				}
 
-				await EjectBatteriesFromDevice(deleteInsertedBatteries);
+				await DeviceService.DeleteDeviceById(ItemId);
+
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAll();
 			}
-
-			showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
-
-			await DeviceService.DeleteDeviceById(ItemId);
-
-			ModalNavigationService.MarkForReload();
-			ModalNavigationService.CloseAll();
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
-			showConfirmKeepOrDeleteBatteryFromDeletedDevice = false;
-		}
-		finally
-		{
-			showConfirmDeleteDevice = false;
 		}
 	}
 
 	/// <summary>
 	/// Vysunutí / smazání všech baterií v zařízení
 	/// </summary>
-	/// <param name="deleteBatteries">bool, zachovat / odstranit baterie</param>
 	/// <returns>Asynchronní operace</returns>
-	private async Task EjectBatteriesFromDevice(bool deleteBatteries)
+	private async Task EjectBatteriesFromDevice()
 	{
 		try
 		{
 			if (device.Batteries?.Count > 0)
 			{
-				if (deleteBatteries)
-				{
-					foreach (Battery battery in device.Batteries)
-					{
-						await BatteryService.DeleteBatteryById(battery.Id);
-					}
-				}
-				else
+				int result = await confirmDialog.Show("Chcete všechny baterie vysunout a ponechat v evidenci nebo vysunout a ihned odstranit z evidence?", new() { "Vysunout a ponechat", "Vysunout a odstranit", "Zrušit" });
+				if (result == 1)
 				{
 					foreach (Battery battery in device.Batteries)
 					{
 						await BatteryService.EjectBatteryFromDevice(battery.Id, device.Name);
 					}
+
+					ModalNavigationService.MarkForReload();
+
+					await LoadDeviceList();
 				}
+				else if (result == 2)
+				{
+					foreach (Battery battery in device.Batteries)
+					{
+						await BatteryService.DeleteBatteryById(battery.Id);
+					}
+
+					ModalNavigationService.MarkForReload();
+
+					await LoadDeviceList();
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+		}
+		finally
+		{
+			selectedBatteryId = null;
+		}
+	}
+
+	/// <summary>
+	/// Vysunutí / odstranění vybrané baterie ze zařízení
+	/// </summary>
+	/// <returns>Asynchronní operace</returns>
+	private async Task EjectBatteryFromDevice()
+	{
+		try
+		{
+			if (selectedBatteryId is null)
+			{
+				return;
+			}
+
+			int result = await confirmDialog.Show("Chcete tuto baterii vysunout a ponechat v evidenci nebo vysunout a ihned odstranit z evidence?", new() { "Vysunout a ponechat", "Vysunout a odstranit", "Zrušit" });
+			if (result == 1)
+			{
+				await BatteryService.EjectBatteryFromDevice(selectedBatteryId!.Value, device.Name);
+
+				ModalNavigationService.MarkForReload();
+
+				await LoadDeviceList();
+			}
+			else if (result == 2)
+			{
+				await BatteryService.DeleteBatteryById(selectedBatteryId!.Value);
 
 				ModalNavigationService.MarkForReload();
 
@@ -335,46 +331,6 @@ else
 		}
 		finally
 		{
-			showConfirmEjectOrDeleteSelectedBattery = false;
-			showConfirmEjectOrDeleteAllBatteries = false;
-			selectedBatteryId = null;
-		}
-	}
-
-	/// <summary>
-	/// Vysunutí / odstranění vybrané baterie ze zařízení
-	/// </summary>
-	/// <param name="deleteEjectedBattery">bool, zachovat / odstranit baterii</param>
-	/// <returns>Asynchronní operace</returns>
-	private async Task EjectBatteryFromDevice(bool deleteEjectedBattery)
-	{
-		try
-		{
-			if (selectedBatteryId is null)
-			{
-				return;
-			}
-
-			if (deleteEjectedBattery)
-			{
-				await BatteryService.DeleteBatteryById(selectedBatteryId!.Value);
-			}
-			else
-			{
-				await BatteryService.EjectBatteryFromDevice(selectedBatteryId!.Value, device.Name);
-			}
-
-			ModalNavigationService.MarkForReload();
-
-			await LoadDeviceList();
-		}
-		catch (Exception ex)
-		{
-			errorMessage = ExceptionHandlerService.HandleException(ex);
-		}
-		finally
-		{
-			showConfirmEjectOrDeleteSelectedBattery = false;
 			selectedBatteryId = null;
 		}
 	}

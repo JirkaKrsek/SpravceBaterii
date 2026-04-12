@@ -26,6 +26,9 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<!--Zobrazení potvrzovacího dialogu-->
+<ConfirmDialog @ref="confirmDialog" />
+
 <EditForm Model="@device" OnValidSubmit="SaveDevice" FormName="DeviceForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
@@ -74,22 +77,9 @@
 
 		@if(ItemId is not null)
 		{
-			<button type="button" @onclick="() => showConfirm = true">Smazat toto zařízení</button>
+			<button type="button" @onclick="() => DeleteDevice(device.Id)">Odstranit zařízení</button>
 		}
 	</div>
-
-	@if (showConfirm)
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-				<p>Opravdu chcete odstranit toto zařízení?</p>
-				<div class="action-buttons">
-					<button type="button" @onclick="() => DeleteDevice(device.Id)">Ano</button>
-					<button type="button" @onclick="() => showConfirm = false">Ne</button>
-				</div>
-			</div>
-		</div>
-	}
 </EditForm>
 
 @code {
@@ -101,7 +91,7 @@
 
 
 	private string errorMessage = "";
-	private bool showConfirm = false;
+	private ConfirmDialog confirmDialog = default!;
 
 	private Device device = new();
 	private List<Location> Locations = new();
@@ -188,18 +178,17 @@
 	{
 		try
 		{
-			await DeviceService.DeleteDeviceById(deviceId);
+			if (await confirmDialog.Show("Opravdu chcete toto zařízení odstranit z evidence?", new() { "Odstranit", "Zrušit" }) == 1)
+			{
+				await DeviceService.DeleteDeviceById(deviceId);
 
-			ModalNavigationService.MarkForReload();
-			ModalNavigationService.CloseAll();
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAll();
+			}
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
-		}
-		finally
-		{
-			showConfirm = false;
 		}
 	}
 

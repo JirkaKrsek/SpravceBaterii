@@ -29,6 +29,9 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<!--Zobrazení potvrzovacího dialogu-->
+<ConfirmDialog @ref="confirmDialog" />
+
 <EditForm Model="@battery" OnValidSubmit="SaveBattery" FormName="AddBatteryForm" class="add-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
@@ -125,25 +128,12 @@
 
 		@if (ItemId is not null)
 		{
-			<button type="button" @onclick="() => showConfirm = true">Smazat tuto baterii</button>
+			<button type="button" @onclick="() => DeleteBattery(battery.Id)">Odstranit baterii</button>
 		}
 	</div>
-
-	@if (showConfirm)
-	{
-		<div class="overlay">
-			<div class="overlay-content">
-			<p>Opravdu chcete odstranit tuto baterii?</p>
-				<div class="action-buttons">
-			<button type="button" @onclick="() => DeleteBattery(battery.Id)">Ano</button>
-			<button type="button" @onclick="() => showConfirm = false">Ne</button>
-		</div>
-		</div>
-		</div>
-	}
 </EditForm>
 
-	@code {
+@code {
 	/// <summary>
 	/// Vstupní parametr - ID položky pro její načtení
 	/// </summary>
@@ -152,7 +142,7 @@
 
 
 	private string errorMessage = "";
-	private bool showConfirm = false;
+	private ConfirmDialog confirmDialog = default!;
 
 	private List<BatteryType> BatteryTypes = new();
 	private List<ChemicalComposition> ChemicalCompositions = new();
@@ -189,7 +179,7 @@
 					int freeSlots = device.BatteryCount - usedSlots;
 					maxBatteryCount = battery.Count + freeSlots;
 				}
-				
+
 				if (!battery.IsRechargeable)
 				{
 					disposableBattery = await DisposableBatteryService.GetDisposableBatteryById(battery.Id) ?? new()
@@ -282,18 +272,17 @@
 	{
 		try
 		{
-			await BatteryService.DeleteBatteryById(batteryId);
+			if (await confirmDialog.Show("Opravdu chcete tuto baterii odstranit z evidence?", new() { "Odstranit", "Zrušit" }) == 1)
+			{
+				await BatteryService.DeleteBatteryById(batteryId);
 
-			ModalNavigationService.MarkForReload();
-			ModalNavigationService.CloseAll();
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAll();
+			}
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
-		}
-		finally
-		{
-			showConfirm = false;
 		}
 	}
 

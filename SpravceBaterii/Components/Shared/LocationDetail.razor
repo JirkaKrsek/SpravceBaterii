@@ -24,6 +24,9 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<!--Zobrazení potvrzovacího dialogu-->
+<ConfirmDialog @ref="confirmDialog" />
+
 @if (isDataLoaded)
 {
 	<table>
@@ -110,25 +113,8 @@ else
 
 <div class="action-buttons">
 	<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), location.Id)">Upravit umístění</button>
-	<button type="button" @onclick="() => showConfirmDeleteLocation = true">Odstranit toto umístění</button>
+	<button type="button" @onclick="async () => await DeleteLocation()">Odstranit</button>
 </div>
-
-@if (showConfirmDeleteLocation)
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			@if (DeviceList.Count > 0)
-			{
-				<p>Zařízení zůstanou zachována.</p>
-			}
-			<p>Opravdu chcete odstranit toto umístění?</p>
-			<div class="action-buttons">
-				<button type="button" @onclick="async () => await DeleteLocation()">Ano</button>
-				<button type="button" @onclick="() => showConfirmDeleteLocation = false">Ne</button>
-			</div>
-		</div>
-	</div>
-}
 
 @code {
 	/// <summary>
@@ -139,7 +125,7 @@ else
 
 
 	private string errorMessage = "";
-	private bool showConfirmDeleteLocation = false;
+	private ConfirmDialog confirmDialog = default!;
 	private bool isDataLoaded = false;
 
 	private Location location = new();
@@ -184,22 +170,31 @@ else
 	{
 		try
 		{
+			string question;
 			if (DeviceList.Count > 0)
 			{
-				await DeviceService.UnassignDevicesInLocationById(location.Id);
+				question = "Opravdu chcete toto umístění odstranit z evidence? Zařízení v evidenci zůstanou zachována.";
 			}
-			await LocationService.DeleteLocationById(location.Id);
+			else
+			{
+				question = "Opravdu chcete toto umístění odstranit z evidence?";
+			}
 
-			ModalNavigationService.MarkForReload();
-			ModalNavigationService.CloseAll();
+			if (await confirmDialog.Show(question, new() { "Odstranit", "Zrušit" }) == 1)
+			{
+				if (DeviceList.Count > 0)
+				{
+					await DeviceService.UnassignDevicesInLocationById(location.Id);
+				}
+				await LocationService.DeleteLocationById(location.Id);
+
+				ModalNavigationService.MarkForReload();
+				ModalNavigationService.CloseAll();
+			}
 		}
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
-		}
-		finally
-		{
-			showConfirmDeleteLocation = false;
 		}
 	}
 

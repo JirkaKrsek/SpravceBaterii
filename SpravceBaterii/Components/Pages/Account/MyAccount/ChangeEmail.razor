@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Components.Shared
 @using SpravceBaterii.Data.Models
 @using SpravceBaterii.Services
 @using System.ComponentModel.DataAnnotations
@@ -17,6 +18,9 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<!--Zobrazení potvrzovacího dialogu-->
+<ConfirmDialog @ref="confirmDialog" />
+
 <EditForm Model="@InputEmail" OnValidSubmit="Change" FormName="Change" class="account-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
@@ -34,20 +38,6 @@
 	</div>
 </EditForm>
 
-<!--Zobrazení úspěšné hlášky-->
-@if (showSuccessInfo)
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			<button type="button" class="close" @onclick="CloseSuccessInfo">X</button>
-			<p>E-mail byl úspěšně změněn.</p>
-			<div class="action-buttons">
-				<button type="button" @onclick="CloseSuccessInfo">Zavřít</button>
-			</div>
-		</div>
-	</div>
-}
-
 @code {
 	/// <summary>
 	/// Vstupní parametr - ID položky pro její načtení
@@ -55,11 +45,10 @@
 	[Parameter]
 	public int? ItemId { get; set; }
 
-	private InputModelEmail InputEmail { get; set; } = new InputModelEmail();
-
 	private string errorMessage = "";
-	private bool showSuccessInfo = false;
-	private bool needUpdateCookie = false;
+	private ConfirmDialog confirmDialog = default!;
+
+	private InputModelEmail InputEmail { get; set; } = new InputModelEmail();
 
 	/// <summary>
 	/// Nastavení potřebných dat při zobrazení komponenty
@@ -100,8 +89,12 @@
 						user.UserName = InputEmail.NewEmail;
 						await UserManager.UpdateAsync(user);
 
-						needUpdateCookie = true;
-						showSuccessInfo = true;
+						if (await confirmDialog.Show("E-mail byl úspěšně změněn.", new() { "Zavřít" }) == 1)
+						{
+							ModalNavigationService.MarkForReload();
+							ModalNavigationService.Close();
+							Navigation.NavigateTo("/aktualizace-cookie", true);
+						}
 					}
 					else
 					{
@@ -119,23 +112,6 @@
 		catch (Exception ex)
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
-		}
-	}
-
-	/// <summary>
-	/// Po zavření hlášky o úspěšném procesu se komponenta zavře a proběhne aktualizace Cookie
-	/// </summary>
-	/// <returns>Asynchronní metoda</returns>
-	private async Task CloseSuccessInfo()
-	{
-		showSuccessInfo = false;
-
-		if (needUpdateCookie)
-		{
-			needUpdateCookie = false;
-			ModalNavigationService.MarkForReload();
-			ModalNavigationService.Close();
-			Navigation.NavigateTo("/aktualizace-cookie", true);
 		}
 	}
 
