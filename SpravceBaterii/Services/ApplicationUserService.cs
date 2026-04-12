@@ -67,7 +67,7 @@ namespace SpravceBaterii.Services
         }
 
         /// <summary>
-        /// Výpočet všech uložených záznamů přihlášeného uživatele
+        /// Výpočet všech uložených záznamů aktuálně přihlášeného uživatele
         /// </summary>
         /// <returns>UserStatisticsDto</returns>
         public async Task<UserStatisticsDto> GetUserStatistics()
@@ -75,10 +75,12 @@ namespace SpravceBaterii.Services
             string userId = await GetUserIdAsync();
 
             int disposableBatteries = await applicationDbContext.Batteries
-                .CountAsync(b => b.UserId == userId && !b.IsRechargeable);
+                .Where(b => b.UserId == userId && !b.IsRechargeable)
+                .SumAsync(b => b.Count);
 
             int rechargeableBatteries = await applicationDbContext.Batteries
-                .CountAsync(b => b.UserId == userId && b.IsRechargeable);
+                .Where(b => b.UserId == userId && b.IsRechargeable)
+                .SumAsync(b => b.Count);
 
             int batteries = disposableBatteries + rechargeableBatteries;
 
