@@ -15,27 +15,27 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p class="error-message">@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 @code {
-    private string errorMessage = "";
+	private string errorMessage = "";
 
-    /// <summary>
-    /// Po načtení této stránky automaticky odhlásí aktuálně přihlášeného uživatele a přesměruje na domovskou stránku
-    /// </summary>
-    /// <returns>Asynchronní metoda</returns>
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            await SignInManager.SignOutAsync();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = ExceptionHandlerService.HandleException(ex);
-            return;
-        }
-        Navigation.NavigateTo("/", true);
-    }
+	/// <summary>
+	/// Po načtení této stránky automaticky odhlásí aktuálně přihlášeného uživatele a přesměruje na domovskou stránku
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			await SignInManager.SignOutAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+			return;
+		}
+		Navigation.NavigateTo("/", true);
+	}
 }

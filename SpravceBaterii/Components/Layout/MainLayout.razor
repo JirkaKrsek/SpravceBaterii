@@ -3,21 +3,21 @@
 @inherits LayoutComponentBase
 
 <nav>
-    <NavLink href="/" Match="NavLinkMatch.All" class="logo"><img src="@Assets["logo.png"]" alt="Logo" />Správce baterií</NavLink>
+	<NavLink href="/" Match="NavLinkMatch.All" class="logo"><img src="@Assets["logo.png"]" alt="Logo" />Správce baterií</NavLink>
 
-    <AuthorizeView>
-        <Authorized>
-            <NavLink href="/baterie">Baterie</NavLink>
-            <NavLink href="/zarizeni">Zařízení</NavLink>
-            <NavLink href="/umisteni">Umístění</NavLink>
-            <NavLink href="/mujucet">Můj účet</NavLink>
-            <NavLink href="/odhlaseni" class="logout">Odhlásit se</NavLink>
-        </Authorized>
-        <NotAuthorized>
-            <NavLink href="/registrace">Registrace</NavLink>
-            <NavLink href="/prihlaseni">Přihlásit se</NavLink>
-        </NotAuthorized>
-    </AuthorizeView>
+	<AuthorizeView>
+		<Authorized>
+			<NavLink href="/baterie">Baterie</NavLink>
+			<NavLink href="/zarizeni">Zařízení</NavLink>
+			<NavLink href="/umisteni">Umístění</NavLink>
+			<NavLink href="/mujucet">Můj účet</NavLink>
+			<NavLink href="/odhlaseni" class="logout">Odhlásit se</NavLink>
+		</Authorized>
+		<NotAuthorized>
+			<NavLink href="/registrace">Registrace</NavLink>
+			<NavLink href="/prihlaseni">Přihlásit se</NavLink>
+		</NotAuthorized>
+	</AuthorizeView>
 </nav>
 
 <ModalNavigation />
@@ -25,19 +25,24 @@
 <main>@Body</main>
 
 <div id="blazor-error-ui" data-nosnippet>
-    Došlo k neočekávané chybě.
-    <a href="." class="reload">Obnovit stránku</a>
-    <span class="dismiss">🗙</span>
+	Došlo k neočekávané chybě.
+	<a href="." class="reload">Obnovit stránku</a>
+	<span class="dismiss">🗙</span>
 </div>
 
 <footer>
 	<p class="footer-title">&copy; @DateTime.Now.Year - Správce Baterií</p>
-    <p>Webová aplikace pro správu spotřebních baterií.</p>
-    <p>Vytvořeno jako bakalářská práce pomocí .NET Blazor a SQL Server.</p>
-    <p>Přihlašovací údaje slouží výhradně k přihlášení uživatele a jsou bezpečně uloženy.</p>
-    <p>Veškerá uložená data jsou používána pouze v rámci této webové aplikace a nejsou sdílena ani poskytována třetím stranám.</p>
-    <p>Tato webová aplikace je poskytována bez záruky a autor neručí za případnou ztrátu nebo poškození dat.</p>
-    <p>Autor: Jiří Krsek</p>
-    <p>Kontakt: <a href="https://github.com/JirkaKrsek" target="_blank">Odkaz na GitHub autora</a></p>
-    <p><a href="/">Zpět na domovskou stránku</a></p>
+	<p>Webová aplikace pro správu spotřebních baterií.</p>
+	<p>Vytvořeno pro bakalářskou práci na FIM UHK (2025/2026).</p>
+	<p>Přihlašovací údaje slouží výhradně k přihlášení uživatele a jsou bezpečně uloženy.</p>
+	<p>Veškerá uložená data jsou používána pouze v rámci této webové aplikace a nejsou sdílena ani poskytována třetím stranám.</p>
+	<p>Tato webová aplikace je poskytována bez záruky a autor neručí za případnou ztrátu nebo poškození uložených dat.</p>
+	<p>Autor: Jiří Krsek</p>
+	<p>Kontakt:</p>
+	<p><a href="https://github.com/JirkaKrsek" target="_blank" title="Odkaz na GitHub profil autora">GitHub profil</a></p>
+	<p>
+		<a href="https://github.com/JirkaKrsek/SpravceBaterii" target="_blank" title="Odkaz na GitHub repozitář této webové aplikace">GitHub repozitář</a>
+	</p>
+	<p>Pro dotazy, návrhy a hlášení chyb mě prosím kontaktujte prostřednictvím GitHubu nebo využijte sekci Issues v repozitáři.</p>
+	<p><a href="/">Zpět na domovskou stránku</a></p>
 </footer>

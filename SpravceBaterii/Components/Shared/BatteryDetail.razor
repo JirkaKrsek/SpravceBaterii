@@ -79,14 +79,14 @@
 		}
 		@if (battery.DeviceId is not null)
 		{
-		<tr>
-			<td>Očekávaná doba životnosti (ve dnech): </td>
+			<tr>
+				<td>Očekávaná doba životnosti (ve dnech): </td>
 				<td>@battery.ExpectedLifespan</td>
 			</tr>
 			<tr>
 				<td>Do konce životnosti zbývá dní: </td>
-			<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
-		</tr>
+				<td class="@(batteryStatusExpectedLifeSpan?.CssClass ?? "")">@(batteryStatusExpectedLifeSpan?.Days?.ToString() ?? "")</td>
+			</tr>
 		}
 		<tr>
 			<td>Byla použita v zařízení: </td>
@@ -151,7 +151,7 @@ else
 <hr>
 
 <div class="action-buttons">
-	<button type="button" @onclick ="() => ModalNavigationService.Open(typeof(BatteryForm), battery.Id)">Upravit</button>
+	<button type="button" @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), battery.Id)">Upravit</button>
 
 	@if (battery.DeviceId is not null && battery.IsRechargeable)
 	{

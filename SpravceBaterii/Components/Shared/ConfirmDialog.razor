@@ -1,49 +1,49 @@
 ﻿@if (visible)
 {
-    <div class="overlay">
-        <div class="overlay-content">
-            <p>@((MarkupString)message)</p>
-            <div class="action-buttons">
-                @for(int i = 0; i < options.Count; i++)
-                {
-                    int index = i + 1;
-                    <button @onclick="() => Close(index)">@options[i]</button>
+	<div class="overlay">
+		<div class="overlay-content">
+			<p>@((MarkupString)message)</p>
+			<div class="action-buttons">
+				@for (int i = 0; i < options.Count; i++)
+				{
+					int index = i + 1;
+					<button @onclick="() => Close(index)">@options[i]</button>
 				}
-            </div>
-        </div>
-    </div>
+			</div>
+		</div>
+	</div>
 }
 
 @code {
-    private bool visible = false;
-    private string message = "";
-    private List<string> options = new();
-    private TaskCompletionSource<int> taskCompletionSource = new();
+	private bool visible = false;
+	private string message = "";
+	private List<string> options = new();
+	private TaskCompletionSource<int> taskCompletionSource = new();
 
-    /// <summary>
-    /// Zobrazení dialogu s nastavenou otázkou a možnostmi pro uživatele
-    /// </summary>
-    /// <param name="messageText">Text obsahující otázku</param>
-    /// <param name="optionsText">Možnosti pro tlačítka</param>
-    /// <returns>Pořadí uživatelem vybrané možnosti</returns>
-    public Task<int> Show(string messageText, List<string> optionsText)
-    {
-        message = messageText;
-        options = optionsText;
-        taskCompletionSource = new();
-        visible = true;
+	/// <summary>
+	/// Zobrazení dialogu s nastavenou otázkou a možnostmi pro uživatele
+	/// </summary>
+	/// <param name="messageText">Text obsahující otázku</param>
+	/// <param name="optionsText">Možnosti pro tlačítka</param>
+	/// <returns>Pořadí uživatelem vybrané možnosti</returns>
+	public Task<int> Show(string messageText, List<string> optionsText)
+	{
+		message = messageText;
+		options = optionsText;
+		taskCompletionSource = new();
+		visible = true;
 
-        StateHasChanged();
-        return taskCompletionSource.Task;
-    }
+		StateHasChanged();
+		return taskCompletionSource.Task;
+	}
 
-    /// <summary>
-    /// Zavření dialogu a vrácení výsledku uživatelem zvolené možnosti
-    /// </summary>
-    /// <param name="result">Pořadí uživatelem vybrané možnosti</param>
-    private void Close(int result)
-    {
-        visible = false;
-        taskCompletionSource.SetResult(result);
-    }
+	/// <summary>
+	/// Zavření dialogu a vrácení výsledku uživatelem zvolené možnosti
+	/// </summary>
+	/// <param name="result">Pořadí uživatelem vybrané možnosti</param>
+	private void Close(int result)
+	{
+		visible = false;
+		taskCompletionSource.SetResult(result);
+	}
 }
