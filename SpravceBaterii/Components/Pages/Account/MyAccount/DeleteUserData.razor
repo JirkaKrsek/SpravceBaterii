@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using SpravceBaterii.Components.Shared
 @using SpravceBaterii.Data.Models
 @using SpravceBaterii.Services
 @using System.ComponentModel.DataAnnotations
@@ -21,6 +22,9 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<!--Zobrazení potvrzovacího dialogu-->
+<ConfirmDialog @ref="confirmDialog" />
+
 <EditForm Model="@InputCurrentPassword" OnValidSubmit="DeleteAllUserData" FormName="DeleteAllUserData" class="account-update">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
@@ -35,20 +39,6 @@
 	</div>
 </EditForm>
 
-<!--Zobrazení úspěšné hlášky-->
-@if (showSuccessInfo)
-{
-	<div class="overlay">
-		<div class="overlay-content">
-			<button type="button" class="close" @onclick="CloseSuccessInfo">X</button>
-			<p>Všechna vaše uložená data byla úspěšně smazána.</p>
-			<div class="action-buttons">
-				<button type="button" @onclick="CloseSuccessInfo">Zavřít</button>
-			</div>
-		</div>
-	</div>
-}
-
 @code {
 	/// <summary>
 	/// Vstupní parametr - ID položky pro její načtení
@@ -56,10 +46,10 @@
 	[Parameter]
 	public int? ItemId { get; set; }
 
-	private InputModelCurrentPassword InputCurrentPassword { get; set; } = new InputModelCurrentPassword();
-
 	private string errorMessage = "";
-	private bool showSuccessInfo = false;
+	private ConfirmDialog confirmDialog = default!;
+
+	private InputModelCurrentPassword InputCurrentPassword { get; set; } = new InputModelCurrentPassword();
 
 	/// <summary>
 	/// Nastavení potřebných dat při zobrazení komponenty
@@ -89,7 +79,12 @@
 			if (await CheckCurrentPassword())
 			{
 				await UserService.DeleteAllUserData();
-				showSuccessInfo = true;
+
+				if (await confirmDialog.Show("Všechna vaše uložená data byla úspěšně smazána.", new() { "Zavřít" }) == 1)
+				{
+					ModalNavigationService.MarkForReload();
+					ModalNavigationService.Close();
+				}
 			}
 			else
 			{
@@ -101,17 +96,6 @@
 		{
 			errorMessage = ExceptionHandlerService.HandleException(ex);
 		}
-	}
-
-	/// <summary>
-	/// Zavření komponenty po zavření hlášky o úspěšném procesu
-	/// </summary>
-	/// <returns>Asynchronní metoda</returns>
-	private async Task CloseSuccessInfo()
-	{
-		showSuccessInfo = false;
-		ModalNavigationService.MarkForReload();
-		ModalNavigationService.Close();
 	}
 
 	/// <summary>
