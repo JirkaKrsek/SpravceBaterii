@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace SpravceBaterii.Data.Models
 {
@@ -9,8 +10,9 @@ namespace SpravceBaterii.Data.Models
     {
         public int Id { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Kapacita baterie je min. 1")]
-        public int? Capacity { get; set; }
+        [Precision(18, 2)]
+        [Range(0.1, double.MaxValue, ErrorMessage = "Kapacita baterie je min. 0.1")]
+        public decimal? Capacity { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Počet cyklů baterie je min. 1")]
         public int? CycleCount { get; set; }
