@@ -75,7 +75,7 @@
 	<div class="action-buttons">
 		<button type="submit">Uložit</button>
 
-		@if(ItemId is not null)
+		@if (ItemId is not null)
 		{
 			<button type="button" @onclick="() => DeleteDevice(device.Id)">Odstranit zařízení</button>
 		}
@@ -152,7 +152,7 @@
 			{
 				await DeviceService.AddDevice(device);
 
-				ModalNavigationService.MarkForReload();			
+				ModalNavigationService.MarkForReload();
 				ModalNavigationService.CloseAndOpen(typeof(DeviceDetail), device.Id);
 			}
 			else

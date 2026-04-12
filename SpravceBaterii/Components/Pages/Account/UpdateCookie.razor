@@ -17,32 +17,32 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p class="error-message">@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 @code {
-    private string errorMessage = "";
+	private string errorMessage = "";
 
-    /// <summary>
-    /// Po načtení této stránky proběhne automatická aktualizace Cookie v prohlížeči aktuálně přihlášeného uživatele a přesměruje na stránku Můj účet
-    /// </summary>
-    /// <returns>Asynchronní metoda</returns>
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
-            if (user != null)
-            {
-                await SignInManager.RefreshSignInAsync(user);
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = ExceptionHandlerService.HandleException(ex);
-            return;
-        }
+	/// <summary>
+	/// Po načtení této stránky proběhne automatická aktualizace Cookie v prohlížeči aktuálně přihlášeného uživatele a přesměruje na stránku Můj účet
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			ApplicationUser? user = await UserManager.FindByIdAsync(await UserService.GetUserIdAsync());
+			if (user != null)
+			{
+				await SignInManager.RefreshSignInAsync(user);
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+			return;
+		}
 
-        Navigation.NavigateTo("/mujucet", true);
-    }
+		Navigation.NavigateTo("/mujucet", true);
+	}
 }

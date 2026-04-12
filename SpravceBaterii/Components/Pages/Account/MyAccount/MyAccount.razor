@@ -20,7 +20,7 @@
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p class="error-message">@errorMessage</p>
+	<p class="error-message">@errorMessage</p>
 }
 
 <p>Zde můžete vidět své statistiky, změnit přihlašovací údaje, odstranit svá data nebo celý účet.</p>
@@ -39,7 +39,8 @@
 <div class="user-info">
 	<h2>Celkový počet evidovaných záznamů = @userStatistics?.TotalCount</h2>
 	<ul>
-		<li>Baterií = @userStatistics?.Batteries
+		<li>
+			Baterií = @userStatistics?.Batteries
 			<ul>
 				<li>z toho jednorázových = @userStatistics?.DisposableBatteries</li>
 				<li>z toho nabíjecích = @userStatistics?.RechargeableBatteries</li>

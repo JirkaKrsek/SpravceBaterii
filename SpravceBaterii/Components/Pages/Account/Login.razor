@@ -18,27 +18,27 @@
 
 <!--Formulář pro registraci-->
 <EditForm Model="@Input" OnValidSubmit="LoginUser" FormName="LoginForm" class="account">
-    <!--Zobrazení chybové hlášky pokud je vyplněna-->
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <p class="error-message">@errorMessage</p>
-    }
+	<!--Zobrazení chybové hlášky pokud je vyplněna-->
+	@if (!string.IsNullOrEmpty(errorMessage))
+	{
+		<p class="error-message">@errorMessage</p>
+	}
 
 	<DataAnnotationsValidator />
 	<ValidationSummary />
 
-    <p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
+	<p class="required-info">Pole označená <span>*</span> jsou povinná.</p>
 
-    <label for="input-email">E-mail: </label>
-    <InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Zadejte e-mail" required></InputText>
+	<label for="input-email">E-mail: </label>
+	<InputText id="input-email" @bind-Value="Input.Email" type="email" placeholder="Zadejte e-mail" required></InputText>
 
 	<label for="input-password">Heslo: </label>
-    <InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="Zadejte heslo" required></InputText>
+	<InputText id="input-password" @bind-Value="Input.Password" type="password" placeholder="Zadejte heslo" required></InputText>
 
-    <div>
-        <InputCheckbox id="input-checkbox" @bind-Value="Input.RememberMe"></InputCheckbox>
-        <label for="input-checkbox" title="Po zavření prohlížeče zůstanete přihlášeni">Zůstat přihlášen(a)</label>
-    </div>
+	<div>
+		<InputCheckbox id="input-checkbox" @bind-Value="Input.RememberMe"></InputCheckbox>
+		<label for="input-checkbox" title="Po zavření prohlížeče zůstanete přihlášeni">Zůstat přihlášen(a)</label>
+	</div>
 
 	<button type="submit">Přihlásit se</button>
 </EditForm>
@@ -46,66 +46,66 @@
 <p class="switch-account-page">Ještě nemáte účet? <a href="/registrace">Zaregistrovat se</a></p>
 
 @code {
-    [SupplyParameterFromForm]
-    private InputModel Input { get; set; } = new InputModel();
+	[SupplyParameterFromForm]
+	private InputModel Input { get; set; } = new InputModel();
 
-    private string errorMessage = "";
+	private string errorMessage = "";
 
-    /// <summary>
-    /// Po načtení této stránky proběhne kontrola stavu přihlášení uživatele
-    /// Pokud je již přihlášen, bude přesměrován na domovskou stránku
-    /// </summary>
-    /// <returns>Asynchronní metoda</returns>
-    protected override async Task OnInitializedAsync()
-    {
-        if (await UserService.IsUserAuthenticatedAsync())
-        {
-            Navigation.NavigateTo("/", true);
-            return;
-        }
-    }
+	/// <summary>
+	/// Po načtení této stránky proběhne kontrola stavu přihlášení uživatele
+	/// Pokud je již přihlášen, bude přesměrován na domovskou stránku
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	protected override async Task OnInitializedAsync()
+	{
+		if (await UserService.IsUserAuthenticatedAsync())
+		{
+			Navigation.NavigateTo("/", true);
+			return;
+		}
+	}
 
-    /// <summary>
-    /// Přihlášení existujícího uživatele pomocí e-mailu a hesla
-    /// </summary>
-    /// <returns>Asynchronní metoda</returns>
-    private async Task LoginUser()
-    {
-        try
-        {
-            SignInResult result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, true);
-            if (result.Succeeded)
-            {
-                ApplicationUser? user = await UserManager.FindByEmailAsync(Input.Email);
-                if (user != null)
-                {
-                    user.LastLoginDate = DateTime.UtcNow;
-                    await UserManager.UpdateAsync(user);
-                }
-            }
-            else if (result.IsLockedOut)
-            {
-                errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později";
-                return;
-            }
-            else if (result.IsNotAllowed)
-            {
-                errorMessage = "Přihlášení bylo zamítnuto";
-                return;
-            }
-            else
-            {
-                errorMessage = "Zadali jste nesprávný e-mail nebo heslo";
-                return;
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = ExceptionHandlerService.HandleException(ex);
-            return;
+	/// <summary>
+	/// Přihlášení existujícího uživatele pomocí e-mailu a hesla
+	/// </summary>
+	/// <returns>Asynchronní metoda</returns>
+	private async Task LoginUser()
+	{
+		try
+		{
+			SignInResult result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, true);
+			if (result.Succeeded)
+			{
+				ApplicationUser? user = await UserManager.FindByEmailAsync(Input.Email);
+				if (user != null)
+				{
+					user.LastLoginDate = DateTime.UtcNow;
+					await UserManager.UpdateAsync(user);
+				}
+			}
+			else if (result.IsLockedOut)
+			{
+				errorMessage = "Váš účet je dočasně zablokovaný, zkuste to znovu později";
+				return;
+			}
+			else if (result.IsNotAllowed)
+			{
+				errorMessage = "Přihlášení bylo zamítnuto";
+				return;
+			}
+			else
+			{
+				errorMessage = "Zadali jste nesprávný e-mail nebo heslo";
+				return;
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = ExceptionHandlerService.HandleException(ex);
+			return;
 		}
 
-        Navigation.NavigateTo("/zarizeni", true);
+		Navigation.NavigateTo("/zarizeni", true);
 	}
 
 	/// <summary>

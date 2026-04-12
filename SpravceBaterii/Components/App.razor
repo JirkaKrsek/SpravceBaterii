@@ -2,55 +2,55 @@
 <html lang="cs">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/" />
-    <ResourcePreloader />
-    <link rel="stylesheet" href="@Assets["app.css"]" />
-    <link rel="stylesheet" href="@Assets["SpravceBaterii.styles.css"]" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<base href="/" />
+	<ResourcePreloader />
+	<link rel="stylesheet" href="@Assets["app.css"]" />
+	<link rel="stylesheet" href="@Assets["SpravceBaterii.styles.css"]" />
 	<link rel="icon" type="image/png" href="@Assets["icon.png"]" />
-    <ImportMap />
-    <HeadOutlet @rendermode="@GetRenderMode()" />
+	<ImportMap />
+	<HeadOutlet @rendermode="@GetRenderMode()" />
 </head>
 
 <body>
-    <Routes @rendermode="@GetRenderMode()" />
-    <ReconnectModal />
-    <script src="@Assets["_framework/blazor.web.js"]"></script>
+	<Routes @rendermode="@GetRenderMode()" />
+	<ReconnectModal />
+	<script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 
 </html>
 
 
 @code {
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
+	[CascadingParameter]
+	private HttpContext HttpContext { get; set; } = default!;
 
-    /// <summary>
-    /// Přepínání režimu renderování podle cesty URL
-    /// Požadované cesty jsou vykresleny staticky (SSR), ostatní interaktivně
-    /// </summary>
-    /// <returns>
-    /// RenderMode.InteractiveServer - interaktivní režim
-    /// null - statický (SSR) režim
-    /// </returns>
-    private IComponentRenderMode? GetRenderMode()
-    {
-        string path = HttpContext.Request.Path.Value!;
+	/// <summary>
+	/// Přepínání režimu renderování podle cesty URL
+	/// Požadované cesty jsou vykresleny staticky (SSR), ostatní interaktivně
+	/// </summary>
+	/// <returns>
+	/// RenderMode.InteractiveServer - interaktivní režim
+	/// null - statický (SSR) režim
+	/// </returns>
+	private IComponentRenderMode? GetRenderMode()
+	{
+		string path = HttpContext.Request.Path.Value!;
 
-        string[] staticPages =
-        {
-            "/registrace",
-            "/prihlaseni",
-            "/odhlaseni",
-            "/aktualizace-cookie"
-        };
+		string[] staticPages =
+		{
+			"/registrace",
+			"/prihlaseni",
+			"/odhlaseni",
+			"/aktualizace-cookie"
+		};
 
-        if (staticPages.Contains(path, StringComparer.OrdinalIgnoreCase))
-        {
-            return null;
-        }
+		if (staticPages.Contains(path, StringComparer.OrdinalIgnoreCase))
+		{
+			return null;
+		}
 
-        return RenderMode.InteractiveServer;
-    }
+		return RenderMode.InteractiveServer;
+	}
 }
