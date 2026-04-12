@@ -19,6 +19,9 @@
 	<p class="error-message">@errorMessage</p>
 }
 
+<!--Zobrazení potvrzovacího dialogu-->
+<ConfirmDialog @ref="confirmDialog" />
+
 @if (Batteries.Count < 1)
 {
 	<h3>Nejsou dostupné žádné volné baterie</h3>
@@ -110,6 +113,7 @@ else
 
 
 	private string errorMessage = "";
+	private ConfirmDialog confirmDialog = default!;
 
 	private Device device = new();
 	private List<Battery> Batteries = new();
@@ -157,6 +161,15 @@ else
 
 			if (device is not null && device.BatteryTypeId == selectedBattery.BatteryTypeId)
 			{
+				if (selectedBattery.UsageHistory is not null && selectedBattery.UsageHistory.Length > 0)
+				{
+					string usageHistoryToHTML = selectedBattery.UsageHistory.Replace("\n", "<br>");
+					if (await confirmDialog.Show("Pozor! Tato baterie má historii předchozího použití:" + "<br>" + usageHistoryToHTML + "<br>" + "Chcete ji přesto vložit do zařízení?", new() { "Ano, vložit", "Ne, zrušit" }) == 2)
+					{
+						return;
+					}
+				}
+
 				if (Input.batteryCountToInsert < selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
 				{
 					//Původní baterie nevložená do zařízení s aktualizací počtu
