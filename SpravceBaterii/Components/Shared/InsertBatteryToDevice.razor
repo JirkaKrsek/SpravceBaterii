@@ -236,7 +236,7 @@ else
 			int freeBatteryCount = selectedBattery.Count;
 
 			maxCount = Math.Min(freeSlots, freeBatteryCount);
-			Input.batteryCountToInsert = 1;
+			Input.batteryCountToInsert = maxCount;
 		}
 		else
 		{
