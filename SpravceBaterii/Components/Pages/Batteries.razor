@@ -16,7 +16,11 @@
 
 <PageTitle>Správce baterií - Baterie</PageTitle>
 
-<h1>Baterie</h1>
+<div class="component-header">
+	<h1>Baterie</h1>
+
+	<button @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
+</div>
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -24,11 +28,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-<button @onclick="() => ModalNavigationService.Open(typeof(BatteryForm), null)">Přidat novou baterii</button>
-
 <hr>
-
-<h2>Seznam všech baterií</h2>
 
 @if (BatteryList.Count < 1)
 {
