@@ -16,7 +16,11 @@
 
 <PageTitle>Správce baterií - Umístění</PageTitle>
 
-<h1>Umístění</h1>
+<div class="component-header">
+	<h1>Umístění</h1>
+
+	<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
+</div>
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -24,11 +28,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-<button @onclick="() => ModalNavigationService.Open(typeof(LocationForm), null)">Přidat nové umístění</button>
-
 <hr>
-
-<h2>Seznam všech umístění</h2>
 
 @if (LocationList.Count < 1)
 {

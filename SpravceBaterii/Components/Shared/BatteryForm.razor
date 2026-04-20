@@ -106,8 +106,8 @@
 	@if (battery.IsRechargeable)
 	{
 		<!--Nabíjecí baterie-->
-		<label for="input-RechargeableBattery-Capacity">Kapacita: </label>
-		<InputNumber id="input-RechargeableBattery-Capacity" @bind-Value="rechargeableBattery.Capacity"></InputNumber>
+		<label for="input-RechargeableBattery-Capacity">Kapacita (Ah): </label>
+		<InputNumber id="input-RechargeableBattery-Capacity" @bind-Value="rechargeableBattery.Capacity" step="0.1"></InputNumber>
 
 		<label for="input-RechargeableBattery-CycleCount">Počet cyklů: </label>
 		<InputNumber id="input-RechargeableBattery-CycleCount" @bind-Value="rechargeableBattery.CycleCount"></InputNumber>

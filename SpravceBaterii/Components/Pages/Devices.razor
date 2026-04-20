@@ -16,7 +16,11 @@
 
 <PageTitle>Správce baterií - Zařízení</PageTitle>
 
-<h1>Zařízení</h1>
+<div class="component-header">
+	<h1>Zařízení</h1>
+
+	<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
+</div>
 
 <!--Zobrazení chybové hlášky pokud je vyplněna-->
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -24,11 +28,7 @@
 	<p class="error-message">@errorMessage</p>
 }
 
-<button @onclick="() => ModalNavigationService.Open(typeof(DeviceForm), null)">Přidat nové zařízení</button>
-
 <hr>
-
-<h2>Seznam všech zařízení</h2>
 
 @if (DeviceList.Count < 1)
 {

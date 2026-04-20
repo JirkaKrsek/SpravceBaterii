@@ -1,15 +1,7 @@
 h1:focus {
     outline: none;
 }
-/*
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
 
-.invalid {
-    outline: 1px solid #e50000;
-}
-*/
 .validation-message {
     color: #e50000;
 }
@@ -47,7 +39,6 @@ html {
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 16px;
-    /*background-color: #f3f6fb;*/
     background-color: #0f172a;
     color: black;
     margin: 0;
@@ -65,6 +56,16 @@ main {
 }
 hr {
     margin: 20px 0;
+}
+div.component-header {
+    margin-top: 20px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+div.component-header h1, div.component-header button {
+    margin: 0;
 }
 p.switch-account-page a {
     color: darkblue;
@@ -331,11 +332,6 @@ table.selectable textarea:disabled {
     color: black;
 }
 
-/* Záhlaví komponenty */
-div.component-header {
-    margin-right: 20px;
-}
-
 /* Tlačítka */
 button {
     font-size: 16px;
@@ -366,7 +362,6 @@ button.close {
 button.close:hover {
     background-color: darkred;
 }
-
 
 /* Formuláře */
 form {
