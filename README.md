@@ -27,3 +27,6 @@ Pro dotazy, návrhy a hlášení chyb vytváøejte nová **Issues** v tomto repozitáøi.
 ## Autor
 **Jiøí Krsek**
 https://github.com/JirkaKrsek
+
+## Licence
+Tento projekt je chránìn autorským právem. Více informací v souboru LICENSE.md.
