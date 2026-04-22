@@ -170,7 +170,7 @@ else
 					}
 				}
 
-				if (Input.batteryCountToInsert < selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
+				if (Input.batteryCountToInsert < selectedBattery.Count && Input.batteryCountToInsert <= maxCount && Input.batteryCountToInsert > 0)
 				{
 					//Původní baterie nevložená do zařízení s aktualizací počtu
 					selectedBattery.Count = selectedBattery.Count - Input.batteryCountToInsert;
@@ -184,7 +184,7 @@ else
 					newBattery.ExpectedLifespan = Input.ExpectedLifespan;
 					await BatteryService.AddBattery(newBattery);
 				}
-				else if (Input.batteryCountToInsert == selectedBattery.Count & Input.batteryCountToInsert <= maxCount & Input.batteryCountToInsert > 0)
+				else if (Input.batteryCountToInsert == selectedBattery.Count && Input.batteryCountToInsert <= maxCount && Input.batteryCountToInsert > 0)
 				{
 					//Původní baterie pro vložení do zařízení se správným počtem
 					selectedBattery.DeviceId = ItemId;
